@@ -1,0 +1,3 @@
+public enum Tool {
+    PENCIL, BUCKET, ERASER, EYEDROPPER, MAGNIFYING_GLASS
+}
