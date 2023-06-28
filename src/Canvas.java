@@ -3,25 +3,23 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Canvas extends JPanel {
     private int canvasWidth = 400;
     private int canvasHeight = 400;
-
     private BufferedImage image;
-
     private SelectionsHolder selectionsHolder;
-
     private boolean isMouseDown;
-
     private Point previousMousePosition;
+    private int scale = 1;
 
     public Canvas(SelectionsHolder selectionsHolder) {
         this.isMouseDown = false;
         this.selectionsHolder = selectionsHolder;
         this.previousMousePosition = null;
 
-        setSize(new Dimension(canvasWidth, canvasHeight));
         setBackground(new Color(197, 207, 223));
         image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {
@@ -34,11 +32,18 @@ public class Canvas extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (selectionsHolder.getTool() == Tool.PENCIL) {
-                    image.setRGB(e.getX(), e.getY(), getIntFromColor(Color.black));
-                    isMouseDown = true;
-                    previousMousePosition = e.getPoint();
-                    repaint();
+                if (e.getX() / scale >= 0 && e.getX() / scale < image.getWidth() && e.getY() / scale >= 0 && e.getY() / scale < image.getHeight()) {
+                    if (selectionsHolder.getTool() == Tool.PENCIL) {
+                        image.setRGB(e.getX() / scale, e.getY() / scale, ColorUtils.getIntFromColor(Color.black));
+                        isMouseDown = true;
+                        previousMousePosition = e.getPoint();
+                        repaint();
+                    } else if (selectionsHolder.getTool() == Tool.BUCKET) {
+                        int oldRgb = image.getRGB(e.getX() / scale, e.getY() / scale);
+                        int newRgb = ColorUtils.getIntFromColor(Color.black);
+                        spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
+                        repaint();
+                    }
                 }
             }
 
@@ -74,8 +79,8 @@ public class Canvas extends JPanel {
                         previousMouseX += xOffset;
                         previousMouseY += yOffset;
 
-                        if (previousMouseX >= 0 && previousMouseX < image.getWidth() && previousMouseY >= 0 && previousMouseY < image.getHeight()) {
-                            image.setRGB(previousMouseX, previousMouseY, getIntFromColor(Color.black));
+                        if (previousMouseX >= 0 && previousMouseX / scale < image.getWidth() && previousMouseY >= 0 && previousMouseY / scale < image.getHeight()) {
+                            image.setRGB(previousMouseX / scale, previousMouseY / scale, ColorUtils.getIntFromColor(Color.black));
                         }
                     }
                     previousMousePosition = e.getPoint();
@@ -87,24 +92,42 @@ public class Canvas extends JPanel {
 
     }
 
-    public int getIntFromColor(Color color){
-        int red = (color.getRed() << 16) &  0x00FF0000;
-        int green = (color.getGreen() << 8) &  0x00FF0000;
-        int blue = color.getBlue() &  0x00FF0000;
-        return 0xFF000000 | red | green | blue;
+    // paint bucket logic
+    //
+    // note: I am aware this is a recursive algorithm, however doing this using recursive method calls will run out of memory when used on large areas
+    // so this method replicates the recursive nature using a queue strategy
+    //
+    // also note: on REALLY large areas, there may be a slight delay due to the amount of computation required
+    private void spreadColor(int x, int y, int oldRgb, int newRgb) {
+        Queue<Point> spreadQueue = new LinkedList<>();
+        spreadQueue.add(new Point(x, y));
+        while (!spreadQueue.isEmpty()) {
+            Point next = spreadQueue.poll();
+            if (next.x >= 0 && next.x < image.getWidth() && next.y >= 0 && next.y < image.getHeight()) {
+                int rgb = image.getRGB(next.x, next.y);
+                if (rgb == oldRgb) {
+                    image.setRGB(next.x, next.y, newRgb);
+                    spreadQueue.add(new Point(next.x + 1, next.y));
+                    spreadQueue.add(new Point(next.x - 1, next.y));
+                    spreadQueue.add(new Point(next.x, next.y + 1));
+                    spreadQueue.add(new Point(next.x, next.y - 1));
+                }
+            }
+        }
     }
+
 
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension( canvasWidth,canvasHeight );
+        return new Dimension( canvasWidth * scale, canvasHeight * scale );
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
-        g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+        g.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
     }
 
 }
