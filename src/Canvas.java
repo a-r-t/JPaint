@@ -56,9 +56,15 @@ public class Canvas extends JPanel {
                         }
                     }
                     else if (selectionsHolder.getTool() == Tool.BUCKET) {
-                        if (e.getButton() == MouseEvent.BUTTON1) { // left click
+                        if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
+                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
+                                currentColor = ColorUtils.getIntFromColor(Color.black);
+                            }
+                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+                                currentColor = ColorUtils.getIntFromColor(Color.white);
+                            }
                             int oldRgb = image.getRGB(e.getX() / scale, e.getY() / scale);
-                            int newRgb = ColorUtils.getIntFromColor(Color.black);
+                            int newRgb = currentColor;
                             spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
                             repaint();
                         }
@@ -81,8 +87,11 @@ public class Canvas extends JPanel {
                         }
                     }
                     else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
+                        int rgb = image.getRGB(e.getX() / scale, e.getY() / scale);
                         if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            int rgb = image.getRGB(e.getX() / scale, e.getY() / scale);
+                            System.out.println(ColorUtils.getColorFromInt(rgb));
+                        }
+                        if (e.getButton() == MouseEvent.BUTTON3) { // right click
                             System.out.println(ColorUtils.getColorFromInt(rgb));
                         }
                     }
