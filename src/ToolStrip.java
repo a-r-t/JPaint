@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class ToolStrip extends JPanel {
     private ArrayList<ToolButton> toolButtons = new ArrayList<>();
     private SelectionsHolder selectionsHolder;
+    private ColorSelect colorSelect;
 
     public ToolStrip(SelectionsHolder selectionsHolder) {
         this.selectionsHolder = selectionsHolder;
@@ -30,6 +31,9 @@ public class ToolStrip extends JPanel {
         toolButtons.add(magnifyingGlass);
         toolButtons.add(eyedropper);
         toolButtons.add(eraser);
+
+        colorSelect = new ColorSelect(this.selectionsHolder);
+        add(colorSelect);
 
 
         this.addMouseMotionListener(new MouseAdapter() {
@@ -97,6 +101,7 @@ public class ToolStrip extends JPanel {
                 magnifyingGlass.setLocation(new Point(70, getHeight() / 2 - magnifyingGlass.getHeight() / 2));
                 eyedropper.setLocation(new Point(100, getHeight() / 2 - eyedropper.getHeight() / 2));
                 eraser.setLocation(new Point(130, getHeight() / 2 - eraser.getHeight() / 2));
+                colorSelect.setLocation(new Point(160, getHeight() / 2 - colorSelect.getHeight() / 2));
 
             }
 

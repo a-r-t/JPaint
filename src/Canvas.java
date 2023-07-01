@@ -13,18 +13,18 @@ public class Canvas extends JPanel {
     private int canvasHeight = 400;
     private BufferedImage image;
     private SelectionsHolder selectionsHolder;
-    private boolean isMouseDown;
+    private boolean isLeftMouseDown;
+    private boolean isRightMouseDown;
     private Point previousMousePosition;
     private int scale = 1;
     private final int MIN_SCALE = 1;
     private final int MAX_SCALE = 10;
-    private int currentColor;
 
     public Canvas(SelectionsHolder selectionsHolder) {
-        this.isMouseDown = false;
+        this.isLeftMouseDown = false;
+        this.isRightMouseDown = false;
         this.selectionsHolder = selectionsHolder;
         this.previousMousePosition = null;
-        this.currentColor = ColorUtils.getIntFromColor(Color.black);
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, new Color(197, 207, 223)));
@@ -42,29 +42,32 @@ public class Canvas extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (e.getX() / scale >= 0 && e.getX() / scale < image.getWidth() && e.getY() / scale >= 0 && e.getY() / scale < image.getHeight()) {
                     if (selectionsHolder.getTool() == Tool.PENCIL) {
-                        if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
+                        if ((e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) && (!isLeftMouseDown && !isRightMouseDown)) { // left or right click
+                            int color = 0;
                             if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                currentColor = ColorUtils.getIntFromColor(Color.black);
+                                color = selectionsHolder.getPaintColorAsIntRGB();
+                                isLeftMouseDown = true;
                             }
                             else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                currentColor = ColorUtils.getIntFromColor(Color.white);
+                                color = selectionsHolder.getEraseColorAsIntRGB();
+                                isRightMouseDown = true;
                             }
-                            image.setRGB(e.getX() / scale, e.getY() / scale, currentColor);
-                            isMouseDown = true;
+                            image.setRGB(e.getX() / scale, e.getY() / scale, color);
                             previousMousePosition = e.getPoint();
                             repaint();
                         }
                     }
                     else if (selectionsHolder.getTool() == Tool.BUCKET) {
                         if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
+                            int color = 0;
                             if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                currentColor = ColorUtils.getIntFromColor(Color.black);
+                                color = selectionsHolder.getPaintColorAsIntRGB();
                             }
                             else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                currentColor = ColorUtils.getIntFromColor(Color.white);
+                                color = selectionsHolder.getEraseColorAsIntRGB();
                             }
                             int oldRgb = image.getRGB(e.getX() / scale, e.getY() / scale);
-                            int newRgb = currentColor;
+                            int newRgb = color;
                             if (oldRgb != newRgb) {
                                 spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
                                 repaint();
@@ -99,9 +102,9 @@ public class Canvas extends JPanel {
                     }
                     else if (selectionsHolder.getTool() == Tool.ERASER) {
                         if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            currentColor = ColorUtils.getIntFromColor(Color.white);
-                            image.setRGB(e.getX() / scale, e.getY() / scale, currentColor);
-                            isMouseDown = true;
+                            int color = selectionsHolder.getEraseColorAsIntRGB();
+                            image.setRGB(e.getX() / scale, e.getY() / scale, color);
+                            isLeftMouseDown = true;
                             previousMousePosition = e.getPoint();
                             repaint();
                         }
@@ -111,15 +114,21 @@ public class Canvas extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                isMouseDown = false;
-                previousMousePosition = null;
+                if (isLeftMouseDown && e.getButton() == MouseEvent.BUTTON1) {
+                    isLeftMouseDown = false;
+                    previousMousePosition = null;
+                }
+                else if (isRightMouseDown && e.getButton() == MouseEvent.BUTTON3) {
+                    isRightMouseDown = false;
+                    previousMousePosition = null;
+                }
             }
         });
 
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (isMouseDown && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
+                if ((isLeftMouseDown || isRightMouseDown) && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
                     int previousMouseX = previousMousePosition.x;
                     int previousMouseY = previousMousePosition.y;
 
@@ -142,7 +151,19 @@ public class Canvas extends JPanel {
                         previousMouseY += yOffset;
 
                         if (previousMouseX >= 0 && previousMouseX / scale < image.getWidth() && previousMouseY >= 0 && previousMouseY / scale < image.getHeight()) {
-                            image.setRGB(previousMouseX / scale, previousMouseY / scale, currentColor);
+                            int color = 0;
+                            if (selectionsHolder.getTool() == Tool.PENCIL) {
+                                if (isLeftMouseDown) {
+                                    color = selectionsHolder.getPaintColorAsIntRGB();
+                                }
+                                else {
+                                    color = selectionsHolder.getEraseColorAsIntRGB();
+                                }
+                            }
+                            else if (selectionsHolder.getTool() == Tool.ERASER) {
+                                color = selectionsHolder.getEraseColorAsIntRGB();
+                            }
+                            image.setRGB(previousMouseX / scale, previousMouseY / scale, color);
                         }
                     }
                     previousMousePosition = e.getPoint();
@@ -195,7 +216,7 @@ public class Canvas extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
-        g.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
+        brush.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
     }
 
 }
