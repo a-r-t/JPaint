@@ -36,6 +36,7 @@ public class Frame {
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setSize(800, 600);
+        frame.setJMenuBar(new MenuBar());
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
