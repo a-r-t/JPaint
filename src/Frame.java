@@ -12,6 +12,7 @@ public class Frame {
     private SelectionsHolder selectionsHolder;
 
     public Frame() {
+        setSwingStyle();
         frame = new JFrame();
         mainPanel = new JPanel();
 
@@ -31,5 +32,13 @@ public class Frame {
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private void setSwingStyle() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 }

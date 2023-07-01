@@ -65,8 +65,10 @@ public class Canvas extends JPanel {
                             }
                             int oldRgb = image.getRGB(e.getX() / scale, e.getY() / scale);
                             int newRgb = currentColor;
-                            spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
-                            repaint();
+                            if (oldRgb != newRgb) {
+                                spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
+                                repaint();
+                            }
                         }
                     }
                     else if (selectionsHolder.getTool() == Tool.MAGNIFYING_GLASS) {
