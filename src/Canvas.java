@@ -27,6 +27,8 @@ public class Canvas extends JPanel {
         this.currentColor = ColorUtils.getIntFromColor(Color.black);
 
         setBackground(new Color(197, 207, 223));
+        setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, new Color(197, 207, 223)));
+
         image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {

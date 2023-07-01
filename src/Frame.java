@@ -22,7 +22,6 @@ public class Frame {
         mainPanel.setLayout(new BorderLayout());
 
         JScrollPane scrollPane = new JScrollPane(canvas);
-        scrollPane.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, new Color(197, 207, 223)));
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(toolstrip, BorderLayout.NORTH);
