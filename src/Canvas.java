@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -38,8 +40,13 @@ public class Canvas extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (e.getX() / scale >= 0 && e.getX() / scale < image.getWidth() && e.getY() / scale >= 0 && e.getY() / scale < image.getHeight()) {
                     if (selectionsHolder.getTool() == Tool.PENCIL) {
-                        if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            currentColor = ColorUtils.getIntFromColor(Color.black);
+                        if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
+                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
+                                currentColor = ColorUtils.getIntFromColor(Color.black);
+                            }
+                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+                                currentColor = ColorUtils.getIntFromColor(Color.white);
+                            }
                             image.setRGB(e.getX() / scale, e.getY() / scale, currentColor);
                             isMouseDown = true;
                             previousMousePosition = e.getPoint();
@@ -67,7 +74,8 @@ public class Canvas extends JPanel {
                             }
                         }
                         if (oldScale != scale) {
-                            revalidate(); // revalidating instead of repainting to ensure parent jscrollpane updates
+                            revalidate(); // updates scroll control to correct itself when canvas grows
+                            repaint();
                         }
                     }
                     else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
@@ -130,7 +138,13 @@ public class Canvas extends JPanel {
             }
         });
 
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
 
+            }
+
+        });
     }
 
     // paint bucket logic
