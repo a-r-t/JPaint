@@ -16,7 +16,6 @@ public class Frame {
         mainPanel = new JPanel();
 
         selectionsHolder = new SelectionsHolder();
-
         canvas = new Canvas(selectionsHolder);
         toolstrip = new ToolStrip(selectionsHolder);
 

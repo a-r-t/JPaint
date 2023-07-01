@@ -21,9 +21,15 @@ public class ToolStrip extends JPanel {
 
         ToolButton pencil = new ToolButton("pencil-icon-transparent.png", Tool.PENCIL);
         ToolButton bucket = new ToolButton("bucket-icon-transparent.png", Tool.BUCKET);
+        ToolButton magnifyingGlass = new ToolButton("magnifying-icon-transparent.png", Tool.MAGNIFYING_GLASS);
+        ToolButton eyedropper = new ToolButton("dropper-icon-transparent.png", Tool.EYE_DROPPER);
+        ToolButton eraser = new ToolButton("eraser-icon-transparent.png", Tool.ERASER);
 
         toolButtons.add(pencil);
         toolButtons.add(bucket);
+        toolButtons.add(magnifyingGlass);
+        toolButtons.add(eyedropper);
+        toolButtons.add(eraser);
 
 
         this.addMouseMotionListener(new MouseAdapter() {
@@ -44,6 +50,12 @@ public class ToolStrip extends JPanel {
 
                     if (oldState != tb.isHovered()) {
                         needsRepaint = true;
+                        if (!oldState) {
+                            setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        }
+                        else {
+                            setCursor(Cursor.getDefaultCursor());
+                        }
                     }
                 }
 
@@ -82,6 +94,10 @@ public class ToolStrip extends JPanel {
             public void componentResized(ComponentEvent e) {
                 pencil.setLocation(new Point(10, getHeight() / 2 - pencil.getHeight() / 2));
                 bucket.setLocation(new Point(40, getHeight() / 2 - bucket.getHeight() / 2));
+                magnifyingGlass.setLocation(new Point(70, getHeight() / 2 - magnifyingGlass.getHeight() / 2));
+                eyedropper.setLocation(new Point(100, getHeight() / 2 - eyedropper.getHeight() / 2));
+                eraser.setLocation(new Point(130, getHeight() / 2 - eraser.getHeight() / 2));
+
             }
 
         });
