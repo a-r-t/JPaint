@@ -2,15 +2,15 @@ import java.awt.*;
 
 public class ColorSwatch {
 
-    private Color color;
-    private Color outerBorderColor;
-    private Color hoveredOuterBorderColor;
-    private Color innerBorderColor;
-    private Color hoveredInnerBorderColor;
-    private Point location;
-    private Dimension size;
-    private boolean isHovered;
-    private boolean showBorder;
+    protected Color color;
+    protected Color outerBorderColor;
+    protected Color hoveredOuterBorderColor;
+    protected Color innerBorderColor;
+    protected Color hoveredInnerBorderColor;
+    protected Point location;
+    protected Dimension size;
+    protected boolean isHovered;
+    protected boolean showBorder;
 
     public ColorSwatch(Color color, Point location, Dimension size) {
         this.color = color;

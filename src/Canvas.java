@@ -52,7 +52,7 @@ public class Canvas extends JPanel {
                             useBucketTool(mouseClick, e.getX(), e.getY());
                             break;
                         case MAGNIFYING_GLASS:
-                            useZoomTool(mouseClick);
+                            useMagnifyingGlassTool(mouseClick);
                             break;
                         case EYE_DROPPER:
                             useEyeDropperTool(mouseClick, e.getX(), e.getY());
@@ -166,7 +166,7 @@ public class Canvas extends JPanel {
         }
     }
 
-    private void useZoomTool(MouseClick mouseClick) {
+    private void useMagnifyingGlassTool(MouseClick mouseClick) {
         int oldScale = scale;
         if (mouseClick == MouseClick.LEFT_CLICK) {
             if (scale < MAX_SCALE) {

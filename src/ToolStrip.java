@@ -11,15 +11,15 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
     private ArrayList<ToolButton> toolButtons = new ArrayList<>();
     private SelectionsHolder selectionsHolder;
     private ColorSelect colorSelect;
-    private ColorSwatch paintColorDisplay;
-    private ColorSwatch eraseColorDisplay;
+    private LabeledColorSwatch paintColorDisplay;
+    private LabeledColorSwatch eraseColorDisplay;
     private Tool previousPaintSelectedTool;
 
     public ToolStrip(SelectionsHolder selectionsHolder) {
         this.selectionsHolder = selectionsHolder;
 
         setBackground(new Color(245, 246, 247));
-        setPreferredSize(new Dimension(getPreferredSize().width, 50));
+        setPreferredSize(new Dimension(getPreferredSize().width, 60));
         setLayout(null);
 
         ToolButton pencil = new ToolButton("pencil-icon-transparent.png", Tool.PENCIL);
@@ -38,8 +38,8 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
         colorSelect.addListener(this);
         add(colorSelect);
 
-        paintColorDisplay = new ColorSwatch(selectionsHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24));
-        eraseColorDisplay = new ColorSwatch(selectionsHolder.getEraseColor(), new Point(0, 0), new Dimension(24, 24));
+        paintColorDisplay = new LabeledColorSwatch(selectionsHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24), "Paint");
+        eraseColorDisplay = new LabeledColorSwatch(selectionsHolder.getEraseColor(), new Point(0, 0), new Dimension(24, 24), "Erase");
 
         this.addMouseMotionListener(new MouseAdapter() {
 
@@ -110,8 +110,8 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
                 eyedropper.setLocation(new Point(100, getHeight() / 2 - eyedropper.getHeight() / 2));
                 eraser.setLocation(new Point(130, getHeight() / 2 - eraser.getHeight() / 2));
                 colorSelect.setLocation(new Point(160, getHeight() / 2 - colorSelect.getHeight() / 2));
-                paintColorDisplay.setLocation(new Point(380, getHeight() / 2 - (int)paintColorDisplay.getSize().getHeight() / 2));
-                eraseColorDisplay.setLocation(new Point(420, getHeight() / 2 - (int)eraseColorDisplay.getSize().getHeight() / 2));
+                paintColorDisplay.setLocation(new Point(380, getHeight() / 2 - (int)paintColorDisplay.getSizeWithLabel().getHeight() / 2));
+                eraseColorDisplay.setLocation(new Point(420, getHeight() / 2 - (int)eraseColorDisplay.getSizeWithLabel().getHeight() / 2));
             }
 
         });
@@ -126,9 +126,7 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
             tb.paint(brush);
         }
         paintColorDisplay.paint(brush);
-        brush.drawString("Paint", paintColorDisplay.getLocation().x, paintColorDisplay.getLocation().y - 3);
         eraseColorDisplay.paint(brush);
-        brush.drawString("Erase", eraseColorDisplay.getLocation().x, eraseColorDisplay.getLocation().y - 3);
 
     }
 
