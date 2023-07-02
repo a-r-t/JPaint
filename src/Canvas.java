@@ -14,12 +14,19 @@ public class Canvas extends JPanel {
     private int canvasHeight = 400;
     private BufferedImage image;
     private SelectionsHolder selectionsHolder;
+
+    private Rectangle horizontalResizer;
+    private Rectangle verticalResizer;
+    private Rectangle diagonalResizer;
+
     private boolean isLeftMouseDown;
     private boolean isRightMouseDown;
     private Point previousMousePosition;
     private int scale = 1;
     private final int MIN_SCALE = 1;
     private final int MAX_SCALE = 10;
+    private final int EXTRA_CANVAS_WIDTH = 10;
+    private final int EXTRA_CANVAS_HEIGHT = 10;
     private ArrayList<CanvasListener> listeners = new ArrayList<>();
 
     public Canvas(SelectionsHolder selectionsHolder) {
@@ -28,9 +35,10 @@ public class Canvas extends JPanel {
         this.selectionsHolder = selectionsHolder;
         this.previousMousePosition = null;
 
-        setBackground(new Color(197, 207, 223));
-        setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, new Color(197, 207, 223)));
+        updateCanvasResizers();
 
+        setBackground(new Color(197, 207, 223));
+        setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
         image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
@@ -127,7 +135,6 @@ public class Canvas extends JPanel {
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-
             }
 
         });
@@ -179,6 +186,7 @@ public class Canvas extends JPanel {
             }
         }
         if (oldScale != scale) {
+            updateCanvasResizers();
             revalidate(); // updates scroll control to correct itself when canvas grows
             repaint();
         }
@@ -243,6 +251,12 @@ public class Canvas extends JPanel {
         }
     }
 
+    private void updateCanvasResizers() {
+        horizontalResizer = new Rectangle(canvasWidth * scale, ((canvasHeight * scale) / 2) - 2, 4, 4);
+        verticalResizer = new Rectangle(((canvasWidth * scale) / 2) - 2, canvasHeight * scale, 4, 4);
+        diagonalResizer = new Rectangle(canvasWidth * scale, canvasHeight * scale, 4, 4);
+    }
+
     private boolean isLeftOrRightClick(MouseClick mouseClick) {
         return mouseClick == MouseClick.LEFT_CLICK || mouseClick == MouseClick.RIGHT_CLICK;
     }
@@ -252,10 +266,11 @@ public class Canvas extends JPanel {
     }
 
 
+    // this is just to make the scroll pane respect the bounds of the canvas's image
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension( canvasWidth * scale, canvasHeight * scale );
+        return new Dimension( (canvasWidth * scale) + EXTRA_CANVAS_WIDTH, (canvasHeight * scale) + EXTRA_CANVAS_HEIGHT);
     }
 
     @Override
@@ -263,6 +278,23 @@ public class Canvas extends JPanel {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
         brush.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
+
+        Color oldColor = brush.getColor();
+        Stroke oldStroke = brush.getStroke();
+
+        brush.setColor(Color.white);
+        brush.fillRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+        brush.fillRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+        brush.fillRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+
+        brush.setColor(new Color(85, 85, 85));
+        brush.setStroke(new BasicStroke(1));
+        brush.drawRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+        brush.drawRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+        brush.drawRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+
+        brush.setColor(oldColor);
+        brush.setStroke(oldStroke);
     }
 
     public void addListener(CanvasListener listener) {
