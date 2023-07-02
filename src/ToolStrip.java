@@ -7,14 +7,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class ToolStrip extends JPanel {
+public class ToolStrip extends JPanel implements ColorSelectListener, CanvasListener {
     private ArrayList<ToolButton> toolButtons = new ArrayList<>();
     private SelectionsHolder selectionsHolder;
     private ColorSelect colorSelect;
+    private ColorSwatch paintColorDisplay;
+    private ColorSwatch eraseColorDisplay;
+    private Tool previousPaintSelectedTool;
 
     public ToolStrip(SelectionsHolder selectionsHolder) {
         this.selectionsHolder = selectionsHolder;
-
 
         setBackground(new Color(245, 246, 247));
         setPreferredSize(new Dimension(getPreferredSize().width, 50));
@@ -33,8 +35,11 @@ public class ToolStrip extends JPanel {
         toolButtons.add(eraser);
 
         colorSelect = new ColorSelect(this.selectionsHolder);
+        colorSelect.addListener(this);
         add(colorSelect);
 
+        paintColorDisplay = new ColorSwatch(selectionsHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24));
+        eraseColorDisplay = new ColorSwatch(selectionsHolder.getEraseColor(), new Point(0, 0), new Dimension(24, 24));
 
         this.addMouseMotionListener(new MouseAdapter() {
 
@@ -81,6 +86,9 @@ public class ToolStrip extends JPanel {
                         toolButtons.forEach(toolButton -> toolButton.setSelected(false));
                         tb.setSelected(true);
                         selectionsHolder.setTool(tb.getTool());
+                        if (tb.getTool() == Tool.PENCIL || tb.getTool() == Tool.BUCKET) {
+                            previousPaintSelectedTool = tb.getTool();
+                        }
                     }
 
                     if (oldState != tb.isSelected()) {
@@ -102,7 +110,8 @@ public class ToolStrip extends JPanel {
                 eyedropper.setLocation(new Point(100, getHeight() / 2 - eyedropper.getHeight() / 2));
                 eraser.setLocation(new Point(130, getHeight() / 2 - eraser.getHeight() / 2));
                 colorSelect.setLocation(new Point(160, getHeight() / 2 - colorSelect.getHeight() / 2));
-
+                paintColorDisplay.setLocation(new Point(380, getHeight() / 2 - (int)paintColorDisplay.getSize().getHeight() / 2));
+                eraseColorDisplay.setLocation(new Point(420, getHeight() / 2 - (int)eraseColorDisplay.getSize().getHeight() / 2));
             }
 
         });
@@ -116,8 +125,35 @@ public class ToolStrip extends JPanel {
         for (ToolButton tb : toolButtons) {
             tb.paint(brush);
         }
+        paintColorDisplay.paint(brush);
+        brush.drawString("Paint", paintColorDisplay.getLocation().x, paintColorDisplay.getLocation().y - 3);
+        eraseColorDisplay.paint(brush);
+        brush.drawString("Erase", eraseColorDisplay.getLocation().x, eraseColorDisplay.getLocation().y - 3);
 
+    }
 
+    @Override
+    public void onPaintColorChanged(Color color) {
+        paintColorDisplay.setColor(color);
+        repaint();
+    }
 
+    @Override
+    public void onEraseColorChanged(Color color) {
+        eraseColorDisplay.setColor(color);
+        repaint();
+    }
+
+    @Override
+    public void onEyeDropperUsedToChangePaintColor() {
+        if (previousPaintSelectedTool == null) {
+            previousPaintSelectedTool = Tool.PENCIL;
+        }
+        for (int i = 0;  i < toolButtons.size(); i++) {
+            ToolButton tb = toolButtons.get(i);
+            tb.setSelected(tb.getTool() == previousPaintSelectedTool);
+        }
+        selectionsHolder.setTool(previousPaintSelectedTool);
+        repaint();
     }
 }

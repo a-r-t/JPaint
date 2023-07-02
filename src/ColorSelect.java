@@ -2,12 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ColorSelect extends JPanel {
     private SelectionsHolder selectionsHolder;
     private ColorSwatch[] defaultColors;
-
+    private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
 
     public ColorSelect(SelectionsHolder selectionsHolder) {
         this.selectionsHolder = selectionsHolder;
@@ -54,19 +55,36 @@ public class ColorSelect extends JPanel {
 
         this.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                boolean needsRepaint = false;
-                for (int i = 0;  i < defaultColors.length; i++) {
-                    ColorSwatch cs = defaultColors[i];
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
+                    boolean needsRepaint = false;
+                    for (int i = 0; i < defaultColors.length; i++) {
+                        ColorSwatch cs = defaultColors[i];
 
-                    if (cs.isPointInBounds(e.getPoint())) {
-                        selectionsHolder.setPaintColor(cs.getColor());
-                        needsRepaint = true;
-                        break;
+                        if (cs.isPointInBounds(e.getPoint())) {
+                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
+                                selectionsHolder.setPaintColor(cs.getColor());
+
+                                // let subscribers know paint color was just changed
+                                for (ColorSelectListener listener : listeners) {
+                                    listener.onPaintColorChanged(cs.getColor());
+                                }
+                            }
+                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+                                selectionsHolder.setEraseColor(cs.getColor());
+
+                                // let subscribers know erase color was just changed
+                                for (ColorSelectListener listener : listeners) {
+                                    listener.onEraseColorChanged(cs.getColor());
+                                }
+                            }
+                            needsRepaint = true;
+                            break;
+                        }
                     }
-                }
-                if (needsRepaint) {
-                    repaint();
+                    if (needsRepaint) {
+                        repaint();
+                    }
                 }
             }
         });
@@ -115,5 +133,9 @@ public class ColorSelect extends JPanel {
         for (ColorSwatch colorSwatch : defaultColors) {
             colorSwatch.paint(brush);
         }
+    }
+
+    public void addListener(ColorSelectListener listener) {
+        listeners.add(listener);
     }
 }

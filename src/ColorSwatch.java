@@ -10,11 +10,13 @@ public class ColorSwatch {
     private Point location;
     private Dimension size;
     private boolean isHovered;
+    private boolean showBorder;
 
     public ColorSwatch(Color color, Point location, Dimension size) {
         this.color = color;
         this.location = location;
         this.size = size;
+        this.showBorder = true;
         outerBorderColor = new Color(160, 160, 160);
         hoveredOuterBorderColor = new Color(100, 165, 231);
 
@@ -90,20 +92,29 @@ public class ColorSwatch {
         return p.x >= location.x && p.x < location.x + size.width && p.y >= location.y && p.y < location.y + size.height;
     }
 
+    public boolean isShowBorder() {
+        return showBorder;
+    }
+
+    public void setShowBorder(boolean showBorder) {
+        this.showBorder = showBorder;
+    }
+
     public void paint(Graphics2D brush) {
         Color oldColor = brush.getColor();
 
-        if (isHovered) {
-            brush.setColor(hoveredInnerBorderColor);
-            brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
-            brush.setColor(hoveredOuterBorderColor);
-            brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
-        }
-        else {
-            brush.setColor(innerBorderColor);
-            brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
-            brush.setColor(outerBorderColor);
-            brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+        if (showBorder) {
+            if (isHovered) {
+                brush.setColor(hoveredInnerBorderColor);
+                brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                brush.setColor(hoveredOuterBorderColor);
+                brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+            } else {
+                brush.setColor(innerBorderColor);
+                brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                brush.setColor(outerBorderColor);
+                brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+            }
         }
 
         brush.setColor(color);

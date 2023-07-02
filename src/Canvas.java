@@ -5,6 +5,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -19,6 +20,7 @@ public class Canvas extends JPanel {
     private int scale = 1;
     private final int MIN_SCALE = 1;
     private final int MAX_SCALE = 10;
+    private ArrayList<CanvasListener> listeners = new ArrayList<>();
 
     public Canvas(SelectionsHolder selectionsHolder) {
         this.isLeftMouseDown = false;
@@ -40,74 +42,24 @@ public class Canvas extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getX() / scale >= 0 && e.getX() / scale < image.getWidth() && e.getY() / scale >= 0 && e.getY() / scale < image.getHeight()) {
-                    if (selectionsHolder.getTool() == Tool.PENCIL) {
-                        if ((e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) && (!isLeftMouseDown && !isRightMouseDown)) { // left or right click
-                            int color = 0;
-                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                color = selectionsHolder.getPaintColorAsIntRGB();
-                                isLeftMouseDown = true;
-                            }
-                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                color = selectionsHolder.getEraseColorAsIntRGB();
-                                isRightMouseDown = true;
-                            }
-                            image.setRGB(e.getX() / scale, e.getY() / scale, color);
-                            previousMousePosition = e.getPoint();
-                            repaint();
-                        }
-                    }
-                    else if (selectionsHolder.getTool() == Tool.BUCKET) {
-                        if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
-                            int color = 0;
-                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                color = selectionsHolder.getPaintColorAsIntRGB();
-                            }
-                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                color = selectionsHolder.getEraseColorAsIntRGB();
-                            }
-                            int oldRgb = image.getRGB(e.getX() / scale, e.getY() / scale);
-                            int newRgb = color;
-                            if (oldRgb != newRgb) {
-                                spreadColor(e.getX() / scale, e.getY() / scale, oldRgb, newRgb);
-                                repaint();
-                            }
-                        }
-                    }
-                    else if (selectionsHolder.getTool() == Tool.MAGNIFYING_GLASS) {
-                        int oldScale = scale;
-                        if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            if (scale < MAX_SCALE) {
-                                scale++;
-                            }
-                        }
-                        else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                            if (scale > MIN_SCALE) {
-                                scale--;
-                            }
-                        }
-                        if (oldScale != scale) {
-                            revalidate(); // updates scroll control to correct itself when canvas grows
-                            repaint();
-                        }
-                    }
-                    else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
-                        int rgb = image.getRGB(e.getX() / scale, e.getY() / scale);
-                        if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            System.out.println(ColorUtils.getColorFromInt(rgb));
-                        }
-                        if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                            System.out.println(ColorUtils.getColorFromInt(rgb));
-                        }
-                    }
-                    else if (selectionsHolder.getTool() == Tool.ERASER) {
-                        if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                            int color = selectionsHolder.getEraseColorAsIntRGB();
-                            image.setRGB(e.getX() / scale, e.getY() / scale, color);
-                            isLeftMouseDown = true;
-                            previousMousePosition = e.getPoint();
-                            repaint();
-                        }
+                MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
+                if (isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint())) {
+                    switch(selectionsHolder.getTool()) {
+                        case PENCIL:
+                            usePencilTool(mouseClick, e.getX(), e.getY());
+                            break;
+                        case BUCKET:
+                            useBucketTool(mouseClick, e.getX(), e.getY());
+                            break;
+                        case MAGNIFYING_GLASS:
+                            useZoomTool(mouseClick);
+                            break;
+                        case EYE_DROPPER:
+                            useEyeDropperTool(mouseClick, e.getX(), e.getY());
+                            break;
+                        case ERASER:
+                            useEraserTool(mouseClick, e.getX(), e.getY());
+                            break;
                     }
                 }
             }
@@ -181,7 +133,93 @@ public class Canvas extends JPanel {
         });
     }
 
-    // paint bucket logic
+    private void usePencilTool(MouseClick mouseClick, int mouseX, int mouseY) {
+        if (!isLeftMouseDown && !isRightMouseDown) {
+            int color = 0;
+            if (mouseClick == MouseClick.LEFT_CLICK) {
+                color = selectionsHolder.getPaintColorAsIntRGB();
+                isLeftMouseDown = true;
+            }
+            else if (mouseClick == MouseClick.RIGHT_CLICK) {
+                color = selectionsHolder.getEraseColorAsIntRGB();
+                isRightMouseDown = true;
+            }
+            image.setRGB(mouseX / scale, mouseY / scale, color);
+            previousMousePosition = new Point(mouseX, mouseY);
+            repaint();
+        }
+    }
+
+    private void useBucketTool(MouseClick mouseClick, int mouseX, int mouseY) {
+        int color = 0;
+        if (mouseClick == MouseClick.LEFT_CLICK) {
+            color = selectionsHolder.getPaintColorAsIntRGB();
+        }
+        else if (mouseClick == MouseClick.RIGHT_CLICK) {
+            color = selectionsHolder.getEraseColorAsIntRGB();
+        }
+        int oldRgb = image.getRGB(mouseX / scale, mouseY / scale);
+        int newRgb = color;
+        if (oldRgb != newRgb) {
+            spreadColor(mouseX / scale, mouseY / scale, oldRgb, newRgb);
+            repaint();
+        }
+    }
+
+    private void useZoomTool(MouseClick mouseClick) {
+        int oldScale = scale;
+        if (mouseClick == MouseClick.LEFT_CLICK) {
+            if (scale < MAX_SCALE) {
+                scale++;
+            }
+        }
+        else if (mouseClick == MouseClick.RIGHT_CLICK) {
+            if (scale > MIN_SCALE) {
+                scale--;
+            }
+        }
+        if (oldScale != scale) {
+            revalidate(); // updates scroll control to correct itself when canvas grows
+            repaint();
+        }
+    }
+
+    private void useEyeDropperTool(MouseClick mouseClick, int mouseX, int mouseY) {
+        int rgb = image.getRGB(mouseX / scale, mouseY / scale);
+        Color color = ColorUtils.getColorFromInt(rgb);
+        if (mouseClick == MouseClick.LEFT_CLICK) {
+            selectionsHolder.setPaintColor(color);
+
+            // let subscribers know paint color was just changed
+            for (CanvasListener listener : listeners) {
+                listener.onPaintColorChanged(color);
+            }
+
+            for (CanvasListener listener : listeners) {
+                listener.onEyeDropperUsedToChangePaintColor();
+            }
+        }
+        else if (mouseClick == MouseClick.RIGHT_CLICK) {
+            selectionsHolder.setEraseColor(color);
+
+            // let subscribers know erase color was just changed
+            for (CanvasListener listener : listeners) {
+                listener.onEraseColorChanged(color);
+            }
+        }
+    }
+
+    private void useEraserTool(MouseClick mouseClick, int mouseX, int mouseY) {
+        if (mouseClick == MouseClick.LEFT_CLICK) {
+            int color = selectionsHolder.getEraseColorAsIntRGB();
+            image.setRGB(mouseX / scale, mouseY / scale, color);
+            isLeftMouseDown = true;
+            previousMousePosition = new Point(mouseX, mouseY);
+            repaint();
+        }
+    }
+
+    // paint bucket spread logic
     //
     // note: I am aware this is a recursive algorithm, however doing this using recursive method calls will run out of memory when used on large areas
     // so this method replicates the recursive nature using a queue strategy
@@ -205,6 +243,14 @@ public class Canvas extends JPanel {
         }
     }
 
+    private boolean isLeftOrRightClick(MouseClick mouseClick) {
+        return mouseClick == MouseClick.LEFT_CLICK || mouseClick == MouseClick.RIGHT_CLICK;
+    }
+
+    private boolean isMouseInCanvas(Point mouseCoords) {
+        return mouseCoords.x / scale >= 0 && mouseCoords.x / scale < image.getWidth() && mouseCoords.y / scale >= 0 && mouseCoords.y / scale < image.getHeight();
+    }
+
 
     @Override
     public Dimension getPreferredSize()
@@ -219,4 +265,7 @@ public class Canvas extends JPanel {
         brush.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
     }
 
+    public void addListener(CanvasListener listener) {
+        listeners.add(listener);
+    }
 }
