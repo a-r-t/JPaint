@@ -27,13 +27,20 @@ public class Canvas extends JPanel {
     private final int MAX_SCALE = 10;
     private final int EXTRA_CANVAS_WIDTH = 10;
     private final int EXTRA_CANVAS_HEIGHT = 10;
+    private final int CANVAS_START_X = 10;
+    private final int CANVAS_START_Y = 10;
+
     private ArrayList<CanvasListener> listeners = new ArrayList<>();
+    private CanvasMode canvasMode;
+    private CanvasResizeDirection canvasResizeDirection = null;
+    private Rectangle canvasResizeBorder;
 
     public Canvas(SelectionsHolder selectionsHolder) {
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
         this.selectionsHolder = selectionsHolder;
         this.previousMousePosition = null;
+        this.canvasMode = CanvasMode.PAINT;
 
         updateCanvasResizers();
 
@@ -51,7 +58,21 @@ public class Canvas extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
-                if (isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint())) {
+
+                if (mouseClick == MouseClick.LEFT_CLICK) {
+                    if (horizontalResizer.contains(e.getPoint())) {
+                        canvasMode = CanvasMode.RESIZE;
+                        canvasResizeDirection = CanvasResizeDirection.EAST;
+                    } else if (verticalResizer.contains(e.getPoint())) {
+                        canvasMode = CanvasMode.RESIZE;
+                        canvasResizeDirection = CanvasResizeDirection.SOUTH;
+                    } else if (diagonalResizer.contains(e.getPoint())) {
+                        canvasMode = CanvasMode.RESIZE;
+                        canvasResizeDirection = CanvasResizeDirection.SOUTH_EAST;
+                    }
+                }
+
+                if (canvasMode == CanvasMode.PAINT && isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint()) && selectionsHolder.getTool() != null) {
                     switch(selectionsHolder.getTool()) {
                         case PENCIL:
                             usePencilTool(mouseClick, e.getX(), e.getY());
@@ -74,60 +95,93 @@ public class Canvas extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (isLeftMouseDown && e.getButton() == MouseEvent.BUTTON1) {
+                MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
+
+                if (isLeftMouseDown && mouseClick == MouseClick.LEFT_CLICK) {
                     isLeftMouseDown = false;
                     previousMousePosition = null;
                 }
-                else if (isRightMouseDown && e.getButton() == MouseEvent.BUTTON3) {
+                else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
                     isRightMouseDown = false;
                     previousMousePosition = null;
+                }
+                else if (canvasMode == CanvasMode.RESIZE && mouseClick == MouseClick.LEFT_CLICK) {
+
+                    if (canvasResizeDirection == CanvasResizeDirection.EAST) {
+                        canvasWidth = Math.max(e.getX() / scale, 1);
+                        resizeCanvas();
+                    }
+                    canvasMode = CanvasMode.PAINT;
+                    canvasResizeDirection = null;
+                    setCursor(Cursor.getDefaultCursor());
+                    repaint();
                 }
             }
         });
 
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
+            public void mouseMoved(MouseEvent e) {
+                if (horizontalResizer.contains(e.getPoint())) {
+                    setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                }
+                else if (verticalResizer.contains(e.getPoint())) {
+                    setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+                }
+                else if (diagonalResizer.contains(e.getPoint())) {
+                    setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
+                }
+                else {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
+
+            @Override
             public void mouseDragged(MouseEvent e) {
-                if ((isLeftMouseDown || isRightMouseDown) && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
-                    int previousMouseX = previousMousePosition.x;
-                    int previousMouseY = previousMousePosition.y;
+                if (canvasMode == CanvasMode.PAINT) {
+                    if ((isLeftMouseDown || isRightMouseDown) && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
+                        int previousMouseX = previousMousePosition.x;
+                        int previousMouseY = previousMousePosition.y;
 
-                    while(previousMouseX != e.getX() || previousMouseY != e.getY()) {
-                        int xOffset = 0;
-                        int yOffset = 0;
-                        if (previousMouseX > e.getX()) {
-                            xOffset = -1;
-                        }
-                        else if (previousMouseX < e.getX()) {
-                            xOffset = 1;
-                        }
-                        if (previousMouseY > e.getY()) {
-                            yOffset = -1;
-                        }
-                        else if (previousMouseY < e.getY()) {
-                            yOffset = 1;
-                        }
-                        previousMouseX += xOffset;
-                        previousMouseY += yOffset;
+                        while (previousMouseX != e.getX() || previousMouseY != e.getY()) {
+                            int xOffset = 0;
+                            int yOffset = 0;
+                            if (previousMouseX > e.getX()) {
+                                xOffset = -1;
+                            } else if (previousMouseX < e.getX()) {
+                                xOffset = 1;
+                            }
+                            if (previousMouseY > e.getY()) {
+                                yOffset = -1;
+                            } else if (previousMouseY < e.getY()) {
+                                yOffset = 1;
+                            }
+                            previousMouseX += xOffset;
+                            previousMouseY += yOffset;
 
-                        if (previousMouseX >= 0 && previousMouseX / scale < image.getWidth() && previousMouseY >= 0 && previousMouseY / scale < image.getHeight()) {
-                            int color = 0;
-                            if (selectionsHolder.getTool() == Tool.PENCIL) {
-                                if (isLeftMouseDown) {
-                                    color = selectionsHolder.getPaintColorAsIntRGB();
-                                }
-                                else {
+                            if (previousMouseX >= 0 && previousMouseX / scale < image.getWidth() && previousMouseY >= 0 && previousMouseY / scale < image.getHeight()) {
+                                int color = 0;
+                                if (selectionsHolder.getTool() == Tool.PENCIL) {
+                                    if (isLeftMouseDown) {
+                                        color = selectionsHolder.getPaintColorAsIntRGB();
+                                    } else {
+                                        color = selectionsHolder.getEraseColorAsIntRGB();
+                                    }
+                                } else if (selectionsHolder.getTool() == Tool.ERASER) {
                                     color = selectionsHolder.getEraseColorAsIntRGB();
                                 }
+                                image.setRGB(previousMouseX / scale, previousMouseY / scale, color);
                             }
-                            else if (selectionsHolder.getTool() == Tool.ERASER) {
-                                color = selectionsHolder.getEraseColorAsIntRGB();
-                            }
-                            image.setRGB(previousMouseX / scale, previousMouseY / scale, color);
                         }
+                        previousMousePosition = e.getPoint();
+                        repaint();
                     }
-                    previousMousePosition = e.getPoint();
-                    repaint();
+                }
+                else if (canvasMode == CanvasMode.RESIZE) {
+                    if (canvasResizeDirection == CanvasResizeDirection.EAST) {
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, canvasHeight * scale);
+                        repaint();
+                    }
                 }
             }
         });
@@ -252,9 +306,9 @@ public class Canvas extends JPanel {
     }
 
     private void updateCanvasResizers() {
-        horizontalResizer = new Rectangle(canvasWidth * scale, ((canvasHeight * scale) / 2) - 2, 4, 4);
-        verticalResizer = new Rectangle(((canvasWidth * scale) / 2) - 2, canvasHeight * scale, 4, 4);
-        diagonalResizer = new Rectangle(canvasWidth * scale, canvasHeight * scale, 4, 4);
+        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * scale),  ((CANVAS_START_Y + canvasHeight * scale) / 2) - 2, 4, 4);
+        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * scale) / 2) - 2, CANVAS_START_Y + canvasHeight * scale, 4, 4);
+        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * scale, CANVAS_START_Y + canvasHeight * scale, 4, 4);
     }
 
     private boolean isLeftOrRightClick(MouseClick mouseClick) {
@@ -265,6 +319,22 @@ public class Canvas extends JPanel {
         return mouseCoords.x / scale >= 0 && mouseCoords.x / scale < image.getWidth() && mouseCoords.y / scale >= 0 && mouseCoords.y / scale < image.getHeight();
     }
 
+    private void resizeCanvas() {
+        BufferedImage newImage = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < newImage.getWidth(); x++) {
+            for (int y = 0; y < newImage.getHeight(); y++) {
+                if (x < image.getWidth() && y < image.getHeight()) {
+                    newImage.setRGB(x, y, image.getRGB(x, y));
+                }
+                else {
+                    newImage.setRGB(x, y, Color.WHITE.getRGB());
+                }
+            }
+        }
+        image = newImage;
+        updateCanvasResizers();
+        repaint();
+    }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
     @Override
@@ -277,8 +347,11 @@ public class Canvas extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
-        brush.drawImage(image, 0, 0, image.getWidth() * scale, image.getHeight() * scale, null);
 
+        // paint current image as canvas
+        brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * scale, image.getHeight() * scale, null);
+
+        // paint resizers
         Color oldColor = brush.getColor();
         Stroke oldStroke = brush.getStroke();
 
@@ -288,13 +361,28 @@ public class Canvas extends JPanel {
         brush.fillRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
         brush.setColor(new Color(85, 85, 85));
-        brush.setStroke(new BasicStroke(1));
         brush.drawRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
         brush.drawRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
         brush.drawRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
         brush.setColor(oldColor);
         brush.setStroke(oldStroke);
+
+        // paint resize borders
+        if (canvasMode == CanvasMode.RESIZE) {
+            brush.setColor(new Color(0, 0, 0));
+            for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i+=2) {
+                brush.fillRect(i, CANVAS_START_Y, 1, 1);
+                brush.fillRect(i, CANVAS_START_Y + canvasHeight * scale, 1, 1);
+            }
+            for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i+=2) {
+                brush.fillRect(CANVAS_START_X, i, 1, 1);
+                brush.fillRect((int)(canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+            }
+
+        }
+
+
     }
 
     public void addListener(CanvasListener listener) {
