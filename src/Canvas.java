@@ -109,8 +109,15 @@ public class Canvas extends JPanel {
 
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
                         canvasWidth = Math.max(e.getX() / scale, 1);
-                        resizeCanvas();
                     }
+                    else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
+                        canvasHeight = Math.max(e.getY() / scale, 1);
+                    }
+                    else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
+                        canvasWidth = Math.max(e.getX() / scale, 1);
+                        canvasHeight = Math.max(e.getY() / scale, 1);
+                    }
+                    resizeCanvas();
                     canvasMode = CanvasMode.PAINT;
                     canvasResizeDirection = null;
                     setCursor(Cursor.getDefaultCursor());
@@ -122,13 +129,13 @@ public class Canvas extends JPanel {
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                if (horizontalResizer.contains(e.getPoint())) {
+                if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
                     setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
                 }
-                else if (verticalResizer.contains(e.getPoint())) {
+                else if (spreadRectangle(verticalResizer, 5, 0).contains(e.getPoint())) {
                     setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
                 }
-                else if (diagonalResizer.contains(e.getPoint())) {
+                else if (spreadRectangle(diagonalResizer, 5, 5).contains(e.getPoint())) {
                     setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
                 }
                 else {
@@ -182,6 +189,14 @@ public class Canvas extends JPanel {
                         canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, canvasHeight * scale);
                         repaint();
                     }
+                    else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * scale, e.getPoint().y);
+                        repaint();
+                    }
+                    else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, e.getPoint().y);
+                        repaint();
+                    }
                 }
             }
         });
@@ -192,6 +207,11 @@ public class Canvas extends JPanel {
             }
 
         });
+    }
+
+    // increase size of rectangle in all directions
+    private Rectangle spreadRectangle(Rectangle original, int xSpread, int ySpread) {
+        return new Rectangle(original.x - xSpread, original.y - ySpread, original.width + (xSpread * 2), original.height + (ySpread * 2));
     }
 
     private void usePencilTool(MouseClick mouseClick, int mouseX, int mouseY) {
@@ -306,8 +326,8 @@ public class Canvas extends JPanel {
     }
 
     private void updateCanvasResizers() {
-        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * scale),  ((CANVAS_START_Y + canvasHeight * scale) / 2) - 2, 4, 4);
-        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * scale) / 2) - 2, CANVAS_START_Y + canvasHeight * scale, 4, 4);
+        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * scale),  ((CANVAS_START_Y + canvasHeight * scale) / 2) + 2, 4, 4);
+        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * scale) / 2) + 2, CANVAS_START_Y + canvasHeight * scale, 4, 4);
         diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * scale, CANVAS_START_Y + canvasHeight * scale, 4, 4);
     }
 
@@ -333,14 +353,13 @@ public class Canvas extends JPanel {
         }
         image = newImage;
         updateCanvasResizers();
-        repaint();
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension( (canvasWidth * scale) + EXTRA_CANVAS_WIDTH, (canvasHeight * scale) + EXTRA_CANVAS_HEIGHT);
+        return new Dimension( CANVAS_START_X + (canvasWidth * scale) + EXTRA_CANVAS_WIDTH, CANVAS_START_Y + (canvasHeight * scale) + EXTRA_CANVAS_HEIGHT);
     }
 
     @Override
@@ -371,16 +390,40 @@ public class Canvas extends JPanel {
         // paint resize borders
         if (canvasMode == CanvasMode.RESIZE) {
             brush.setColor(new Color(0, 0, 0));
-            for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i+=2) {
-                brush.fillRect(i, CANVAS_START_Y, 1, 1);
-                brush.fillRect(i, CANVAS_START_Y + canvasHeight * scale, 1, 1);
+            if (canvasResizeDirection == CanvasResizeDirection.EAST) {
+                for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
+                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
+                    brush.fillRect(i, CANVAS_START_Y + canvasHeight * scale, 1, 1);
+                }
+                for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
+                    brush.fillRect(CANVAS_START_X, i, 1, 1);
+                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                }
             }
-            for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i+=2) {
-                brush.fillRect(CANVAS_START_X, i, 1, 1);
-                brush.fillRect((int)(canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+            else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
+                for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
+                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
+                    brush.fillRect(i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
+                }
+                for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
+                    brush.fillRect(CANVAS_START_X, i, 1, 1);
+                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                }
+            }
+            else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
+                for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
+                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
+                    brush.fillRect(i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
+                }
+                for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
+                    brush.fillRect(CANVAS_START_X, i, 1, 1);
+                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                }
             }
 
         }
+
+        brush.setColor(oldColor);
 
 
     }
