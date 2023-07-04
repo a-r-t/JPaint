@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -5,7 +6,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -35,6 +38,8 @@ public class Canvas extends JPanel {
     private CanvasResizeDirection canvasResizeDirection = null;
     private Rectangle canvasResizeBorder;
 
+    private HashMap<String, Cursor> cursors = new HashMap<>();
+
     public Canvas(SelectionsHolder selectionsHolder) {
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
@@ -43,6 +48,7 @@ public class Canvas extends JPanel {
         this.canvasMode = CanvasMode.PAINT;
 
         updateCanvasResizers();
+        loadCursors();
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
@@ -58,15 +64,16 @@ public class Canvas extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
+                Point mousePosition = getAdjustedMousePosition(e.getPoint());
 
                 if (mouseClick == MouseClick.LEFT_CLICK) {
-                    if (horizontalResizer.contains(e.getPoint())) {
+                    if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
                         canvasMode = CanvasMode.RESIZE;
                         canvasResizeDirection = CanvasResizeDirection.EAST;
-                    } else if (verticalResizer.contains(e.getPoint())) {
+                    } else if (spreadRectangle(verticalResizer, 5, 0).contains(e.getPoint())) {
                         canvasMode = CanvasMode.RESIZE;
                         canvasResizeDirection = CanvasResizeDirection.SOUTH;
-                    } else if (diagonalResizer.contains(e.getPoint())) {
+                    } else if (spreadRectangle(diagonalResizer, 5, 5).contains(e.getPoint())) {
                         canvasMode = CanvasMode.RESIZE;
                         canvasResizeDirection = CanvasResizeDirection.SOUTH_EAST;
                     }
@@ -75,7 +82,7 @@ public class Canvas extends JPanel {
                 if (canvasMode == CanvasMode.PAINT && isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint()) && selectionsHolder.getTool() != null) {
                     switch(selectionsHolder.getTool()) {
                         case PENCIL:
-                            usePencilTool(mouseClick, e.getX(), e.getY());
+                            usePencilTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
                         case BUCKET:
                             useBucketTool(mouseClick, e.getX(), e.getY());
@@ -138,6 +145,9 @@ public class Canvas extends JPanel {
                 else if (spreadRectangle(diagonalResizer, 5, 5).contains(e.getPoint())) {
                     setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
                 }
+                else if (selectionsHolder.getTool() == Tool.PENCIL) {
+                    setCursor(cursors.get("PENCIL"));
+                }
                 else {
                     setCursor(Cursor.getDefaultCursor());
                 }
@@ -145,22 +155,24 @@ public class Canvas extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                Point mousePosition = getAdjustedMousePosition(e.getPoint());
+
                 if (canvasMode == CanvasMode.PAINT) {
                     if ((isLeftMouseDown || isRightMouseDown) && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
                         int previousMouseX = previousMousePosition.x;
                         int previousMouseY = previousMousePosition.y;
 
-                        while (previousMouseX != e.getX() || previousMouseY != e.getY()) {
+                        while (previousMouseX != mousePosition.x || previousMouseY != mousePosition.y) {
                             int xOffset = 0;
                             int yOffset = 0;
-                            if (previousMouseX > e.getX()) {
+                            if (previousMouseX > mousePosition.x) {
                                 xOffset = -1;
-                            } else if (previousMouseX < e.getX()) {
+                            } else if (previousMouseX < mousePosition.x) {
                                 xOffset = 1;
                             }
-                            if (previousMouseY > e.getY()) {
+                            if (previousMouseY > mousePosition.y) {
                                 yOffset = -1;
-                            } else if (previousMouseY < e.getY()) {
+                            } else if (previousMouseY < mousePosition.y) {
                                 yOffset = 1;
                             }
                             previousMouseX += xOffset;
@@ -180,7 +192,7 @@ public class Canvas extends JPanel {
                                 image.setRGB(previousMouseX / scale, previousMouseY / scale, color);
                             }
                         }
-                        previousMousePosition = e.getPoint();
+                        previousMousePosition = mousePosition;
                         repaint();
                     }
                 }
@@ -207,6 +219,32 @@ public class Canvas extends JPanel {
             }
 
         });
+    }
+
+    private Point getAdjustedMousePosition(Point mousePosition) {
+        if (getCursor() == cursors.get("PENCIL")) {
+            return new Point(mousePosition.x - 10, mousePosition.y - 9);
+        }
+        else {
+            return mousePosition;
+        }
+    }
+
+    private void loadCursors() {
+        // note: cursor image sizes MUST be 32x32, otherwise they will be forcibly scaled up/down to match 32x32
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Cursor pencilCursor = null;
+        try {
+            pencilCursor = toolkit.createCustomCursor(
+                    ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
+                    new Point(7, 23),
+                    "pencil"
+            );
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        cursors.put("PENCIL", pencilCursor);
     }
 
     // increase size of rectangle in all directions
