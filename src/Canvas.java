@@ -78,7 +78,6 @@ public class Canvas extends JPanel implements SelectionsListener {
                         canvasResizeDirection = CanvasResizeDirection.SOUTH_EAST;
                     }
                 }
-                System.out.println("Mouse pos: " + mousePosition + ", is in canvas?: " + isMouseInCanvas(mousePosition));
                 if (canvasMode == CanvasMode.PAINT && isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint()) && selectionsHolder.getTool() != null) {
                     switch(selectionsHolder.getTool()) {
                         case PENCIL:
@@ -236,21 +235,6 @@ public class Canvas extends JPanel implements SelectionsListener {
         else {
             setCursor(Cursor.getDefaultCursor());
         }
-    }
-
-    private Point getAdjustedMousePosition(Point mousePosition) {
-//        if (getCursor() == cursors.get("PENCIL")) {
-//            return new Point(mousePosition.x - 10, mousePosition.y - 10);
-//        }
-//        else if (selectionsHolder.getTool() == Tool.BUCKET) {
-//            return new Point(mousePosition.x - 10, mousePosition.y - 9);
-//        }
-//        else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
-//            return new Point(mousePosition.x - 10, mousePosition.y - 9);
-//        }
-//        else {
-            return mousePosition;
-       // }
     }
 
     private void loadCursors() {
