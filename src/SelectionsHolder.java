@@ -1,9 +1,11 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SelectionsHolder {
     private Tool tool;
     private Color paintColor;
     private Color eraseColor;
+    private ArrayList<SelectionsListener> listeners = new ArrayList<>();
 
     public SelectionsHolder() {
         tool = null;
@@ -17,6 +19,10 @@ public class SelectionsHolder {
 
     public void setTool(Tool tool) {
         this.tool = tool;
+
+        for (SelectionsListener listener : listeners) {
+            listener.onToolChanged(this.tool);
+        }
     }
 
     public Color getPaintColor() {
@@ -29,6 +35,10 @@ public class SelectionsHolder {
 
     public void setPaintColor(Color paintColor) {
         this.paintColor = paintColor;
+
+        for (SelectionsListener listener : listeners) {
+            listener.onPaintColorChanged(this.paintColor);
+        }
     }
 
     public Color getEraseColor() {
@@ -41,5 +51,13 @@ public class SelectionsHolder {
 
     public void setEraseColor(Color eraseColor) {
         this.eraseColor = eraseColor;
+
+        for (SelectionsListener listener : listeners) {
+            listener.onEraseColorChanged(this.eraseColor);
+        }
+    }
+
+    public void addListener(SelectionsListener listener) {
+        listeners.add(listener);
     }
 }

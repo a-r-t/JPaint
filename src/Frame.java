@@ -24,6 +24,7 @@ public class Frame {
 
         selectionsHolder = new SelectionsHolder();
         canvas = new Canvas(selectionsHolder);
+        selectionsHolder.addListener(canvas);
         toolstrip = new ToolStrip(selectionsHolder);
         canvas.addListener(toolstrip);
 

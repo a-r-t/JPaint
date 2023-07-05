@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Canvas extends JPanel {
+public class Canvas extends JPanel implements SelectionsListener {
     private int canvasWidth = 400;
     private int canvasHeight = 400;
     private BufferedImage image;
@@ -64,7 +64,7 @@ public class Canvas extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
-                Point mousePosition = getAdjustedMousePosition(e.getPoint());
+                Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
                 if (mouseClick == MouseClick.LEFT_CLICK) {
                     if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
@@ -78,20 +78,20 @@ public class Canvas extends JPanel {
                         canvasResizeDirection = CanvasResizeDirection.SOUTH_EAST;
                     }
                 }
-
+                System.out.println("Mouse pos: " + mousePosition + ", is in canvas?: " + isMouseInCanvas(mousePosition));
                 if (canvasMode == CanvasMode.PAINT && isLeftOrRightClick(mouseClick) && isMouseInCanvas(e.getPoint()) && selectionsHolder.getTool() != null) {
                     switch(selectionsHolder.getTool()) {
                         case PENCIL:
                             usePencilTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
                         case BUCKET:
-                            useBucketTool(mouseClick, e.getX(), e.getY());
+                            useBucketTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
                         case MAGNIFYING_GLASS:
                             useMagnifyingGlassTool(mouseClick);
                             break;
                         case EYE_DROPPER:
-                            useEyeDropperTool(mouseClick, e.getX(), e.getY());
+                            useEyeDropperTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
                         case ERASER:
                             useEraserTool(mouseClick, e.getX(), e.getY());
@@ -136,26 +136,13 @@ public class Canvas extends JPanel {
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
-                    setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-                }
-                else if (spreadRectangle(verticalResizer, 5, 0).contains(e.getPoint())) {
-                    setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-                }
-                else if (spreadRectangle(diagonalResizer, 5, 5).contains(e.getPoint())) {
-                    setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
-                }
-                else if (selectionsHolder.getTool() == Tool.PENCIL) {
-                    setCursor(cursors.get("PENCIL"));
-                }
-                else {
-                    setCursor(Cursor.getDefaultCursor());
-                }
+                Point mousePosition = e.getPoint();
+                updateCursor(mousePosition);
             }
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                Point mousePosition = getAdjustedMousePosition(e.getPoint());
+                Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
                 if (canvasMode == CanvasMode.PAINT) {
                     if ((isLeftMouseDown || isRightMouseDown) && (selectionsHolder.getTool() == Tool.PENCIL || selectionsHolder.getTool() == Tool.ERASER)) {
@@ -221,30 +208,80 @@ public class Canvas extends JPanel {
         });
     }
 
-    private Point getAdjustedMousePosition(Point mousePosition) {
-        if (getCursor() == cursors.get("PENCIL")) {
-            return new Point(mousePosition.x - 10, mousePosition.y - 9);
+    private void updateCursor(Point mousePosition) {
+        if (spreadRectangle(horizontalResizer, 0, 5).contains(mousePosition)) {
+            setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+        }
+        else if (spreadRectangle(verticalResizer, 5, 0).contains(mousePosition)) {
+            setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+        }
+        else if (spreadRectangle(diagonalResizer, 5, 5).contains(mousePosition)) {
+            setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
+        }
+        else if (isMouseInCanvas(mousePosition)) {
+            if (selectionsHolder.getTool() == Tool.PENCIL) {
+                setCursor(cursors.get("PENCIL"));
+            }
+            else if (selectionsHolder.getTool() == Tool.BUCKET) {
+                setCursor(cursors.get("BUCKET"));
+
+            }
+            else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
+                setCursor(cursors.get("EYE_DROPPER"));
+            }
+            else {
+                setCursor(Cursor.getDefaultCursor());
+            }
         }
         else {
-            return mousePosition;
+            setCursor(Cursor.getDefaultCursor());
         }
+    }
+
+    private Point getAdjustedMousePosition(Point mousePosition) {
+//        if (getCursor() == cursors.get("PENCIL")) {
+//            return new Point(mousePosition.x - 10, mousePosition.y - 10);
+//        }
+//        else if (selectionsHolder.getTool() == Tool.BUCKET) {
+//            return new Point(mousePosition.x - 10, mousePosition.y - 9);
+//        }
+//        else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
+//            return new Point(mousePosition.x - 10, mousePosition.y - 9);
+//        }
+//        else {
+            return mousePosition;
+       // }
     }
 
     private void loadCursors() {
         // note: cursor image sizes MUST be 32x32, otherwise they will be forcibly scaled up/down to match 32x32
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Cursor pencilCursor = null;
+        Cursor bucketCursor = null;
+        Cursor eyedropperCursor = null;
         try {
             pencilCursor = toolkit.createCustomCursor(
                     ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
                     new Point(7, 23),
                     "pencil"
             );
-
+            bucketCursor = toolkit.createCustomCursor(
+                    ImageIO.read(ToolStrip.class.getResource("/bucket-cursor-transparent.png")),
+                    new Point(8, 19),
+                    "bucket"
+            );
+            eyedropperCursor = toolkit.createCustomCursor(
+                    ImageIO.read(ToolStrip.class.getResource("/eyedropper-cursor-transparent.png")),
+                    new Point(9, 22),
+                    "eyedropper"
+            );
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
         cursors.put("PENCIL", pencilCursor);
+        cursors.put("BUCKET", bucketCursor);
+        cursors.put("EYE_DROPPER", eyedropperCursor);
     }
 
     // increase size of rectangle in all directions
@@ -315,6 +352,7 @@ public class Canvas extends JPanel {
                 listener.onPaintColorChanged(color);
             }
 
+            // let subscribers know eye dropper was just used to change paint color
             for (CanvasListener listener : listeners) {
                 listener.onEyeDropperUsedToChangePaintColor();
             }
@@ -373,8 +411,8 @@ public class Canvas extends JPanel {
         return mouseClick == MouseClick.LEFT_CLICK || mouseClick == MouseClick.RIGHT_CLICK;
     }
 
-    private boolean isMouseInCanvas(Point mouseCoords) {
-        return mouseCoords.x / scale >= 0 && mouseCoords.x / scale < image.getWidth() && mouseCoords.y / scale >= 0 && mouseCoords.y / scale < image.getHeight();
+    private boolean isMouseInCanvas(Point mousePosition) {
+        return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < image.getWidth() * scale && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < image.getHeight() * scale;
     }
 
     private void resizeCanvas() {
@@ -462,11 +500,30 @@ public class Canvas extends JPanel {
         }
 
         brush.setColor(oldColor);
-
-
     }
 
     public void addListener(CanvasListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public void onToolChanged(Tool tool) {
+        Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+
+        // apparently this method updates the mousePosition variable in place...yikes
+        SwingUtilities.convertPointFromScreen(mousePosition, this);
+
+        updateCursor(mousePosition);
+
+    }
+
+    @Override
+    public void onPaintColorChanged(Color color) {
+
+    }
+
+    @Override
+    public void onEraseColorChanged(Color color) {
+
     }
 }
