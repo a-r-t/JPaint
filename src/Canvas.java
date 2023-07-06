@@ -25,9 +25,6 @@ public class Canvas extends JPanel implements SelectionsListener {
     private boolean isLeftMouseDown;
     private boolean isRightMouseDown;
     private Point previousMousePosition;
-    private int scale = 1;
-    private final int MIN_SCALE = 1;
-    private final int MAX_SCALE = 10;
     private final int EXTRA_CANVAS_WIDTH = 10;
     private final int EXTRA_CANVAS_HEIGHT = 10;
     private final int CANVAS_START_X = 10;
@@ -86,9 +83,6 @@ public class Canvas extends JPanel implements SelectionsListener {
                         case BUCKET:
                             useBucketTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
-                        case MAGNIFYING_GLASS:
-                            useMagnifyingGlassTool(mouseClick);
-                            break;
                         case EYE_DROPPER:
                             useEyeDropperTool(mouseClick, mousePosition.x, mousePosition.y);
                             break;
@@ -114,19 +108,20 @@ public class Canvas extends JPanel implements SelectionsListener {
                 else if (canvasMode == CanvasMode.RESIZE && mouseClick == MouseClick.LEFT_CLICK) {
 
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
-                        canvasWidth = Math.max(e.getX() / scale, 1);
+                        canvasWidth = Math.max(e.getX() / selectionsHolder.getScale(), 1);
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
-                        canvasHeight = Math.max(e.getY() / scale, 1);
+                        canvasHeight = Math.max(e.getY() / selectionsHolder.getScale(), 1);
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
-                        canvasWidth = Math.max(e.getX() / scale, 1);
-                        canvasHeight = Math.max(e.getY() / scale, 1);
+                        canvasWidth = Math.max(e.getX() / selectionsHolder.getScale(), 1);
+                        canvasHeight = Math.max(e.getY() / selectionsHolder.getScale(), 1);
                     }
                     resizeCanvas();
                     canvasMode = CanvasMode.PAINT;
                     canvasResizeDirection = null;
                     setCursor(Cursor.getDefaultCursor());
+                    revalidate();
                     repaint();
                 }
             }
@@ -164,7 +159,7 @@ public class Canvas extends JPanel implements SelectionsListener {
                             previousMouseX += xOffset;
                             previousMouseY += yOffset;
 
-                            if (previousMouseX >= 0 && previousMouseX / scale < image.getWidth() && previousMouseY >= 0 && previousMouseY / scale < image.getHeight()) {
+                            if (previousMouseX >= 0 && previousMouseX / selectionsHolder.getScale() < image.getWidth() && previousMouseY >= 0 && previousMouseY / selectionsHolder.getScale() < image.getHeight()) {
                                 int color = 0;
                                 if (selectionsHolder.getTool() == Tool.PENCIL) {
                                     if (isLeftMouseDown) {
@@ -175,7 +170,7 @@ public class Canvas extends JPanel implements SelectionsListener {
                                 } else if (selectionsHolder.getTool() == Tool.ERASER) {
                                     color = selectionsHolder.getEraseColorAsIntRGB();
                                 }
-                                image.setRGB(previousMouseX / scale, previousMouseY / scale, color);
+                                image.setRGB(previousMouseX / selectionsHolder.getScale(), previousMouseY / selectionsHolder.getScale(), color);
                             }
                         }
                         previousMousePosition = mousePosition;
@@ -184,11 +179,11 @@ public class Canvas extends JPanel implements SelectionsListener {
                 }
                 else if (canvasMode == CanvasMode.RESIZE) {
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, canvasHeight * scale);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, canvasHeight * selectionsHolder.getScale());
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * scale, e.getPoint().y);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * selectionsHolder.getScale(), e.getPoint().y);
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
@@ -284,7 +279,7 @@ public class Canvas extends JPanel implements SelectionsListener {
                 color = selectionsHolder.getEraseColorAsIntRGB();
                 isRightMouseDown = true;
             }
-            image.setRGB(mouseX / scale, mouseY / scale, color);
+            image.setRGB(mouseX / selectionsHolder.getScale(), mouseY / selectionsHolder.getScale(), color);
             previousMousePosition = new Point(mouseX, mouseY);
             repaint();
         }
@@ -298,35 +293,16 @@ public class Canvas extends JPanel implements SelectionsListener {
         else if (mouseClick == MouseClick.RIGHT_CLICK) {
             color = selectionsHolder.getEraseColorAsIntRGB();
         }
-        int oldRgb = image.getRGB(mouseX / scale, mouseY / scale);
+        int oldRgb = image.getRGB(mouseX / selectionsHolder.getScale(), mouseY / selectionsHolder.getScale());
         int newRgb = color;
         if (oldRgb != newRgb) {
-            spreadColor(mouseX / scale, mouseY / scale, oldRgb, newRgb);
-            repaint();
-        }
-    }
-
-    private void useMagnifyingGlassTool(MouseClick mouseClick) {
-        int oldScale = scale;
-        if (mouseClick == MouseClick.LEFT_CLICK) {
-            if (scale < MAX_SCALE) {
-                scale++;
-            }
-        }
-        else if (mouseClick == MouseClick.RIGHT_CLICK) {
-            if (scale > MIN_SCALE) {
-                scale--;
-            }
-        }
-        if (oldScale != scale) {
-            updateCanvasResizers();
-            revalidate(); // updates scroll control to correct itself when canvas grows
+            spreadColor(mouseX / selectionsHolder.getScale(), mouseY / selectionsHolder.getScale(), oldRgb, newRgb);
             repaint();
         }
     }
 
     private void useEyeDropperTool(MouseClick mouseClick, int mouseX, int mouseY) {
-        int rgb = image.getRGB(mouseX / scale, mouseY / scale);
+        int rgb = image.getRGB(mouseX / selectionsHolder.getScale(), mouseY / selectionsHolder.getScale());
         Color color = ColorUtils.getColorFromInt(rgb);
         if (mouseClick == MouseClick.LEFT_CLICK) {
             selectionsHolder.setPaintColor(color);
@@ -354,7 +330,7 @@ public class Canvas extends JPanel implements SelectionsListener {
     private void useEraserTool(MouseClick mouseClick, int mouseX, int mouseY) {
         if (mouseClick == MouseClick.LEFT_CLICK) {
             int color = selectionsHolder.getEraseColorAsIntRGB();
-            image.setRGB(mouseX / scale, mouseY / scale, color);
+            image.setRGB(mouseX / selectionsHolder.getScale(), mouseY / selectionsHolder.getScale(), color);
             isLeftMouseDown = true;
             previousMousePosition = new Point(mouseX, mouseY);
             repaint();
@@ -386,9 +362,9 @@ public class Canvas extends JPanel implements SelectionsListener {
     }
 
     private void updateCanvasResizers() {
-        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * scale),  ((CANVAS_START_Y + canvasHeight * scale) / 2) + 2, 4, 4);
-        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * scale) / 2) + 2, CANVAS_START_Y + canvasHeight * scale, 4, 4);
-        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * scale, CANVAS_START_Y + canvasHeight * scale, 4, 4);
+        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * selectionsHolder.getScale()),  ((CANVAS_START_Y + canvasHeight * selectionsHolder.getScale()) / 2) + 2, 4, 4);
+        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * selectionsHolder.getScale()) / 2) + 2, CANVAS_START_Y + canvasHeight * selectionsHolder.getScale(), 4, 4);
+        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * selectionsHolder.getScale(), CANVAS_START_Y + canvasHeight * selectionsHolder.getScale(), 4, 4);
     }
 
     private boolean isLeftOrRightClick(MouseClick mouseClick) {
@@ -396,7 +372,7 @@ public class Canvas extends JPanel implements SelectionsListener {
     }
 
     private boolean isMouseInCanvas(Point mousePosition) {
-        return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < image.getWidth() * scale && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < image.getHeight() * scale;
+        return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < image.getWidth() * selectionsHolder.getScale() && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < image.getHeight() * selectionsHolder.getScale();
     }
 
     private void resizeCanvas() {
@@ -419,7 +395,7 @@ public class Canvas extends JPanel implements SelectionsListener {
     @Override
     public Dimension getPreferredSize()
     {
-        return new Dimension( CANVAS_START_X + (canvasWidth * scale) + EXTRA_CANVAS_WIDTH, CANVAS_START_Y + (canvasHeight * scale) + EXTRA_CANVAS_HEIGHT);
+        return new Dimension( CANVAS_START_X + (canvasWidth * selectionsHolder.getScale()) + EXTRA_CANVAS_WIDTH, CANVAS_START_Y + (canvasHeight * selectionsHolder.getScale()) + EXTRA_CANVAS_HEIGHT);
     }
 
     @Override
@@ -428,7 +404,7 @@ public class Canvas extends JPanel implements SelectionsListener {
         Graphics2D brush = (Graphics2D) g;
 
         // paint current image as canvas
-        brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * scale, image.getHeight() * scale, null);
+        brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * selectionsHolder.getScale(), image.getHeight() * selectionsHolder.getScale(), null);
 
         // paint resizers
         Color oldColor = brush.getColor();
@@ -453,7 +429,7 @@ public class Canvas extends JPanel implements SelectionsListener {
             if (canvasResizeDirection == CanvasResizeDirection.EAST) {
                 for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
                     brush.fillRect(i, CANVAS_START_Y, 1, 1);
-                    brush.fillRect(i, CANVAS_START_Y + canvasHeight * scale, 1, 1);
+                    brush.fillRect(i, CANVAS_START_Y + canvasHeight * selectionsHolder.getScale(), 1, 1);
                 }
                 for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
                     brush.fillRect(CANVAS_START_X, i, 1, 1);
@@ -509,5 +485,12 @@ public class Canvas extends JPanel implements SelectionsListener {
     @Override
     public void onEraseColorChanged(Color color) {
 
+    }
+
+    @Override
+    public void onScaleChanged(int scale) {
+        updateCanvasResizers();
+        revalidate(); // updates scroll control to correct itself when canvas grows
+        repaint();
     }
 }

@@ -6,11 +6,13 @@ public class SelectionsHolder {
     private Color paintColor;
     private Color eraseColor;
     private ArrayList<SelectionsListener> listeners = new ArrayList<>();
+    private int scale;
 
     public SelectionsHolder() {
         tool = null;
         paintColor = new Color(0, 0, 0);
         eraseColor = new Color(255, 255, 255);
+        scale = 1;
     }
 
     public Tool getTool() {
@@ -54,6 +56,18 @@ public class SelectionsHolder {
 
         for (SelectionsListener listener : listeners) {
             listener.onEraseColorChanged(this.eraseColor);
+        }
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+
+        for (SelectionsListener listener : listeners) {
+            listener.onScaleChanged(this.scale);
         }
     }
 
