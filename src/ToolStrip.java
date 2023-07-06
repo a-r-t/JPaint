@@ -30,11 +30,15 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
         ToolButton bucket = new ToolButton("bucket-icon-transparent.png", Tool.BUCKET);
         ToolButton eyedropper = new ToolButton("dropper-icon-transparent.png", Tool.EYE_DROPPER);
         ToolButton eraser = new ToolButton("eraser-icon-transparent.png", Tool.ERASER);
+        ToolButton rectangleSelect = new ToolButton("rectangle-select-icon.png", Tool.RECTANGLE_SELECT);
+        ToolButton freeFormSelect = new ToolButton("freeform-select-icon.png", Tool.FREE_FORM_SELECT);
 
         toolButtons.add(pencil);
         toolButtons.add(bucket);
         toolButtons.add(eyedropper);
         toolButtons.add(eraser);
+        toolButtons.add(rectangleSelect);
+        toolButtons.add(freeFormSelect);
 
         colorSelect = new ColorSelect(this.selectionsHolder);
         add(colorSelect);
@@ -209,6 +213,8 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
                 eraseColorDisplay.setLocation(new Point(390, getHeight() / 2 - (int)eraseColorDisplay.getSizeWithLabel().getHeight() / 2));
                 zoomIn.setLocation(new Point(430, getHeight() / 2 - zoomIn.getHeight() / 2));
                 zoomOut.setLocation(new Point(460, getHeight() / 2 - zoomOut.getHeight() / 2));
+                rectangleSelect.setLocation(new Point(490, getHeight() / 2 - rectangleSelect.getHeight() / 2));
+                freeFormSelect.setLocation(new Point(520, getHeight() / 2 - freeFormSelect.getHeight() / 2));
             }
 
         });
