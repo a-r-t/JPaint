@@ -7,7 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class ToolStrip extends JPanel implements ColorSelectListener, CanvasListener {
+public class ToolStrip extends JPanel implements SelectionsListener, CanvasListener {
     private ArrayList<ToolButton> toolButtons = new ArrayList<>();
     private SelectionsHolder selectionsHolder;
     private ColorSelect colorSelect;
@@ -37,7 +37,6 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
         toolButtons.add(eraser);
 
         colorSelect = new ColorSelect(this.selectionsHolder);
-        colorSelect.addListener(this);
         add(colorSelect);
 
         paintColorDisplay = new LabeledColorSwatch(selectionsHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24), "Paint");
@@ -232,6 +231,9 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
     }
 
     @Override
+    public void onToolChanged(Tool tool) { }
+
+    @Override
     public void onPaintColorChanged(Color color) {
         paintColorDisplay.setColor(color);
         repaint();
@@ -242,6 +244,9 @@ public class ToolStrip extends JPanel implements ColorSelectListener, CanvasList
         eraseColorDisplay.setColor(color);
         repaint();
     }
+
+    @Override
+    public void onScaleChanged(int scale) { }
 
     @Override
     public void onEyeDropperUsedToChangePaintColor() {
