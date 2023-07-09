@@ -118,9 +118,11 @@ public class Canvas extends JPanel implements ChoicesListener {
                     isLeftMouseDown = false;
                     previousMousePosition = null;
 
-                    if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT && (selectBorder.width == 0 || selectBorder.height == 0)) {
-                        allowCanvasResizing = true;
-                        repaint();
+                    if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+                        if (selectBorder.width == 0 || selectBorder.height == 0) {
+                            allowCanvasResizing = true;
+                            repaint();
+                        }
                     }
                 }
                 else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
@@ -463,12 +465,25 @@ public class Canvas extends JPanel implements ChoicesListener {
 
             if (selectBorder.contains(new Point(mouseX, mouseY))) { // move existing selection
                 moveSelection = true;
-                selectedSubimage = image.getSubimage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width, selectBorder.height);
+                selectedSubimage = ImageUtils.getSubimage(image, originalSelectBorder.x, originalSelectBorder.y, selectBorder.width, selectBorder.height);
                 selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
                 selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
                 previousMousePosition = new Point(mouseX, mouseY);
             }
             else { // create new selection
+
+                // if previous selection exists and was moved, permanently "commit" the changes to the image
+                if (selectBorder.x > 0 && selectBorder.y > 0 && (selectBorder.x != originalSelectBorder.x || selectBorder.y != originalSelectBorder.y)) {
+                    Graphics2D graphics = image.createGraphics();
+
+                    graphics.setColor(choicesHolder.getEraseColor());
+                    graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width, selectBorder.height);
+                    graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
+
+                    graphics.dispose();
+                }
+
+                // prepare for new selection to be made
                 moveSelection = false;
                 clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
                 selectAnchor = new Point((mouseX - CANVAS_START_X) / choicesHolder.getScale(), (mouseY - CANVAS_START_Y) / choicesHolder.getScale());
@@ -523,16 +538,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         Graphics2D newImageGraphics = newImage.createGraphics();
         newImageGraphics.drawImage(image.getSubimage(0, 0, Math.min(image.getWidth(), newImage.getWidth()), Math.min(image.getHeight(), newImage.getHeight())), 0, 0, null);
         newImageGraphics.dispose();
-//        for (int x = 0; x < newImage.getWidth(); x++) {
-//            for (int y = 0; y < newImage.getHeight(); y++) {
-//                if (x < image.getWidth() && y < image.getHeight()) {
-//                    newImage.setRGB(x, y, image.getRGB(x, y));
-//                }
-//                else {
-//                    newImage.setRGB(x, y, Color.WHITE.getRGB());
-//                }
-//            }
-//        }
+
         image = newImage;
         updateCanvasResizers();
 
@@ -558,7 +564,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         // paint current image as canvas
         brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * choicesHolder.getScale(), image.getHeight() * choicesHolder.getScale(), null);
 
-        // paint resizers
+        // canvas resizers
         if (allowCanvasResizing) {
             brush.setColor(Color.white);
             brush.fillRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
@@ -575,12 +581,12 @@ public class Canvas extends JPanel implements ChoicesListener {
         }
 
         if (canvasMode == CanvasMode.PAINT) {
-            // paint select
+            // select layer
             if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
                 brush.drawImage(selectionImageLayer, CANVAS_START_X, CANVAS_START_Y, selectionImageLayer.getWidth() * choicesHolder.getScale(), selectionImageLayer.getHeight() * choicesHolder.getScale(), null);
             }
         }
-        // paint resize borders
+        // canvas resize borders
         else if (canvasMode == CanvasMode.RESIZE) {
             brush.setColor(new Color(0, 0, 0));
             if (canvasResizeDirection == CanvasResizeDirection.EAST) {
