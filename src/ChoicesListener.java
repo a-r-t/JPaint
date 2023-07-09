@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public interface SelectionsListener {
+public interface ChoicesListener {
     void onToolChanged(Tool tool);
     void onPaintColorChanged(Color color);
     void onEraseColorChanged(Color color);

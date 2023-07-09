@@ -1,14 +1,14 @@
 import java.awt.*;
 import java.util.ArrayList;
 
-public class SelectionsHolder {
+public class ChoicesHolder {
     private Tool tool;
     private Color paintColor;
     private Color eraseColor;
-    private ArrayList<SelectionsListener> listeners = new ArrayList<>();
     private int scale;
+    private ArrayList<ChoicesListener> listeners = new ArrayList<>();
 
-    public SelectionsHolder() {
+    public ChoicesHolder() {
         tool = null;
         paintColor = new Color(0, 0, 0);
         eraseColor = new Color(255, 255, 255);
@@ -22,7 +22,7 @@ public class SelectionsHolder {
     public void setTool(Tool tool) {
         this.tool = tool;
 
-        for (SelectionsListener listener : listeners) {
+        for (ChoicesListener listener : listeners) {
             listener.onToolChanged(this.tool);
         }
     }
@@ -38,7 +38,7 @@ public class SelectionsHolder {
     public void setPaintColor(Color paintColor) {
         this.paintColor = paintColor;
 
-        for (SelectionsListener listener : listeners) {
+        for (ChoicesListener listener : listeners) {
             listener.onPaintColorChanged(this.paintColor);
         }
     }
@@ -54,7 +54,7 @@ public class SelectionsHolder {
     public void setEraseColor(Color eraseColor) {
         this.eraseColor = eraseColor;
 
-        for (SelectionsListener listener : listeners) {
+        for (ChoicesListener listener : listeners) {
             listener.onEraseColorChanged(this.eraseColor);
         }
     }
@@ -66,12 +66,12 @@ public class SelectionsHolder {
     public void setScale(int scale) {
         this.scale = scale;
 
-        for (SelectionsListener listener : listeners) {
+        for (ChoicesListener listener : listeners) {
             listener.onScaleChanged(this.scale);
         }
     }
 
-    public void addListener(SelectionsListener listener) {
+    public void addListener(ChoicesListener listener) {
         listeners.add(listener);
     }
 }

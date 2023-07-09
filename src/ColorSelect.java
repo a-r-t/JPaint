@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ColorSelect extends JPanel {
-    private SelectionsHolder selectionsHolder;
+    private ChoicesHolder choicesHolder;
     private ColorSwatch[] defaultColors;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
 
-    public ColorSelect(SelectionsHolder selectionsHolder) {
-        this.selectionsHolder = selectionsHolder;
+    public ColorSelect(ChoicesHolder choicesHolder) {
+        this.choicesHolder = choicesHolder;
         setLayout(null);
         setBackground(new Color(245, 246, 247));
         defaultColors = loadDefaultColors();
@@ -63,7 +63,7 @@ public class ColorSelect extends JPanel {
 
                         if (cs.isPointInBounds(e.getPoint())) {
                             if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                selectionsHolder.setPaintColor(cs.getColor());
+                                choicesHolder.setPaintColor(cs.getColor());
 
                                 // let subscribers know paint color was just changed
                                 for (ColorSelectListener listener : listeners) {
@@ -71,7 +71,7 @@ public class ColorSelect extends JPanel {
                                 }
                             }
                             else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                selectionsHolder.setEraseColor(cs.getColor());
+                                choicesHolder.setEraseColor(cs.getColor());
 
                                 // let subscribers know erase color was just changed
                                 for (ColorSelectListener listener : listeners) {

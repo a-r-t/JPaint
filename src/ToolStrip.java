@@ -1,4 +1,3 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -7,9 +6,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class ToolStrip extends JPanel implements SelectionsListener, CanvasListener {
+public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener {
     private ArrayList<ToolButton> toolButtons = new ArrayList<>();
-    private SelectionsHolder selectionsHolder;
+    private ChoicesHolder choicesHolder;
     private ColorSelect colorSelect;
     private LabeledColorSwatch paintColorDisplay;
     private LabeledColorSwatch eraseColorDisplay;
@@ -19,8 +18,8 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
     private final int MIN_SCALE = 1;
     private final int MAX_SCALE = 10;
 
-    public ToolStrip(SelectionsHolder selectionsHolder) {
-        this.selectionsHolder = selectionsHolder;
+    public ToolStrip(ChoicesHolder choicesHolder) {
+        this.choicesHolder = choicesHolder;
 
         setBackground(new Color(245, 246, 247));
         setPreferredSize(new Dimension(getPreferredSize().width, 60));
@@ -40,11 +39,11 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
         toolButtons.add(rectangleSelect);
         toolButtons.add(freeFormSelect);
 
-        colorSelect = new ColorSelect(this.selectionsHolder);
+        colorSelect = new ColorSelect(this.choicesHolder);
         add(colorSelect);
 
-        paintColorDisplay = new LabeledColorSwatch(selectionsHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24), "Paint");
-        eraseColorDisplay = new LabeledColorSwatch(selectionsHolder.getEraseColor(), new Point(0, 0), new Dimension(24, 24), "Erase");
+        paintColorDisplay = new LabeledColorSwatch(choicesHolder.getPaintColor(), new Point(0, 0), new Dimension(24, 24), "Paint");
+        eraseColorDisplay = new LabeledColorSwatch(choicesHolder.getEraseColor(), new Point(0, 0), new Dimension(24, 24), "Erase");
 
         zoomIn = new ImageButton("zoom-in-icon.png");
         zoomOut = new ImageButton("zoom-out-icon.png");
@@ -131,7 +130,7 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
                         if (tb.isPointInBounds(e.getPoint())) {
                             toolButtons.forEach(toolButton -> toolButton.setSelected(false));
                             tb.setSelected(true);
-                            selectionsHolder.setTool(tb.getTool());
+                            choicesHolder.setTool(tb.getTool());
                             if (tb.getTool() == Tool.PENCIL || tb.getTool() == Tool.BUCKET) {
                                 previousPaintSelectedTool = tb.getTool();
                             }
@@ -145,8 +144,8 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
                     oldState = zoomIn.isSelected();
                     if (zoomIn.isPointInBounds(e.getPoint())) {
                         zoomIn.setSelected(true);
-                        if (selectionsHolder.getScale() < MAX_SCALE) {
-                            selectionsHolder.setScale(selectionsHolder.getScale() + 1);
+                        if (choicesHolder.getScale() < MAX_SCALE) {
+                            choicesHolder.setScale(choicesHolder.getScale() + 1);
                         }
                     } else {
                         zoomIn.setSelected(false);
@@ -158,8 +157,8 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
                     oldState = zoomOut.isSelected();
                     if (zoomOut.isPointInBounds(e.getPoint())) {
                         zoomOut.setSelected(true);
-                        if (selectionsHolder.getScale() > MIN_SCALE) {
-                            selectionsHolder.setScale(selectionsHolder.getScale() - 1);
+                        if (choicesHolder.getScale() > MIN_SCALE) {
+                            choicesHolder.setScale(choicesHolder.getScale() - 1);
                         }
                     } else {
                         zoomOut.setSelected(false);
@@ -263,7 +262,7 @@ public class ToolStrip extends JPanel implements SelectionsListener, CanvasListe
             ToolButton tb = toolButtons.get(i);
             tb.setSelected(tb.getTool() == previousPaintSelectedTool);
         }
-        selectionsHolder.setTool(previousPaintSelectedTool);
+        choicesHolder.setTool(previousPaintSelectedTool);
         repaint();
     }
 }

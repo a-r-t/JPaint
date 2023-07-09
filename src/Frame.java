@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -14,7 +13,7 @@ public class Frame {
     private JPanel mainPanel;
     private Canvas canvas;
     private ToolStrip toolstrip;
-    private SelectionsHolder selectionsHolder;
+    private ChoicesHolder choicesHolder;
 
     public Frame() {
         setSwingStyle();
@@ -22,11 +21,11 @@ public class Frame {
         frame.setIconImages(getIcons());
         mainPanel = new JPanel();
 
-        selectionsHolder = new SelectionsHolder();
-        canvas = new Canvas(selectionsHolder);
-        selectionsHolder.addListener(canvas);
-        toolstrip = new ToolStrip(selectionsHolder);
-        selectionsHolder.addListener(toolstrip);
+        choicesHolder = new ChoicesHolder();
+        canvas = new Canvas(choicesHolder);
+        choicesHolder.addListener(canvas);
+        toolstrip = new ToolStrip(choicesHolder);
+        choicesHolder.addListener(toolstrip);
         canvas.addListener(toolstrip);
 
         mainPanel.setLayout(new BorderLayout());
