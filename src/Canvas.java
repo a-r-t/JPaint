@@ -113,6 +113,7 @@ public class Canvas extends JPanel implements SelectionsListener {
 
                     if (selectionsHolder.getTool() == Tool.RECTANGLE_SELECT && (selectBorder.width == 0 || selectBorder.height == 0)) {
                         allowCanvasResizing = true;
+                        repaint();
                     }
                 }
                 else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
@@ -214,10 +215,10 @@ public class Canvas extends JPanel implements SelectionsListener {
                         }
 
                         if (x + width >= canvasWidth) {
-                            width = canvasWidth - x;
+                            width = canvasWidth - x - 1;
                         }
                         if (y + height >= canvasHeight) {
-                            height = canvasHeight - y;
+                            height = canvasHeight - y - 1;
                         }
 
 
@@ -417,6 +418,7 @@ public class Canvas extends JPanel implements SelectionsListener {
             isLeftMouseDown = true;
             selectAnchor = new Point((mouseX - CANVAS_START_X) / selectionsHolder.getScale(), (mouseY - CANVAS_START_Y) / selectionsHolder.getScale());
             allowCanvasResizing = false;
+            selectBorder = new Rectangle(0, 0,0,0);
             repaint();
         }
     }
@@ -570,9 +572,7 @@ public class Canvas extends JPanel implements SelectionsListener {
 
         allowCanvasResizing = true;
 
-        if (tool == Tool.RECTANGLE_SELECT) {
-            clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
-        }
+        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
 
         repaint();
     }
