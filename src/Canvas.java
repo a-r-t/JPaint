@@ -21,6 +21,7 @@ public class Canvas extends JPanel implements SelectionsListener {
     private Rectangle horizontalResizer;
     private Rectangle verticalResizer;
     private Rectangle diagonalResizer;
+    private boolean allowCanvasResizing = true;
 
     private boolean isLeftMouseDown;
     private boolean isRightMouseDown;
@@ -34,6 +35,10 @@ public class Canvas extends JPanel implements SelectionsListener {
     private CanvasMode canvasMode;
     private CanvasResizeDirection canvasResizeDirection = null;
     private Rectangle canvasResizeBorder;
+    private BufferedImage selectionImageLayer;
+
+    private Rectangle selectBorder;
+    private Point selectAnchor;
 
     private HashMap<String, Cursor> cursors = new HashMap<>();
 
@@ -49,12 +54,14 @@ public class Canvas extends JPanel implements SelectionsListener {
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
+
         image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                image.setRGB(x, y, Color.WHITE.getRGB());
-            }
-        }
+        clearImage(image, new Color(255, 255, 255));
+
+        selectionImageLayer = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
+        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+
+
         this.setDoubleBuffered(true);
 
         this.addMouseListener(new MouseAdapter() {
@@ -63,7 +70,7 @@ public class Canvas extends JPanel implements SelectionsListener {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
                 Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
-                if (mouseClick == MouseClick.LEFT_CLICK) {
+                if (mouseClick == MouseClick.LEFT_CLICK && allowCanvasResizing) {
                     if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
                         canvasMode = CanvasMode.RESIZE;
                         canvasResizeDirection = CanvasResizeDirection.EAST;
@@ -89,6 +96,9 @@ public class Canvas extends JPanel implements SelectionsListener {
                         case ERASER:
                             useEraserTool(mouseClick, e.getX(), e.getY());
                             break;
+                        case RECTANGLE_SELECT:
+                            useRectangleSelectTool(mouseClick, e.getX(), e.getY());
+                            break;
                     }
                 }
             }
@@ -100,6 +110,10 @@ public class Canvas extends JPanel implements SelectionsListener {
                 if (isLeftMouseDown && mouseClick == MouseClick.LEFT_CLICK) {
                     isLeftMouseDown = false;
                     previousMousePosition = null;
+
+                    if (selectionsHolder.getTool() == Tool.RECTANGLE_SELECT && (selectBorder.width == 0 || selectBorder.height == 0)) {
+                        allowCanvasResizing = true;
+                    }
                 }
                 else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
                     isRightMouseDown = false;
@@ -131,7 +145,7 @@ public class Canvas extends JPanel implements SelectionsListener {
             @Override
             public void mouseMoved(MouseEvent e) {
                 Point mousePosition = e.getPoint();
-                updateCursor(mousePosition);
+                setCursor(getProperCursor(mousePosition));
             }
 
             @Override
@@ -176,6 +190,58 @@ public class Canvas extends JPanel implements SelectionsListener {
                         previousMousePosition = mousePosition;
                         repaint();
                     }
+                    else if (isLeftMouseDown && selectionsHolder.getTool() == Tool.RECTANGLE_SELECT) {
+                        int pixelX = (int)mousePosition.getX() / selectionsHolder.getScale();
+                        int pixelY = (int)mousePosition.getY() / selectionsHolder.getScale();
+
+                        int x = selectAnchor.x;
+                        int y = selectAnchor.y;
+                        int width = pixelX - selectAnchor.x;
+                        int height = pixelY - selectAnchor.y;
+                        if (width < 0) {
+                            x = pixelX;
+                            if (x < 0) {
+                                x = 0;
+                            }
+                            width = selectAnchor.x - x;
+                        }
+                        if (height < 0) {
+                            y = pixelY;
+                            if (y < 0) {
+                                y = 0;
+                            }
+                            height = selectAnchor.y - y;
+                        }
+
+                        if (x + width >= canvasWidth) {
+                            width = canvasWidth - x;
+                        }
+                        if (y + height >= canvasHeight) {
+                            height = canvasHeight - y;
+                        }
+
+
+                        selectBorder = new Rectangle(x, y, width, height);
+
+                        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                        Graphics2D graphics = selectionImageLayer.createGraphics();
+                        graphics.setColor ( new Color ( 0, 0, 0, 255 ) );
+
+                        if (selectBorder.width > 0 && selectBorder.height > 0) {
+                            for (int i = selectBorder.x; i < selectBorder.x + selectBorder.width; i += 2) {
+                                graphics.fillRect(i, selectBorder.y, 1, 1);
+                                graphics.fillRect(i, selectBorder.y + selectBorder.height, 1, 1);
+                            }
+                            for (int i = selectBorder.y; i < selectBorder.y + selectBorder.height; i += 2) {
+                                graphics.fillRect(selectBorder.x, i, 1, 1);
+                                graphics.fillRect(selectBorder.x + selectBorder.width, i, 1, 1);
+                            }
+                        }
+                        graphics.dispose();
+
+
+                        repaint();
+                    }
                 }
                 else if (canvasMode == CanvasMode.RESIZE) {
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
@@ -202,34 +268,34 @@ public class Canvas extends JPanel implements SelectionsListener {
         });
     }
 
-    private void updateCursor(Point mousePosition) {
-        if (spreadRectangle(horizontalResizer, 0, 5).contains(mousePosition)) {
-            setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+    private Cursor getProperCursor(Point mousePosition) {
+        if (allowCanvasResizing) {
+            if (spreadRectangle(horizontalResizer, 0, 5).contains(mousePosition)) {
+                return new Cursor(Cursor.E_RESIZE_CURSOR);
+            }
+            else if (spreadRectangle(verticalResizer, 5, 0).contains(mousePosition)) {
+                return new Cursor(Cursor.S_RESIZE_CURSOR);
+            }
+            else if (spreadRectangle(diagonalResizer, 5, 5).contains(mousePosition)) {
+                return new Cursor(Cursor.SE_RESIZE_CURSOR);
+            }
         }
-        else if (spreadRectangle(verticalResizer, 5, 0).contains(mousePosition)) {
-            setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-        }
-        else if (spreadRectangle(diagonalResizer, 5, 5).contains(mousePosition)) {
-            setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
-        }
-        else if (isMouseInCanvas(mousePosition)) {
+        if (isMouseInCanvas(mousePosition)) {
             if (selectionsHolder.getTool() == Tool.PENCIL) {
-                setCursor(cursors.get("PENCIL"));
+                return cursors.get("PENCIL");
             }
             else if (selectionsHolder.getTool() == Tool.BUCKET) {
-                setCursor(cursors.get("BUCKET"));
+                return cursors.get("BUCKET");
 
             }
             else if (selectionsHolder.getTool() == Tool.EYE_DROPPER) {
-                setCursor(cursors.get("EYE_DROPPER"));
+                return cursors.get("EYE_DROPPER");
             }
-            else {
-                setCursor(Cursor.getDefaultCursor());
+            else if (selectionsHolder.getTool() == Tool.RECTANGLE_SELECT) {
+                return cursors.get("SELECT");
             }
         }
-        else {
-            setCursor(Cursor.getDefaultCursor());
-        }
+        return Cursor.getDefaultCursor();
     }
 
     private void loadCursors() {
@@ -238,6 +304,7 @@ public class Canvas extends JPanel implements SelectionsListener {
         Cursor pencilCursor = null;
         Cursor bucketCursor = null;
         Cursor eyedropperCursor = null;
+        Cursor selectCursor = null;
         try {
             pencilCursor = toolkit.createCustomCursor(
                     ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
@@ -254,6 +321,11 @@ public class Canvas extends JPanel implements SelectionsListener {
                     new Point(9, 22),
                     "eyedropper"
             );
+            selectCursor = toolkit.createCustomCursor(
+                    ImageIO.read(ToolStrip.class.getResource("/select-cursor-transparent.png")),
+                    new Point(15, 15),
+                    "select"
+            );
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -261,6 +333,7 @@ public class Canvas extends JPanel implements SelectionsListener {
         cursors.put("PENCIL", pencilCursor);
         cursors.put("BUCKET", bucketCursor);
         cursors.put("EYE_DROPPER", eyedropperCursor);
+        cursors.put("SELECT", selectCursor);
     }
 
     // increase size of rectangle in all directions
@@ -337,12 +410,20 @@ public class Canvas extends JPanel implements SelectionsListener {
         }
     }
 
+    private void useRectangleSelectTool(MouseClick mouseClick, int mouseX, int mouseY) {
+        if (mouseClick == MouseClick.LEFT_CLICK) {
+            clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+
+            isLeftMouseDown = true;
+            selectAnchor = new Point((mouseX - CANVAS_START_X) / selectionsHolder.getScale(), (mouseY - CANVAS_START_Y) / selectionsHolder.getScale());
+            allowCanvasResizing = false;
+            repaint();
+        }
+    }
+
+
     // paint bucket spread logic
-    //
-    // note: I am aware this is a recursive algorithm, however doing this using recursive method calls will run out of memory when used on large areas
-    // so this method replicates the recursive nature using a queue strategy
-    //
-    // also note: on REALLY large areas, there may be a slight delay due to the amount of computation required
+    // note: on REALLY large areas, there may be a slight delay due to the amount of computation required
     private void spreadColor(int x, int y, int oldRgb, int newRgb) {
         Queue<Point> spreadQueue = new LinkedList<>();
         spreadQueue.add(new Point(x, y));
@@ -377,6 +458,7 @@ public class Canvas extends JPanel implements SelectionsListener {
 
     private void resizeCanvas() {
         BufferedImage newImage = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
+
         for (int x = 0; x < newImage.getWidth(); x++) {
             for (int y = 0; y < newImage.getHeight(); y++) {
                 if (x < image.getWidth() && y < image.getHeight()) {
@@ -389,6 +471,9 @@ public class Canvas extends JPanel implements SelectionsListener {
         }
         image = newImage;
         updateCanvasResizers();
+
+        selectionImageLayer = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
+        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
@@ -403,28 +488,36 @@ public class Canvas extends JPanel implements SelectionsListener {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
 
+        Color oldColor = brush.getColor();
+        Stroke oldStroke = brush.getStroke();
+
         // paint current image as canvas
         brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * selectionsHolder.getScale(), image.getHeight() * selectionsHolder.getScale(), null);
 
         // paint resizers
-        Color oldColor = brush.getColor();
-        Stroke oldStroke = brush.getStroke();
+        if (allowCanvasResizing) {
+            brush.setColor(Color.white);
+            brush.fillRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+            brush.fillRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+            brush.fillRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
-        brush.setColor(Color.white);
-        brush.fillRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
-        brush.fillRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
-        brush.fillRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+            brush.setColor(new Color(85, 85, 85));
+            brush.drawRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+            brush.drawRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+            brush.drawRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
-        brush.setColor(new Color(85, 85, 85));
-        brush.drawRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
-        brush.drawRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
-        brush.drawRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+            brush.setColor(oldColor);
+            brush.setStroke(oldStroke);
+        }
 
-        brush.setColor(oldColor);
-        brush.setStroke(oldStroke);
-
+        if (canvasMode == CanvasMode.PAINT) {
+            // paint select
+            if (selectionsHolder.getTool() == Tool.RECTANGLE_SELECT) {
+                brush.drawImage(selectionImageLayer, CANVAS_START_X, CANVAS_START_Y, selectionImageLayer.getWidth() * selectionsHolder.getScale(), selectionImageLayer.getHeight() * selectionsHolder.getScale(), null);
+            }
+        }
         // paint resize borders
-        if (canvasMode == CanvasMode.RESIZE) {
+        else if (canvasMode == CanvasMode.RESIZE) {
             brush.setColor(new Color(0, 0, 0));
             if (canvasResizeDirection == CanvasResizeDirection.EAST) {
                 for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
@@ -473,8 +566,30 @@ public class Canvas extends JPanel implements SelectionsListener {
         // apparently this method updates the mousePosition variable in place...yikes
         SwingUtilities.convertPointFromScreen(mousePosition, this);
 
-        updateCursor(mousePosition);
+        setCursor(getProperCursor(mousePosition));
 
+        allowCanvasResizing = true;
+
+        if (tool == Tool.RECTANGLE_SELECT) {
+            clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        }
+
+        repaint();
+    }
+
+    private void clearImage(BufferedImage image, Color color) {
+        Graphics2D graphics = image.createGraphics();
+        Color oldColor = graphics.getColor();
+
+        graphics.setColor(color);
+        if (color.getAlpha() == 0) {
+            graphics.setComposite(AlphaComposite.Clear); // set transparency rule
+        }
+        graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
+
+        // reset graphics config
+        graphics.setColor(oldColor);
+        graphics.setComposite(AlphaComposite.SrcOver);
     }
 
     @Override
