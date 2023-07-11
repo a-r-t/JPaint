@@ -473,7 +473,7 @@ public class Canvas extends JPanel implements ChoicesListener {
             else { // create new selection
 
                 // if a previous selection exists and was moved from its original location, permanently apply the changes to the image
-                if (selectBorder.x > 0 && selectBorder.y > 0 && (selectBorder.x != originalSelectBorder.x || selectBorder.y != originalSelectBorder.y)) {
+                if (selectBorder.width > 0 && selectBorder.height > 0 && (selectBorder.x != originalSelectBorder.x || selectBorder.y != originalSelectBorder.y)) {
                     Graphics2D graphics = image.createGraphics();
 
                     graphics.setColor(choicesHolder.getEraseColor());
