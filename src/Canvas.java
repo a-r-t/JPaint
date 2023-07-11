@@ -260,11 +260,11 @@ public class Canvas extends JPanel implements ChoicesListener {
                             clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
 
                             graphics.setColor(choicesHolder.getEraseColor());
-                            graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width, selectBorder.height);
+                            graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
 
                             selectedSubimageCurrentLocation = new Point(selectedSubimageCurrentLocation.x + differenceX, selectedSubimageCurrentLocation.y + differenceY);
 
-                            graphics.drawImage(selectedSubimage, selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width, selectBorder.height, null);
+                            graphics.drawImage(selectedSubimage, selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width + 1, selectBorder.height + 1, null);
                             selectBorder = new Rectangle(selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width, selectBorder.height);
 
                             graphics.setColor(new Color(0, 0, 0, 255));
@@ -465,7 +465,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
             if (selectBorder.contains(new Point(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale()))) { // move existing selection
                 moveSelection = true;
-                selectedSubimage = ImageUtils.getSubimage(image, originalSelectBorder.x, originalSelectBorder.y, selectBorder.width, selectBorder.height);
+                selectedSubimage = ImageUtils.getSubimage(image, originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
                 selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
                 selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
                 previousMousePosition = new Point(mouseX + CANVAS_START_X, mouseY + CANVAS_START_Y);
@@ -477,7 +477,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                     Graphics2D graphics = image.createGraphics();
 
                     graphics.setColor(choicesHolder.getEraseColor());
-                    graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width, selectBorder.height);
+                    graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
                     graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
 
                     graphics.dispose();
