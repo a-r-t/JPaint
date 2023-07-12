@@ -348,6 +348,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         Cursor eyedropperCursor = null;
         Cursor selectCursor = null;
         Cursor dragCursor = null;
+        Cursor invisibleCursor = null;
         try {
             pencilCursor = toolkit.createCustomCursor(
                     ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
@@ -374,6 +375,12 @@ public class Canvas extends JPanel implements ChoicesListener {
                     new Point(16, 15),
                     "drag"
             );
+            BufferedImage transparentImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+            invisibleCursor = toolkit.createCustomCursor(
+                    transparentImage,
+                    new Point(0, 0),
+                    "invisible"
+            );
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -383,6 +390,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         cursors.put("EYE_DROPPER", eyedropperCursor);
         cursors.put("SELECT", selectCursor);
         cursors.put("DRAG", dragCursor);
+        cursors.put("INVISIBLE", invisibleCursor);
     }
 
     // increase size of rectangle in all directions
