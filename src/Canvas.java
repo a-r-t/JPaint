@@ -1,4 +1,3 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -6,9 +5,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -47,7 +44,7 @@ public class Canvas extends JPanel implements ChoicesListener {
     private Point selectedSubimageCurrentLocation;
     private Rectangle originalSelectBorder;
 
-    private HashMap<String, Cursor> cursors = new HashMap<>();
+    private CanvasCursorManager cursors;
 
     public Canvas(ChoicesHolder choicesHolder) {
         this.isLeftMouseDown = false;
@@ -56,17 +53,18 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.previousMousePosition = null;
         this.canvasMode = CanvasMode.PAINT;
         this.selectBorder = new Rectangle(0, 0, 0, 0);
+        this.cursors = new CanvasCursorManager();
+
         updateCanvasResizers();
-        loadCursors();
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
 
         image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
-        clearImage(image, new Color(255, 255, 255));
+        ImageUtils.clearImage(image, new Color(255, 255, 255));
 
         selectionImageLayer = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
-        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
 
 
         this.setDoubleBuffered(true);
@@ -234,7 +232,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                             selectBorder = new Rectangle(x, y, width, height);
 
-                            clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                            ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
                             Graphics2D graphics = selectionImageLayer.createGraphics();
                             graphics.setColor(new Color(0, 0, 0, 255));
 
@@ -257,7 +255,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                             int differenceY = e.getY() / choicesHolder.getScale() - previousMousePosition.y / choicesHolder.getScale();
 
                             Graphics2D graphics = selectionImageLayer.createGraphics();
-                            clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                            ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
 
                             graphics.setColor(choicesHolder.getEraseColor());
                             graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
@@ -311,86 +309,34 @@ public class Canvas extends JPanel implements ChoicesListener {
     private Cursor getProperCursor(Point mousePosition) {
         if (allowCanvasResizing) {
             if (spreadRectangle(horizontalResizer, 0, 5).contains(mousePosition)) {
-                return new Cursor(Cursor.E_RESIZE_CURSOR);
+                return cursors.get(CanvasCursor.E_RESIZE_CURSOR);
             }
             else if (spreadRectangle(verticalResizer, 5, 0).contains(mousePosition)) {
-                return new Cursor(Cursor.S_RESIZE_CURSOR);
+                return cursors.get(CanvasCursor.S_RESIZE_CURSOR);
             }
             else if (spreadRectangle(diagonalResizer, 5, 5).contains(mousePosition)) {
-                return new Cursor(Cursor.SE_RESIZE_CURSOR);
+                return cursors.get(CanvasCursor.SE_RESIZE_CURSOR);
             }
         }
         if (isMouseInCanvas(mousePosition)) {
             if (choicesHolder.getTool() == Tool.PENCIL) {
-                return cursors.get("PENCIL");
+                return cursors.get(CanvasCursor.PENCIL);
             }
             else if (choicesHolder.getTool() == Tool.BUCKET) {
-                return cursors.get("BUCKET");
+                return cursors.get(CanvasCursor.BUCKET);
 
             }
             else if (choicesHolder.getTool() == Tool.EYE_DROPPER) {
-                return cursors.get("EYE_DROPPER");
+                return cursors.get(CanvasCursor.EYE_DROPPER);
             }
             else if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
                 if (selectBorder.contains(new Point((mousePosition.x - CANVAS_START_X) / choicesHolder.getScale(), (mousePosition.y - CANVAS_START_Y) / choicesHolder.getScale()))) {
-                    return cursors.get("DRAG");
+                    return cursors.get(CanvasCursor.DRAG);
                 }
-                return cursors.get("SELECT");
+                return cursors.get(CanvasCursor.SELECT);
             }
         }
         return Cursor.getDefaultCursor();
-    }
-
-    private void loadCursors() {
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Cursor pencilCursor = null;
-        Cursor bucketCursor = null;
-        Cursor eyedropperCursor = null;
-        Cursor selectCursor = null;
-        Cursor dragCursor = null;
-        Cursor invisibleCursor = null;
-        try {
-            pencilCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
-                    new Point(7, 23),
-                    "pencil"
-            );
-            bucketCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/bucket-cursor-transparent.png")),
-                    new Point(8, 19),
-                    "bucket"
-            );
-            eyedropperCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/eyedropper-cursor-transparent.png")),
-                    new Point(9, 22),
-                    "eyedropper"
-            );
-            selectCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/select-cursor-transparent.png")),
-                    new Point(15, 15),
-                    "select"
-            );
-            dragCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/drag-cursor-transparent.png")),
-                    new Point(16, 15),
-                    "drag"
-            );
-            BufferedImage transparentImage = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
-            invisibleCursor = toolkit.createCustomCursor(
-                    transparentImage,
-                    new Point(0, 0),
-                    "invisible"
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        cursors.put("PENCIL", pencilCursor);
-        cursors.put("BUCKET", bucketCursor);
-        cursors.put("EYE_DROPPER", eyedropperCursor);
-        cursors.put("SELECT", selectCursor);
-        cursors.put("DRAG", dragCursor);
-        cursors.put("INVISIBLE", invisibleCursor);
     }
 
     // increase size of rectangle in all directions
@@ -493,7 +439,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                 // prepare for new selection to be made
                 moveSelection = false;
-                clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
                 selectAnchor = new Point(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
                 allowCanvasResizing = false;
                 selectBorder = new Rectangle(0, 0, 0, 0);
@@ -539,19 +485,11 @@ public class Canvas extends JPanel implements ChoicesListener {
     }
 
     private void resizeCanvas(int newWidth, int newHeight) {
-        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-
-
-        clearImage(newImage, new Color(255, 255, 255));
-        Graphics2D newImageGraphics = newImage.createGraphics();
-        newImageGraphics.drawImage(image.getSubimage(0, 0, Math.min(image.getWidth(), newImage.getWidth()), Math.min(image.getHeight(), newImage.getHeight())), 0, 0, null);
-        newImageGraphics.dispose();
-
-        image = newImage;
+        image = ImageUtils.resizeImage(image, newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
         selectionImageLayer = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
@@ -632,25 +570,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
         brush.setColor(oldColor);
     }
-
-
-    private void clearImage(BufferedImage image, Color color) {
-        Graphics2D graphics = image.createGraphics();
-        Color oldColor = graphics.getColor();
-
-        graphics.setColor(color);
-        if (color.getAlpha() == 0) {
-            graphics.setComposite(AlphaComposite.Clear); // set transparency rule
-        }
-        graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
-
-        // reset graphics config
-        graphics.setColor(oldColor);
-        graphics.setComposite(AlphaComposite.SrcOver);
-
-        graphics.dispose();
-    }
-
+    
     public void addListener(CanvasListener listener) {
         listeners.add(listener);
     }
@@ -666,7 +586,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
         allowCanvasResizing = true;
 
-        clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
 
         repaint();
     }
