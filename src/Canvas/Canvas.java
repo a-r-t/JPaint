@@ -3,10 +3,8 @@ package Canvas;
 import Models.ChoicesHolder;
 import Models.ChoicesListener;
 import Toolstrip.Tool;
-import Utils.ColorUtils;
+import Utils.*;
 import Utils.Image;
-import Utils.ImageUtils;
-import Utils.MouseClick;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,7 +31,6 @@ public class Canvas extends JPanel implements ChoicesListener {
     private final int CANVAS_START_X = 10;
     private final int CANVAS_START_Y = 10;
 
-    private ArrayList<CanvasListener> listeners = new ArrayList<>();
     private CanvasMode canvasMode;
 
     // for canvas resizing
@@ -45,7 +42,7 @@ public class Canvas extends JPanel implements ChoicesListener {
     private boolean allowCanvasResizing = true;
 
     // for selection
-    private BufferedImage selectionImageLayer;
+    private Image selectionImageLayer;
     private Rectangle selectBorder;
     private Point selectAnchor;
     private boolean moveSelection;
@@ -53,6 +50,8 @@ public class Canvas extends JPanel implements ChoicesListener {
     private Point selectedSubimageOriginalLocation;
     private Point selectedSubimageCurrentLocation;
     private Rectangle originalSelectBorder;
+
+    private ArrayList<CanvasListener> listeners = new ArrayList<>();
 
     private CanvasCursorManager cursors;
 
@@ -73,9 +72,8 @@ public class Canvas extends JPanel implements ChoicesListener {
         mainImage = new Image(canvasWidth, canvasHeight);
         mainImage.clear(new Color(255, 255, 255));
 
-        selectionImageLayer = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
-        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
-
+        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         this.setDoubleBuffered(true);
 
@@ -242,8 +240,8 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                             selectBorder = new Rectangle(x, y, width, height);
 
-                            ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
-                            Graphics2D graphics = selectionImageLayer.createGraphics();
+                            selectionImageLayer.clear(new Color(0, 0, 0, 0));
+                            Graphics2D graphics = selectionImageLayer.getGraphics();
                             graphics.setColor(new Color(0, 0, 0, 255));
 
                             if (selectBorder.width > 0 && selectBorder.height > 0) {
@@ -264,8 +262,8 @@ public class Canvas extends JPanel implements ChoicesListener {
                             int differenceX = e.getX() / choicesHolder.getScale() - previousMousePosition.x / choicesHolder.getScale();
                             int differenceY = e.getY() / choicesHolder.getScale() - previousMousePosition.y / choicesHolder.getScale();
 
-                            Graphics2D graphics = selectionImageLayer.createGraphics();
-                            ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                            Graphics2D graphics = selectionImageLayer.getGraphics();
+                            selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
                             graphics.setColor(choicesHolder.getEraseColor());
                             graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
@@ -449,7 +447,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                 // prepare for new selection to be made
                 moveSelection = false;
-                ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+                selectionImageLayer.clear(new Color(0, 0, 0, 0));
                 selectAnchor = new Point(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
                 allowCanvasResizing = false;
                 selectBorder = new Rectangle(0, 0, 0, 0);
@@ -498,8 +496,8 @@ public class Canvas extends JPanel implements ChoicesListener {
         mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
-        selectionImageLayer = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        selectionImageLayer.resize(newWidth, newHeight, new Color(0, 0, 0, 0));
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
@@ -539,7 +537,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         if (canvasMode == CanvasMode.PAINT) {
             // select layer
             if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-                brush.drawImage(selectionImageLayer, CANVAS_START_X, CANVAS_START_Y, selectionImageLayer.getWidth() * choicesHolder.getScale(), selectionImageLayer.getHeight() * choicesHolder.getScale(), null);
+                selectionImageLayer.paint(brush, CANVAS_START_X, CANVAS_START_Y, choicesHolder.getScale());
             }
         }
         // canvas resize borders
@@ -596,7 +594,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
         allowCanvasResizing = true;
 
-        ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         repaint();
     }
