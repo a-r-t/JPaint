@@ -1,3 +1,7 @@
+package Canvas;
+
+import Toolstrip.ToolStrip;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,27 +31,27 @@ public class CanvasCursorManager {
         Cursor invisibleCursor = null;
         try {
             pencilCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/pencil-cursor-transparent.png")),
+                    ImageIO.read(CanvasCursorManager.class.getResource("/pencil-cursor-transparent.png")),
                     new Point(7, 23),
                     "pencil"
             );
             bucketCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/bucket-cursor-transparent.png")),
+                    ImageIO.read(CanvasCursorManager.class.getResource("/bucket-cursor-transparent.png")),
                     new Point(8, 19),
                     "bucket"
             );
             eyedropperCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/eyedropper-cursor-transparent.png")),
+                    ImageIO.read(CanvasCursorManager.class.getResource("/eyedropper-cursor-transparent.png")),
                     new Point(9, 22),
                     "eyedropper"
             );
             selectCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/select-cursor-transparent.png")),
+                    ImageIO.read(CanvasCursorManager.class.getResource("/select-cursor-transparent.png")),
                     new Point(15, 15),
                     "select"
             );
             dragCursor = toolkit.createCustomCursor(
-                    ImageIO.read(ToolStrip.class.getResource("/drag-cursor-transparent.png")),
+                    ImageIO.read(CanvasCursorManager.class.getResource("/drag-cursor-transparent.png")),
                     new Point(16, 15),
                     "drag"
             );

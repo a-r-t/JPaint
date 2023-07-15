@@ -1,3 +1,13 @@
+package Canvas;
+
+import Models.ChoicesHolder;
+import Models.ChoicesListener;
+import Toolstrip.Tool;
+import Utils.ColorUtils;
+import Utils.Image;
+import Utils.ImageUtils;
+import Utils.MouseClick;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -12,7 +22,7 @@ import java.util.Queue;
 public class Canvas extends JPanel implements ChoicesListener {
     private int canvasWidth = 400;
     private int canvasHeight = 400;
-    private BufferedImage image;
+    private Image mainImage;
     private ChoicesHolder choicesHolder;
 
     private boolean isLeftMouseDown;
@@ -60,8 +70,8 @@ public class Canvas extends JPanel implements ChoicesListener {
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
 
-        image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
-        ImageUtils.clearImage(image, new Color(255, 255, 255));
+        mainImage = new Image(canvasWidth, canvasHeight);
+        mainImage.clear(new Color(255, 255, 255));
 
         selectionImageLayer = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
         ImageUtils.clearImage(selectionImageLayer, new Color(0, 0, 0, 0));
@@ -181,7 +191,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                             previousMouseX += xOffset;
                             previousMouseY += yOffset;
 
-                            if (previousMouseX >= 0 && previousMouseX / choicesHolder.getScale() < image.getWidth() && previousMouseY >= 0 && previousMouseY / choicesHolder.getScale() < image.getHeight()) {
+                            if (previousMouseX >= 0 && previousMouseX / choicesHolder.getScale() < mainImage.getWidth() && previousMouseY >= 0 && previousMouseY / choicesHolder.getScale() < mainImage.getHeight()) {
                                 int color = 0;
                                 if (choicesHolder.getTool() == Tool.PENCIL) {
                                     if (isLeftMouseDown) {
@@ -192,7 +202,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                                 } else if (choicesHolder.getTool() == Tool.ERASER) {
                                     color = choicesHolder.getEraseColorAsIntRGB();
                                 }
-                                image.setRGB(previousMouseX / choicesHolder.getScale(), previousMouseY / choicesHolder.getScale(), color);
+                                mainImage.setRGB(previousMouseX / choicesHolder.getScale(), previousMouseY / choicesHolder.getScale(), color);
                             }
                         }
                         previousMousePosition = mousePosition;
@@ -355,7 +365,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                 color = choicesHolder.getEraseColorAsIntRGB();
                 isRightMouseDown = true;
             }
-            image.setRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale(), color);
+            mainImage.setRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale(), color);
             previousMousePosition = new Point(mouseX, mouseY);
             repaint();
         }
@@ -369,7 +379,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         else if (mouseClick == MouseClick.RIGHT_CLICK) {
             color = choicesHolder.getEraseColorAsIntRGB();
         }
-        int oldRgb = image.getRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
+        int oldRgb = mainImage.getRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
         int newRgb = color;
         if (oldRgb != newRgb) {
             spreadColor(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale(), oldRgb, newRgb);
@@ -378,7 +388,7 @@ public class Canvas extends JPanel implements ChoicesListener {
     }
 
     private void useEyeDropperTool(MouseClick mouseClick, int mouseX, int mouseY) {
-        int rgb = image.getRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
+        int rgb = mainImage.getRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale());
         Color color = ColorUtils.getColorFromInt(rgb);
         if (mouseClick == MouseClick.LEFT_CLICK) {
             choicesHolder.setPaintColor(color);
@@ -406,7 +416,7 @@ public class Canvas extends JPanel implements ChoicesListener {
     private void useEraserTool(MouseClick mouseClick, int mouseX, int mouseY) {
         if (mouseClick == MouseClick.LEFT_CLICK) {
             int color = choicesHolder.getEraseColorAsIntRGB();
-            image.setRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale(), color);
+            mainImage.setRGB(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale(), color);
             isLeftMouseDown = true;
             previousMousePosition = new Point(mouseX, mouseY);
             repaint();
@@ -419,7 +429,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
             if (selectBorder.contains(new Point(mouseX / choicesHolder.getScale(), mouseY / choicesHolder.getScale()))) { // move existing selection
                 moveSelection = true;
-                selectedSubimage = ImageUtils.getSubimage(image, originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+                selectedSubimage = mainImage.getSubImage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
                 selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
                 selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
                 previousMousePosition = new Point(mouseX + CANVAS_START_X, mouseY + CANVAS_START_Y);
@@ -428,7 +438,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                 // if a previous selection exists and was moved from its original location, permanently apply the changes to the image
                 if (selectBorder.width > 0 && selectBorder.height > 0 && (selectBorder.x != originalSelectBorder.x || selectBorder.y != originalSelectBorder.y)) {
-                    Graphics2D graphics = image.createGraphics();
+                    Graphics2D graphics = mainImage.getGraphics();
 
                     graphics.setColor(choicesHolder.getEraseColor());
                     graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
@@ -457,10 +467,10 @@ public class Canvas extends JPanel implements ChoicesListener {
         spreadQueue.add(new Point(x, y));
         while (!spreadQueue.isEmpty()) {
             Point next = spreadQueue.poll();
-            if (next.x >= 0 && next.x < image.getWidth() && next.y >= 0 && next.y < image.getHeight()) {
-                int rgb = image.getRGB(next.x, next.y);
+            if (next.x >= 0 && next.x < mainImage.getWidth() && next.y >= 0 && next.y < mainImage.getHeight()) {
+                int rgb = mainImage.getRGB(next.x, next.y);
                 if (rgb == oldRgb) {
-                    image.setRGB(next.x, next.y, newRgb);
+                    mainImage.setRGB(next.x, next.y, newRgb);
                     spreadQueue.add(new Point(next.x + 1, next.y));
                     spreadQueue.add(new Point(next.x - 1, next.y));
                     spreadQueue.add(new Point(next.x, next.y + 1));
@@ -481,11 +491,11 @@ public class Canvas extends JPanel implements ChoicesListener {
     }
 
     private boolean isMouseInCanvas(Point mousePosition) {
-        return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < image.getWidth() * choicesHolder.getScale() && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < image.getHeight() * choicesHolder.getScale();
+        return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < mainImage.getWidth() * choicesHolder.getScale() && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < mainImage.getHeight() * choicesHolder.getScale();
     }
 
     private void resizeCanvas(int newWidth, int newHeight) {
-        image = ImageUtils.resizeImage(image, newWidth, newHeight, choicesHolder.getEraseColor());
+        mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
         selectionImageLayer = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -508,7 +518,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         Stroke oldStroke = brush.getStroke();
 
         // paint current image as canvas
-        brush.drawImage(image, CANVAS_START_X, CANVAS_START_Y, image.getWidth() * choicesHolder.getScale(), image.getHeight() * choicesHolder.getScale(), null);
+        mainImage.paint(brush, CANVAS_START_X, CANVAS_START_Y, choicesHolder.getScale());
 
         // canvas resizers
         if (allowCanvasResizing) {

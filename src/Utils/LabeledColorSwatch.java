@@ -1,4 +1,7 @@
-import javax.swing.plaf.FontUIResource;
+package Utils;
+
+import Toolstrip.ColorSwatch;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 

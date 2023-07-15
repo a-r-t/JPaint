@@ -1,3 +1,5 @@
+package Canvas;
+
 import java.awt.*;
 
 public interface CanvasListener {

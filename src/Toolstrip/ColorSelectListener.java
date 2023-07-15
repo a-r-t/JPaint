@@ -1,8 +1,8 @@
+package Toolstrip;
+
 import java.awt.*;
 
-public interface ChoicesListener {
-    void onToolChanged(Tool tool);
+public interface ColorSelectListener {
     void onPaintColorChanged(Color color);
     void onEraseColorChanged(Color color);
-    void onScaleChanged(int scale);
 }

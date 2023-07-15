@@ -1,3 +1,12 @@
+package Toolstrip;
+
+import Models.ChoicesHolder;
+import Models.ChoicesListener;
+import Canvas.*;
+import Utils.ImageButton;
+import Utils.LabeledColorSwatch;
+import Utils.MouseClick;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;

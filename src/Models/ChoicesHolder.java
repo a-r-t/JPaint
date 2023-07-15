@@ -1,3 +1,8 @@
+package Models;
+
+import Toolstrip.Tool;
+import Utils.ColorUtils;
+
 import java.awt.*;
 import java.util.ArrayList;
 

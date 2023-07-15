@@ -1,3 +1,5 @@
+package Toolstrip;
+
 import java.awt.*;
 
 public class ColorSwatch {

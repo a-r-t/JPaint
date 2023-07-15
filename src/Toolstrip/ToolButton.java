@@ -1,7 +1,8 @@
-import javax.imageio.ImageIO;
+package Toolstrip;
+
+import Utils.ImageButton;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class ToolButton extends ImageButton {
     protected Tool tool;

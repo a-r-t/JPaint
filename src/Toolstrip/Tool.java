@@ -1,3 +1,5 @@
+package Toolstrip;
+
 public enum Tool {
     PENCIL, BUCKET, ERASER, EYE_DROPPER, RECTANGLE_SELECT, FREE_FORM_SELECT
 }

@@ -1,7 +1,17 @@
+package GUI;
+
+import Canvas.Canvas;
+import Models.ChoicesHolder;
+import Toolstrip.MenuBar;
+import Toolstrip.ToolStrip;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import Canvas.*;
+import Toolstrip.*;
+import Models.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

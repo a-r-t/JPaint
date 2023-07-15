@@ -1,7 +1,9 @@
+package Utils;
+
 public enum MouseClick {
     RIGHT_CLICK, LEFT_CLICK, MIDDLE_CLICK;
 
-    static MouseClick convertToMouseClick(int button) {
+    public static MouseClick convertToMouseClick(int button) {
         switch (button) {
             case 1:
                 return LEFT_CLICK;
