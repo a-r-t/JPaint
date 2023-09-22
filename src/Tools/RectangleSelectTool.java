@@ -23,9 +23,7 @@ public class RectangleSelectTool extends BaseTool {
 
     public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
         super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
-
-        selectBorder = new Rectangle(0, 0, 0, 0);
-
+        reset();
     }
 
     @Override
@@ -193,7 +191,7 @@ public class RectangleSelectTool extends BaseTool {
     }
 
     public void applyChanges() {
-        if (!originalSelectBorder.equals(selectBorder)) {
+        if (originalSelectBorder != null && !originalSelectBorder.equals(selectBorder)) {
 
             Graphics2D graphics = canvas.getMainImage().getGraphics();
 

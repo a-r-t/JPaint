@@ -15,8 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class Canvas extends JPanel implements ChoicesListener {
     private int canvasWidth = 400;
@@ -26,13 +24,13 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     private boolean isLeftMouseDown;
     private boolean isRightMouseDown;
-    private Point previousMousePosition;
     private final int EXTRA_CANVAS_WIDTH = 10;
     private final int EXTRA_CANVAS_HEIGHT = 10;
     private final int CANVAS_START_X = 10;
     private final int CANVAS_START_Y = 10;
 
     private CanvasMode canvasMode;
+    private CanvasHistory canvasHistory;
 
     // for canvas resizing
     private CanvasResizeDirection canvasResizeDirection = null;
@@ -61,8 +59,8 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
         this.choicesHolder = choicesHolder;
-        this.previousMousePosition = null;
         this.canvasMode = CanvasMode.PAINT;
+        this.canvasHistory = new CanvasHistory(this);
         this.cursors = new CanvasCursorManager();
         this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
         this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder, cursors);
@@ -90,8 +88,6 @@ public class Canvas extends JPanel implements ChoicesListener {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
                 mouseInfoHolder.mouseButtonPressed(mouseClick);
                 mouseInfoHolder.updateMousePosition(e.getPoint());
-
-                Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
                 if (mouseClick == MouseClick.LEFT_CLICK && allowCanvasResizing) {
                     if (spreadRectangle(horizontalResizer, 0, 5).contains(e.getPoint())) {
@@ -162,11 +158,9 @@ public class Canvas extends JPanel implements ChoicesListener {
 
                 else if (isLeftMouseDown && mouseClick == MouseClick.LEFT_CLICK) {
                     isLeftMouseDown = false;
-                    previousMousePosition = null;
                 }
                 else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
                     isRightMouseDown = false;
-                    previousMousePosition = null;
                 }
             }
         });
@@ -182,7 +176,6 @@ public class Canvas extends JPanel implements ChoicesListener {
             @Override
             public void mouseDragged(MouseEvent e) {
                 mouseInfoHolder.updateMousePosition(e.getPoint());
-                Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
                 if (canvasMode == CanvasMode.PAINT) {
                     if (choicesHolder.getTool() == Tool.PENCIL) {
@@ -268,7 +261,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         return mousePosition.x - CANVAS_START_X >= 0 && mousePosition.x - CANVAS_START_X < mainImage.getWidth() * choicesHolder.getScale() && mousePosition.y - CANVAS_START_Y >= 0 && mousePosition.y - CANVAS_START_Y < mainImage.getHeight() * choicesHolder.getScale();
     }
 
-    private void resizeCanvas(int newWidth, int newHeight) {
+    public void resizeCanvas(int newWidth, int newHeight) {
         mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
@@ -363,7 +356,7 @@ public class Canvas extends JPanel implements ChoicesListener {
     public void onToolChanged(Tool tool) {
         Point mousePosition = MouseInfo.getPointerInfo().getLocation();
 
-        // this method updates the mousePosition variable in place...ew
+        // this Swing method updates the mousePosition variable in place...ew
         SwingUtilities.convertPointFromScreen(mousePosition, this);
 
         setCursor(getProperCursor(mousePosition));
@@ -384,12 +377,12 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     @Override
     public void onPaintColorChanged(Color color) {
-
+        // unused interface method
     }
 
     @Override
     public void onEraseColorChanged(Color color) {
-
+        // unused interface method
     }
 
     @Override
@@ -401,6 +394,10 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     public Image getMainImage() {
         return mainImage;
+    }
+
+    public void setMainImage(BufferedImage image) {
+        this.mainImage = new Image(image);
     }
 
     public Image getSelectionImageLayer() {
@@ -417,6 +414,18 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     public int getStartY() {
         return CANVAS_START_Y;
+    }
+
+    public int getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public int getCanvasHeight() {
+        return canvasHeight;
+    }
+
+    public CanvasHistory getCanvasHistory() {
+        return canvasHistory;
     }
 
 }

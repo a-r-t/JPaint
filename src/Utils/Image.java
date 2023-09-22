@@ -26,6 +26,10 @@ public class Image {
         }
     }
 
+    public Image(BufferedImage image) {
+        this.image = image;
+    }
+
     public Graphics2D getGraphics() {
         return image.createGraphics();
     }
@@ -36,6 +40,10 @@ public class Image {
 
     public int getHeight() {
         return image.getHeight();
+    }
+
+    public BufferedImage getRaw() {
+        return image;
     }
 
     public int getRGB(int x, int y) {
