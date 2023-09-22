@@ -22,7 +22,7 @@ public class EraserTool extends BaseTool {
             int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
             int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
             canvas.getMainImage().setRGB(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale(), color);
-            mode = mode.ERASE;
+            mode = Mode.ERASE;
             canvas.repaint();
         }
     }
@@ -30,6 +30,7 @@ public class EraserTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
+            // if erasing, figures out previous mouse position and new mouse position, and then removes pixels in between
             int previousMouseX = mouseInfoHolder.getPreviousMousePositionX();
             int previousMouseY = mouseInfoHolder.getPreviousMousePositionY();
             int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();

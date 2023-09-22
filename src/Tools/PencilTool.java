@@ -37,6 +37,7 @@ public class PencilTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
+            // if drawing, figures out previous mouse position and new mouse position, and then applies pixels in between
             int previousMouseX = mouseInfoHolder.getPreviousMousePositionX();
             int previousMouseY = mouseInfoHolder.getPreviousMousePositionY();
             int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
