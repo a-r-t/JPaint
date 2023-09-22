@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class ChoicesHolder {
     private Tool tool;
+    private Tool previousTool;
     private Color paintColor;
     private Color eraseColor;
     private int scale;
@@ -15,6 +16,7 @@ public class ChoicesHolder {
 
     public ChoicesHolder() {
         tool = null;
+        previousTool = null;
         paintColor = new Color(0, 0, 0);
         eraseColor = new Color(255, 255, 255);
         scale = 1;
@@ -24,7 +26,12 @@ public class ChoicesHolder {
         return tool;
     }
 
+    public Tool getPreviousTool() {
+        return previousTool;
+    }
+
     public void setTool(Tool tool) {
+        previousTool = this.tool;
         this.tool = tool;
 
         for (ChoicesListener listener : listeners) {

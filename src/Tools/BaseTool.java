@@ -27,4 +27,5 @@ public abstract class BaseTool {
     public Cursor getCursor() {
         return Cursor.getDefaultCursor();
     }
+    public void reset() {}
 }

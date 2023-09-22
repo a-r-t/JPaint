@@ -235,22 +235,14 @@ public class Canvas extends JPanel implements ChoicesListener {
         if (isMouseInCanvas(mousePosition)) {
             if (choicesHolder.getTool() == Tool.PENCIL) {
                 return pencilTool.getCursor();
-                //return cursors.get(CanvasCursor.PENCIL);
             }
             else if (choicesHolder.getTool() == Tool.BUCKET) {
                 return bucketTool.getCursor();
-                //return cursors.get(CanvasCursor.BUCKET);
-
             }
             else if (choicesHolder.getTool() == Tool.EYE_DROPPER) {
                 return eyeDropperTool.getCursor();
-               // return cursors.get(CanvasCursor.EYE_DROPPER);
             }
             else if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-                //if (selectBorder.contains(new Point((mousePosition.x - CANVAS_START_X) / choicesHolder.getScale(), (mousePosition.y - CANVAS_START_Y) / choicesHolder.getScale()))) {
-                //    return cursors.get(CanvasCursor.DRAG);
-                //}
-               // return cursors.get(CanvasCursor.SELECT);
                 return rectangleSelectTool.getCursor();
             }
         }
@@ -378,6 +370,13 @@ public class Canvas extends JPanel implements ChoicesListener {
 
         allowCanvasResizing = true;
 
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.reset();
+        }
+
+        if (choicesHolder.getPreviousTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.applyChanges();
+        }
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         repaint();

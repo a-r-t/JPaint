@@ -46,13 +46,7 @@ public class RectangleSelectTool extends BaseTool {
 
                 // if a previous selection exists and was moved from its original location, permanently apply the changes to the image
                 if (selectBorder.width > 0 && selectBorder.height > 0 && (selectBorder.x != originalSelectBorder.x || selectBorder.y != originalSelectBorder.y)) {
-                    Graphics2D graphics = canvas.getMainImage().getGraphics();
-
-                    graphics.setColor(choicesHolder.getEraseColor());
-                    graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
-                    graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
-
-                    graphics.dispose();
+                    applyChanges();
                 }
 
                 // prepare for new selection to be made
@@ -167,7 +161,7 @@ public class RectangleSelectTool extends BaseTool {
             // this entire block fixes the bottom left of the rectangle select border because it was sometimes coming out wonky due to pixel count
             // it forces the bottom left pixel to always be filled in, and then potentially adjusts the adjacent pixels to make it look less awkward
             graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height, 1, 1);
-            if (canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height) == ColorUtils.getIntFromColor(Color.black) && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1) == ColorUtils.getIntFromColor(Color.black)) {
+            if (selectBorder.x + selectBorder.width < canvas.getMainImage().getWidth() && selectBorder.y + selectBorder.height < canvas.getMainImage().getHeight() && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height) == ColorUtils.getIntFromColor(Color.black) && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1) == ColorUtils.getIntFromColor(Color.black)) {
                 graphics.setColor(new Color(0, 0, 0, 0));
                 graphics.setComposite(AlphaComposite.Clear);
                 graphics.fillRect(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height, 1, 1);
@@ -196,6 +190,24 @@ public class RectangleSelectTool extends BaseTool {
             return cursorManager.get(CanvasCursor.DRAG);
         }
         return cursorManager.get(CanvasCursor.SELECT);
+    }
+
+    public void applyChanges() {
+        if (!originalSelectBorder.equals(selectBorder)) {
+
+            Graphics2D graphics = canvas.getMainImage().getGraphics();
+
+            graphics.setColor(choicesHolder.getEraseColor());
+            graphics.fillRect(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+            graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
+
+            graphics.dispose();
+        }
+    }
+
+    @Override
+    public void reset() {
+        selectBorder = new Rectangle(0, 0, 0, 0);
     }
 
     private enum Mode {
