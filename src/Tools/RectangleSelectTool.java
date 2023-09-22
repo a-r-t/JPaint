@@ -1,6 +1,7 @@
 package Tools;
 
 import Canvas.Canvas;
+import Canvas.CanvasMouseInfoHolder;
 import Models.ChoicesHolder;
 import Utils.Image;
 import Utils.ImageType;
@@ -20,7 +21,7 @@ public class RectangleSelectTool extends BaseTool {
     private boolean moveSelection;
     private Point selectAnchor;
 
-    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
+    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
         super(canvas, choicesHolder, mouseInfoHolder);
 
         selectBorder = new Rectangle(0, 0, 0, 0);

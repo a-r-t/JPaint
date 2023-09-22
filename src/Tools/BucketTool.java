@@ -8,11 +8,12 @@ import Utils.MouseInfoHolder;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.Queue;
+import Canvas.CanvasMouseInfoHolder;
 
 
 public class BucketTool extends BaseTool {
 
-    public BucketTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
+    public BucketTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
         super(canvas, choicesHolder, mouseInfoHolder);
     }
 
@@ -25,12 +26,12 @@ public class BucketTool extends BaseTool {
         else if (mouseInfoHolder.isRightMouseButtonPressed()) {
             color = choicesHolder.getEraseColorAsIntRGB();
         }
-        int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-        int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
-        int oldRgb = canvas.getMainImage().getRGB(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale());
+
+        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+        int oldRgb = canvas.getMainImage().getRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale());
         int newRgb = color;
         if (oldRgb != newRgb) {
-            spreadColor(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale(), oldRgb, newRgb);
+            spreadColor(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), oldRgb, newRgb);
             canvas.repaint();
         }
     }

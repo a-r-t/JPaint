@@ -49,7 +49,7 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     private CanvasCursorManager cursors;
 
-    private MouseInfoHolder mouseInfoHolder;
+    private CanvasMouseInfoHolder mouseInfoHolder;
 
     private PencilTool pencilTool;
     private BucketTool bucketTool;
@@ -64,7 +64,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.previousMousePosition = null;
         this.canvasMode = CanvasMode.PAINT;
         this.cursors = new CanvasCursorManager();
-        this.mouseInfoHolder = new MouseInfoHolder();
+        this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
         this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder);
         this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder);
         this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, listeners);
@@ -130,6 +130,8 @@ public class Canvas extends JPanel implements ChoicesListener {
             public void mouseReleased(MouseEvent e) {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
                 mouseInfoHolder.mouseButtonReleased(mouseClick);
+                mouseInfoHolder.updateMousePosition(e.getPoint());
+
                 if (choicesHolder.getTool() == Tool.PENCIL) {
                     pencilTool.mouseReleased();
                 }
@@ -174,14 +176,14 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                mouseInfoHolder.updateMousePosition(new Point(e.getPoint().x - CANVAS_START_X, e.getPoint().y - CANVAS_START_Y));
+                mouseInfoHolder.updateMousePosition(e.getPoint());
                 Point mousePosition = e.getPoint();
                 setCursor(getProperCursor(mousePosition));
             }
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                mouseInfoHolder.updateMousePosition(new Point(e.getPoint().x - CANVAS_START_X, e.getPoint().y - CANVAS_START_Y));
+                mouseInfoHolder.updateMousePosition(e.getPoint());
                 Point mousePosition = new Point(e.getX() - CANVAS_START_X, e.getY() - CANVAS_START_Y);
 
                 if (canvasMode == CanvasMode.PAINT) {

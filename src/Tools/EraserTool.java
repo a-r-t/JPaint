@@ -4,6 +4,7 @@ import Canvas.Canvas;
 import Models.ChoicesHolder;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
+import Canvas.CanvasMouseInfoHolder;
 
 import java.awt.*;
 
@@ -11,7 +12,7 @@ import java.awt.*;
 public class EraserTool extends BaseTool {
     private Mode mode = null;
 
-    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
+    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
         super(canvas, choicesHolder, mouseInfoHolder);
     }
 
@@ -19,10 +20,9 @@ public class EraserTool extends BaseTool {
     public void mousePressed() {
         if (mode == null && mouseInfoHolder.isLeftMouseButtonPressed()) {
             int color = choicesHolder.getEraseColorAsIntRGB();
-            int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-            int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
-            canvas.getMainImage().setRGB(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale(), color);
-            mode = mode.ERASE;
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+            canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
+            mode = Mode.ERASE;
             canvas.repaint();
         }
     }

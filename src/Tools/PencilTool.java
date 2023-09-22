@@ -5,6 +5,7 @@ import Models.ChoicesHolder;
 import Toolstrip.Tool;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
+import Canvas.CanvasMouseInfoHolder;
 
 import java.awt.*;
 
@@ -12,7 +13,7 @@ import java.awt.*;
 public class PencilTool extends BaseTool {
     private Mode mode = null;
 
-    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
+    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
         super(canvas, choicesHolder, mouseInfoHolder);
     }
 
@@ -28,7 +29,7 @@ public class PencilTool extends BaseTool {
                 color = choicesHolder.getEraseColorAsIntRGB();
                 mode = Mode.ERASE;
             }
-            Point mousePosition = mouseInfoHolder.getCurrentMousePosition();
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
             canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
             canvas.repaint();
         }
@@ -37,10 +38,10 @@ public class PencilTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
-            int previousMouseX = mouseInfoHolder.getPreviousMousePositionX();
-            int previousMouseY = mouseInfoHolder.getPreviousMousePositionY();
-            int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-            int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
+            int previousMouseX = mouseInfoHolder.getPreviousMousePositionInImageX();
+            int previousMouseY = mouseInfoHolder.getPreviousMousePositionInImageY();
+            int mousePositionX = mouseInfoHolder.getCurrentMousePositionInImageX();
+            int mousePositionY = mouseInfoHolder.getCurrentMousePositionInImageY();
 
             while (previousMouseX != mousePositionX || previousMouseY != mousePositionY) {
                 int xOffset = 0;
