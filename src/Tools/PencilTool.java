@@ -8,6 +8,7 @@ import Utils.MouseInfoHolder;
 import Canvas.CanvasMouseInfoHolder;
 import Canvas.CanvasCursorManager;
 import Canvas.CanvasCursor;
+import Canvas.CanvasState;
 import java.awt.*;
 
 
@@ -21,6 +22,8 @@ public class PencilTool extends BaseTool {
     @Override
     public void mousePressed() {
         if (mode == null) {
+            canvas.getCanvasHistory().createPerformedState();
+
             int color = 0;
             if (mouseInfoHolder.isLeftMouseButtonPressed()) {
                 color = choicesHolder.getPaintColorAsIntRGB();
@@ -82,7 +85,6 @@ public class PencilTool extends BaseTool {
         else if (mode == Mode.ERASE && !mouseInfoHolder.isRightMouseButtonPressed()) {
             mode = null;
         }
-
     }
 
     @Override
