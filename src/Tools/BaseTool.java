@@ -4,6 +4,8 @@ import Canvas.Canvas;
 import Models.ChoicesHolder;
 import Utils.MouseInfoHolder;
 
+import java.awt.*;
+
 public abstract class BaseTool {
     protected Canvas canvas;
     protected ChoicesHolder choicesHolder;
