@@ -3,6 +3,7 @@ package Toolstrip;
 import Canvas.Canvas;
 import Canvas.CanvasHistoryListener;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,6 +28,8 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
                 canvas.getCanvasHistory().undo();
             }
         });
+        undo.setIcon(new ImageIcon(JMenuBar.class.getResource("/undo-icon.png")));
+        undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(undo);
 
         redo = new JMenuItem("Redo");
@@ -37,6 +40,8 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
                 canvas.getCanvasHistory().redo();
             }
         });
+        redo.setIcon(new ImageIcon(JMenuBar.class.getResource("/redo-icon.png")));
+        redo.setAccelerator(KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(redo);
 
         JMenu help = new JMenu("Help");
