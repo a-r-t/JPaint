@@ -5,6 +5,8 @@ import Models.ChoicesHolder;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
 import Canvas.CanvasMouseInfoHolder;
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 
 import java.awt.*;
 
@@ -12,8 +14,8 @@ import java.awt.*;
 public class EraserTool extends BaseTool {
     private Mode mode = null;
 
-    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
     }
 
     @Override
@@ -65,6 +67,13 @@ public class EraserTool extends BaseTool {
         if (mode == Mode.ERASE && !mouseInfoHolder.isLeftMouseButtonPressed()) {
             mode = null;
         }
+    }
+
+    @Override
+    public Cursor getCursor() {
+        // TODO: Figure out eraser cursor
+        return super.getCursor();
+        // return cursorManager.get(CanvasCursor);
     }
 
     private enum Mode {

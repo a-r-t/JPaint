@@ -6,15 +6,16 @@ import Toolstrip.Tool;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
 import Canvas.CanvasMouseInfoHolder;
-
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 import java.awt.*;
 
 
 public class PencilTool extends BaseTool {
     private Mode mode = null;
 
-    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
     }
 
     @Override
@@ -82,6 +83,11 @@ public class PencilTool extends BaseTool {
             mode = null;
         }
 
+    }
+
+    @Override
+    public Cursor getCursor() {
+        return cursorManager.get(CanvasCursor.PENCIL);
     }
 
     private enum Mode {

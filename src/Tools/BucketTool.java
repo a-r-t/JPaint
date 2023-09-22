@@ -9,12 +9,13 @@ import java.awt.*;
 import java.util.LinkedList;
 import java.util.Queue;
 import Canvas.CanvasMouseInfoHolder;
-
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 
 public class BucketTool extends BaseTool {
 
-    public BucketTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public BucketTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
     }
 
     @Override
@@ -54,5 +55,10 @@ public class BucketTool extends BaseTool {
                 }
             }
         }
+    }
+
+    @Override
+    public Cursor getCursor() {
+        return cursorManager.get(CanvasCursor.BUCKET);
     }
 }

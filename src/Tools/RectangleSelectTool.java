@@ -2,7 +2,10 @@ package Tools;
 
 import Canvas.Canvas;
 import Canvas.CanvasMouseInfoHolder;
+import Canvas.CanvasCursorManager;
 import Models.ChoicesHolder;
+import Canvas.CanvasCursor;
+
 import Utils.Image;
 import Utils.ImageType;
 import Utils.MouseClick;
@@ -20,8 +23,8 @@ public class RectangleSelectTool extends BaseTool {
     private Rectangle originalSelectBorder;
     private Point selectAnchor;
 
-    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
 
         selectBorder = new Rectangle(0, 0, 0, 0);
 
@@ -56,7 +59,7 @@ public class RectangleSelectTool extends BaseTool {
 
                 // prepare for new selection to be made
                 canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
-                selectAnchor = new Point(mouseInfoHolder.getCurrentMousePositionX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionY() / choicesHolder.getScale());
+                selectAnchor = new Point(mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale());
                 canvas.setAllowCanvasResizing(false);
                 selectBorder = new Rectangle(0, 0, 0, 0);
                 originalSelectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
@@ -68,8 +71,8 @@ public class RectangleSelectTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode == Mode.SELECT) { // creating a new selection
-            int pixelX = mouseInfoHolder.getCurrentMousePositionX() / choicesHolder.getScale();
-            int pixelY = mouseInfoHolder.getCurrentMousePositionY() / choicesHolder.getScale();
+            int pixelX = mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale();
+            int pixelY = mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale();
 
             int x = selectAnchor.x;
             int y = selectAnchor.y;
@@ -159,6 +162,14 @@ public class RectangleSelectTool extends BaseTool {
             canvas.repaint();
         }
         mode = null;
+    }
+
+    @Override
+    public Cursor getCursor() {
+        if (selectBorder.contains(new Point(mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale()))) {
+            return cursorManager.get(CanvasCursor.DRAG);
+        }
+        return cursorManager.get(CanvasCursor.SELECT);
     }
 
     private enum Mode {

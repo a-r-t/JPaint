@@ -65,11 +65,11 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.canvasMode = CanvasMode.PAINT;
         this.cursors = new CanvasCursorManager();
         this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
-        this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder);
-        this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder);
-        this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, listeners);
-        this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder);
-        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder);
+        this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
+        this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors);
 
         updateCanvasResizers();
 
@@ -234,20 +234,24 @@ public class Canvas extends JPanel implements ChoicesListener {
         }
         if (isMouseInCanvas(mousePosition)) {
             if (choicesHolder.getTool() == Tool.PENCIL) {
-                return cursors.get(CanvasCursor.PENCIL);
+                return pencilTool.getCursor();
+                //return cursors.get(CanvasCursor.PENCIL);
             }
             else if (choicesHolder.getTool() == Tool.BUCKET) {
-                return cursors.get(CanvasCursor.BUCKET);
+                return bucketTool.getCursor();
+                //return cursors.get(CanvasCursor.BUCKET);
 
             }
             else if (choicesHolder.getTool() == Tool.EYE_DROPPER) {
-                return cursors.get(CanvasCursor.EYE_DROPPER);
+                return eyeDropperTool.getCursor();
+               // return cursors.get(CanvasCursor.EYE_DROPPER);
             }
             else if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
                 //if (selectBorder.contains(new Point((mousePosition.x - CANVAS_START_X) / choicesHolder.getScale(), (mousePosition.y - CANVAS_START_Y) / choicesHolder.getScale()))) {
                 //    return cursors.get(CanvasCursor.DRAG);
                 //}
-                return cursors.get(CanvasCursor.SELECT);
+               // return cursors.get(CanvasCursor.SELECT);
+                return rectangleSelectTool.getCursor();
             }
         }
         return Cursor.getDefaultCursor();

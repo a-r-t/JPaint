@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import Canvas.CanvasMouseInfoHolder;
-
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 
 public class EyeDropperTool extends BaseTool {
     private ArrayList<CanvasListener> canvasListeners;
 
-    public EyeDropperTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, ArrayList<CanvasListener> canvasListeners) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public EyeDropperTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager, ArrayList<CanvasListener> canvasListeners) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
         this.canvasListeners = canvasListeners;
     }
 
@@ -48,5 +49,10 @@ public class EyeDropperTool extends BaseTool {
                 listener.onEraseColorChanged(color);
             }
         }
+    }
+
+    @Override
+    public Cursor getCursor() {
+        return cursorManager.get(CanvasCursor.EYE_DROPPER);
     }
 }
