@@ -11,21 +11,22 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-
+import Canvas.CanvasMouseInfoHolder;
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 
 public class EyeDropperTool extends BaseTool {
     private ArrayList<CanvasListener> canvasListeners;
 
-    public EyeDropperTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder, ArrayList<CanvasListener> canvasListeners) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public EyeDropperTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager, ArrayList<CanvasListener> canvasListeners) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
         this.canvasListeners = canvasListeners;
     }
 
     @Override
     public void mousePressed() {
-        int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-        int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
-        int rgb = canvas.getMainImage().getRGB(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale());
+        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+        int rgb = canvas.getMainImage().getRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale());
         Color color = ColorUtils.getColorFromInt(rgb);
         if (mouseInfoHolder.isLeftMouseButtonPressed()) {
             choicesHolder.setPaintColor(color);
@@ -48,5 +49,10 @@ public class EyeDropperTool extends BaseTool {
                 listener.onEraseColorChanged(color);
             }
         }
+    }
+
+    @Override
+    public Cursor getCursor() {
+        return cursorManager.get(CanvasCursor.EYE_DROPPER);
     }
 }

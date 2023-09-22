@@ -4,6 +4,9 @@ import Canvas.Canvas;
 import Models.ChoicesHolder;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
+import Canvas.CanvasMouseInfoHolder;
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 
 import java.awt.*;
 
@@ -11,17 +14,16 @@ import java.awt.*;
 public class EraserTool extends BaseTool {
     private Mode mode = null;
 
-    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public EraserTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
     }
 
     @Override
     public void mousePressed() {
         if (mode == null && mouseInfoHolder.isLeftMouseButtonPressed()) {
             int color = choicesHolder.getEraseColorAsIntRGB();
-            int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-            int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
-            canvas.getMainImage().setRGB(mousePositionX / choicesHolder.getScale(), mousePositionY / choicesHolder.getScale(), color);
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+            canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
             mode = Mode.ERASE;
             canvas.repaint();
         }
@@ -30,7 +32,6 @@ public class EraserTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
-            // if erasing, figures out previous mouse position and new mouse position, and then removes pixels in between
             int previousMouseX = mouseInfoHolder.getPreviousMousePositionX();
             int previousMouseY = mouseInfoHolder.getPreviousMousePositionY();
             int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
@@ -66,6 +67,13 @@ public class EraserTool extends BaseTool {
         if (mode == Mode.ERASE && !mouseInfoHolder.isLeftMouseButtonPressed()) {
             mode = null;
         }
+    }
+
+    @Override
+    public Cursor getCursor() {
+        // TODO: Figure out eraser cursor
+        return super.getCursor();
+        // return cursorManager.get(CanvasCursor);
     }
 
     private enum Mode {

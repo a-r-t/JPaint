@@ -5,15 +5,17 @@ import Models.ChoicesHolder;
 import Toolstrip.Tool;
 import Utils.MouseClick;
 import Utils.MouseInfoHolder;
-
+import Canvas.CanvasMouseInfoHolder;
+import Canvas.CanvasCursorManager;
+import Canvas.CanvasCursor;
 import java.awt.*;
 
 
 public class PencilTool extends BaseTool {
     private Mode mode = null;
 
-    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, MouseInfoHolder mouseInfoHolder) {
-        super(canvas, choicesHolder, mouseInfoHolder);
+    public PencilTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+        super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
     }
 
     @Override
@@ -28,7 +30,7 @@ public class PencilTool extends BaseTool {
                 color = choicesHolder.getEraseColorAsIntRGB();
                 mode = Mode.ERASE;
             }
-            Point mousePosition = mouseInfoHolder.getCurrentMousePosition();
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
             canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
             canvas.repaint();
         }
@@ -37,11 +39,10 @@ public class PencilTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
-            // if drawing, figures out previous mouse position and new mouse position, and then applies pixels in between
-            int previousMouseX = mouseInfoHolder.getPreviousMousePositionX();
-            int previousMouseY = mouseInfoHolder.getPreviousMousePositionY();
-            int mousePositionX = mouseInfoHolder.getCurrentMousePositionX();
-            int mousePositionY = mouseInfoHolder.getCurrentMousePositionY();
+            int previousMouseX = mouseInfoHolder.getPreviousMousePositionInImageX();
+            int previousMouseY = mouseInfoHolder.getPreviousMousePositionInImageY();
+            int mousePositionX = mouseInfoHolder.getCurrentMousePositionInImageX();
+            int mousePositionY = mouseInfoHolder.getCurrentMousePositionInImageY();
 
             while (previousMouseX != mousePositionX || previousMouseY != mousePositionY) {
                 int xOffset = 0;
@@ -82,6 +83,11 @@ public class PencilTool extends BaseTool {
             mode = null;
         }
 
+    }
+
+    @Override
+    public Cursor getCursor() {
+        return cursorManager.get(CanvasCursor.PENCIL);
     }
 
     private enum Mode {
