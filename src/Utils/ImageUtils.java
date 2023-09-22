@@ -41,7 +41,7 @@ public class ImageUtils {
     // if new image is larger, empty space is filled in with emptyColor
     // if new image is smaller, original image will be cut off by appropriate amount to fit
     public static BufferedImage resizeImage(BufferedImage image, int newWidth, int newHeight, Color emptyColor) {
-        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage = new BufferedImage(newWidth, newHeight, image.getType());
         clearImage(newImage, emptyColor);
         Graphics2D newImageGraphics = newImage.createGraphics();
         newImageGraphics.drawImage(image.getSubimage(0, 0, Math.min(image.getWidth(), newImage.getWidth()), Math.min(image.getHeight(), newImage.getHeight())), 0, 0, null);
@@ -49,7 +49,7 @@ public class ImageUtils {
         return newImage;
     }
 
-    // creates new image clone from a given image
+    // creates new image deepcopy from a given image
     public static BufferedImage copyImage(BufferedImage image) {
         ColorModel cm = image.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();

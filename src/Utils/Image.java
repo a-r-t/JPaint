@@ -94,7 +94,6 @@ public class Image {
         g.drawImage(image, x, y, width, height, null);
     }
 
-    // TODO: alpha stuff
     public void paint(Graphics2D g, int x, int y, int scale) {
         g.drawImage(image, x, y, image.getWidth() * scale, image.getHeight() * scale, null);
     }
