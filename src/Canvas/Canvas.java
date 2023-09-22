@@ -131,27 +131,7 @@ public class Canvas extends JPanel implements ChoicesListener {
                 MouseClick mouseClick = MouseClick.convertToMouseClick(e.getButton());
                 mouseInfoHolder.mouseButtonReleased(mouseClick);
                 mouseInfoHolder.updateMousePosition(e.getPoint());
-
-                if (choicesHolder.getTool() == Tool.PENCIL) {
-                    pencilTool.mouseReleased();
-                }
-                else if (choicesHolder.getTool() == Tool.ERASER) {
-                    eraserTool.mouseReleased();
-                }
-                else if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-                    rectangleSelectTool.mouseReleased();
-                }
-
-                else if (isLeftMouseDown && mouseClick == MouseClick.LEFT_CLICK) {
-                    isLeftMouseDown = false;
-                    previousMousePosition = null;
-
-                }
-                else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
-                    isRightMouseDown = false;
-                    previousMousePosition = null;
-                }
-                else if (canvasMode == CanvasMode.RESIZE && mouseClick == MouseClick.LEFT_CLICK) {
+                if (canvasMode == CanvasMode.RESIZE && mouseClick == MouseClick.LEFT_CLICK) {
 
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
                         canvasWidth = Math.max(e.getX() / choicesHolder.getScale(), 1);
@@ -169,6 +149,24 @@ public class Canvas extends JPanel implements ChoicesListener {
                     setCursor(Cursor.getDefaultCursor());
                     revalidate();
                     repaint();
+                }
+                else if (choicesHolder.getTool() == Tool.PENCIL) {
+                    pencilTool.mouseReleased();
+                }
+                else if (choicesHolder.getTool() == Tool.ERASER) {
+                    eraserTool.mouseReleased();
+                }
+                else if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+                    rectangleSelectTool.mouseReleased();
+                }
+
+                else if (isLeftMouseDown && mouseClick == MouseClick.LEFT_CLICK) {
+                    isLeftMouseDown = false;
+                    previousMousePosition = null;
+                }
+                else if (isRightMouseDown && mouseClick == MouseClick.RIGHT_CLICK) {
+                    isRightMouseDown = false;
+                    previousMousePosition = null;
                 }
             }
         });

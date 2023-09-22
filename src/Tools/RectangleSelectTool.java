@@ -18,7 +18,6 @@ public class RectangleSelectTool extends BaseTool {
     private Point selectedSubimageOriginalLocation;
     private Point selectedSubimageCurrentLocation;
     private Rectangle originalSelectBorder;
-    private boolean moveSelection;
     private Point selectAnchor;
 
     public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder) {
@@ -33,7 +32,7 @@ public class RectangleSelectTool extends BaseTool {
         if (mode == null && mouseInfoHolder.isLeftMouseButtonPressed()) {
 
             // move existing selection
-            if (selectBorder.contains(new Point(mouseInfoHolder.getCurrentMousePositionX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionY() / choicesHolder.getScale()))) {
+            if (selectBorder.contains(new Point(mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale()))) {
                 mode = Mode.MOVE;
                 selectedSubimage = canvas.getMainImage().getSubImage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
                 selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
@@ -56,7 +55,6 @@ public class RectangleSelectTool extends BaseTool {
                 }
 
                 // prepare for new selection to be made
-                moveSelection = false;
                 canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
                 selectAnchor = new Point(mouseInfoHolder.getCurrentMousePositionX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionY() / choicesHolder.getScale());
                 canvas.setAllowCanvasResizing(false);

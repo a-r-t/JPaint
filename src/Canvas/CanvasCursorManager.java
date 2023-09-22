@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 public class CanvasCursorManager {
 
-    private Canvas canvas;
     private HashMap<CanvasCursor, Cursor> cursors = new HashMap<>();
 
     public CanvasCursorManager() {
