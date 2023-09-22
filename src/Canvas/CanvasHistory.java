@@ -8,6 +8,7 @@ public class CanvasHistory {
     private List<CanvasState> performed; // items that have already been performed (undo)
     private List<CanvasState> recall;    // items that have been undone that can be redone (redo)
     private Canvas canvas;
+    private ArrayList<CanvasHistoryListener> listeners = new ArrayList<>();
 
     public CanvasHistory(Canvas canvas) {
         this.canvas = canvas;
@@ -22,6 +23,8 @@ public class CanvasHistory {
             performed.remove(performed.size() - 1);
         }
         recall.clear();
+
+        emit();
     }
 
     public boolean canUndo() {
@@ -38,6 +41,7 @@ public class CanvasHistory {
             CanvasState currentCanvasState = new CanvasState(ImageUtils.copyImage(canvas.getMainImage().getRaw()), canvas.getCanvasWidth(), canvas.getCanvasHeight());
             setState(lastPerformedCanvasState);
             recall.add(0, currentCanvasState);
+            emit();
         }
     }
 
@@ -47,6 +51,7 @@ public class CanvasHistory {
             CanvasState currentCanvasState = new CanvasState(ImageUtils.copyImage(canvas.getMainImage().getRaw()), canvas.getCanvasWidth(), canvas.getCanvasHeight());
             setState(recallCanvasState);
             performed.add(0, currentCanvasState);
+            emit();
         }
     }
 
@@ -54,6 +59,17 @@ public class CanvasHistory {
         canvas.setMainImage(canvasState.getMainImage());
         canvas.resizeCanvas(canvasState.getWidth(), canvasState.getHeight());
         canvas.repaint();
+    }
+
+    public void addListener(CanvasHistoryListener listener) {
+        listeners.add(listener);
+    }
+
+    public void emit() {
+        // tell listeners the current sizes of the performed and recall lists
+        for (CanvasHistoryListener listener : listeners) {
+            listener.onHistorySizeChange(performed.size(), recall.size());
+        }
     }
 
 

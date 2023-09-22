@@ -377,12 +377,12 @@ public class Canvas extends JPanel implements ChoicesListener {
 
     @Override
     public void onPaintColorChanged(Color color) {
-
+        // unused interface method
     }
 
     @Override
     public void onEraseColorChanged(Color color) {
-
+        // unused interface method
     }
 
     @Override

@@ -1,12 +1,15 @@
 package Toolstrip;
 
 import Canvas.Canvas;
-
+import Canvas.CanvasHistoryListener;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MenuBar extends JMenuBar {
+public class MenuBar extends JMenuBar implements CanvasHistoryListener {
+
+    private JMenuItem undo;
+    private JMenuItem redo;
 
     public MenuBar(Canvas canvas) {
         JMenu file = new JMenu("File");
@@ -16,7 +19,8 @@ public class MenuBar extends JMenuBar {
         JMenu edit = new JMenu("Edit");
         add(edit);
 
-        JMenuItem undo = new JMenuItem("Undo");
+        undo = new JMenuItem("Undo");
+        undo.setEnabled(false);
         undo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -25,7 +29,8 @@ public class MenuBar extends JMenuBar {
         });
         edit.add(undo);
 
-        JMenuItem redo = new JMenuItem("Redo");
+        redo = new JMenuItem("Redo");
+        redo.setEnabled(false);
         redo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -37,5 +42,11 @@ public class MenuBar extends JMenuBar {
         JMenu help = new JMenu("Help");
 
         add(help);
+    }
+
+    @Override
+    public void onHistorySizeChange(int performedSize, int recallSize) {
+        undo.setEnabled(performedSize > 0);
+        redo.setEnabled(recallSize > 0);
     }
 }

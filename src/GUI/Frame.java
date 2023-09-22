@@ -30,9 +30,11 @@ public class Frame {
         frame = new JFrame();
         frame.setIconImages(getIcons());
         mainPanel = new JPanel();
-
         choicesHolder = new ChoicesHolder();
+
         canvas = new Canvas(choicesHolder);
+        MenuBar menuBar = new MenuBar(canvas);
+        canvas.getCanvasHistory().addListener(menuBar);
         choicesHolder.addListener(canvas);
         toolstrip = new ToolStrip(choicesHolder);
         choicesHolder.addListener(toolstrip);
@@ -48,7 +50,7 @@ public class Frame {
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setSize(800, 600);
-        frame.setJMenuBar(new MenuBar(canvas));
+        frame.setJMenuBar(menuBar);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
