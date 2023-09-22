@@ -21,6 +21,8 @@ public class EraserTool extends BaseTool {
     @Override
     public void mousePressed() {
         if (mode == null && mouseInfoHolder.isLeftMouseButtonPressed()) {
+            canvas.getCanvasHistory().createPerformedState();
+
             int color = choicesHolder.getEraseColorAsIntRGB();
             Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
             canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);

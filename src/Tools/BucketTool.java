@@ -20,6 +20,8 @@ public class BucketTool extends BaseTool {
 
     @Override
     public void mousePressed() {
+        canvas.getCanvasHistory().createPerformedState();
+
         int color = 0;
         if (mouseInfoHolder.isLeftMouseButtonPressed()) {
             color = choicesHolder.getPaintColorAsIntRGB();

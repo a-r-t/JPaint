@@ -191,6 +191,8 @@ public class RectangleSelectTool extends BaseTool {
     }
 
     public void applyChanges() {
+        canvas.getCanvasHistory().createPerformedState();
+
         if (originalSelectBorder != null && !originalSelectBorder.equals(selectBorder)) {
 
             Graphics2D graphics = canvas.getMainImage().getGraphics();
