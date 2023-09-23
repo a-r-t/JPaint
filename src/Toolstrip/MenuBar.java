@@ -247,6 +247,11 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 try {
                     ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
                     currentlyOpenFile = filePath;
+
+                    // let subscribers know a file was opened
+                    for (MenuBarListener listener : listeners) {
+                        listener.onFileOpened(currentlyOpenFile);
+                    }
                 } catch (IOException e) {
                     // TODO: Error message in UI that file can't be saved
                 }
