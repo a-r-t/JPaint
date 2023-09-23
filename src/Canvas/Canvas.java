@@ -447,4 +447,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             rectangleSelectTool.reset();
         }
     }
+
+    // essentially "resets" the canvas to "fit" the main image (matches its size)
+    public void fitCanvasToMainImage() {
+        canvasWidth = mainImage.getWidth();
+        canvasHeight = mainImage.getHeight();
+        resizeCanvas(mainImage.getWidth(), mainImage.getHeight());
+        updateCanvasResizers();
+        revalidate();
+        repaint();
+    }
 }

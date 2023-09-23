@@ -2,20 +2,64 @@ package Toolstrip;
 
 import Canvas.Canvas;
 import Canvas.CanvasHistoryListener;
+import GUI.FileChooser;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class MenuBar extends JMenuBar implements CanvasHistoryListener {
-
+    private String currentlyOpenFile = null;
+    private JMenuItem open;
+    private JMenuItem save;
+    private JMenuItem saveAs;
     private JMenuItem undo;
     private JMenuItem redo;
 
     public MenuBar(Canvas canvas) {
         JMenu file = new JMenu("File");
-
         add(file);
+
+        open = new JMenuItem("Open");
+        open.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFile(canvas);
+            }
+        });
+        open.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        file.add(open);
+
+        save = new JMenuItem("Save");
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveFile(canvas);
+            }
+        });
+        save.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        file.add(save);
+
+        saveAs = new JMenuItem("Save As");
+        saveAs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveAsFile(canvas);
+            }
+        });
+        saveAs.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | java.awt.event.InputEvent.SHIFT_MASK));
+        file.add(saveAs);
 
         JMenu edit = new JMenu("Edit");
         add(edit);
@@ -64,4 +108,94 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
     public void onRedo() {
         // interface method not used
     }
+
+    public void openFile(Canvas canvas) {
+        JFileChooser fileChooser = new FileChooser();
+        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        fileChooser.setApproveButtonText("Open");
+        fileChooser.setApproveButtonMnemonic('a');
+        fileChooser.setApproveButtonToolTipText("Open file in application");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files (*.jpg, *.jpeg, *.png)", "jpg", "jpeg", "png"));
+        int returnVal = fileChooser.showDialog(null, "Open");
+
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            File chosenFile = fileChooser.getSelectedFile();
+            if (chosenFile != null) {
+                BufferedImage chosenFileImage = null;
+                try {
+                    chosenFileImage = ImageIO.read(chosenFile);
+                    currentlyOpenFile = chosenFile.getAbsolutePath();
+                    canvas.setMainImage(chosenFileImage);
+                    canvas.fitCanvasToMainImage();
+                } catch (IOException ioException) {
+                    // TODO: Error message in UI that file can't be read
+                }
+            }
+        }
+    }
+
+    public void saveFile(Canvas canvas) {
+        if (currentlyOpenFile == null) {
+            saveAsFile(canvas);
+        }
+        else {
+            String saveFileType = null;
+            if (currentlyOpenFile.endsWith(".jpg") || currentlyOpenFile.endsWith(".jpeg")) {
+                saveFileType = "JPEG";
+            } else {
+                saveFileType = "PNG";
+            }
+
+            try {
+                ImageIO.write(canvas.getMainImage().getRaw(), saveFileType, new File(currentlyOpenFile));
+            } catch (IOException e) {
+                // TODO: Error message in UI that file can't be saved
+            }
+        }
+    }
+
+    public void saveAsFile(Canvas canvas) {
+        JFileChooser fileChooser = new FileChooser();
+        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        fileChooser.setApproveButtonText("Save");
+        fileChooser.setApproveButtonMnemonic('a');
+        fileChooser.setApproveButtonToolTipText("Save file from application");
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG (*.png)", "png", "*.png");
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("JPEG (*.jpeg, *.jpg)", "jpeg", "jpg", "*.jpeg", "*.jpg");
+        fileChooser.addChoosableFileFilter(pngFilter);
+        fileChooser.addChoosableFileFilter(jpgFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(pngFilter);
+        int returnVal = fileChooser.showDialog(null, "Save");
+
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            File chosenFile = fileChooser.getSelectedFile();
+            if (chosenFile != null) {
+                String filePath = chosenFile.getAbsolutePath();
+                String fileType = "";
+
+                if (fileChooser.getFileFilter() == pngFilter) {
+                    if (!filePath.endsWith(".png")) {
+                        filePath = filePath + ".png";
+                    }
+                    fileType = "PNG";
+                }
+                else if (fileChooser.getFileFilter() == jpgFilter) {
+                    if ((!filePath.endsWith(".jpg") || !filePath.endsWith(".jpeg"))) {
+                        filePath = filePath + ".jpg";
+                    }
+                    fileType = "JPEG";
+                }
+
+                try {
+                    ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
+                    currentlyOpenFile = filePath;
+                } catch (IOException e) {
+                    // TODO: Error message in UI that file can't be saved
+                }
+            }
+        }
+    }
+
+
 }
