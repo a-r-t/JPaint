@@ -13,6 +13,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener {
@@ -245,7 +246,13 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
     }
 
     @Override
-    public void onToolChanged(Tool tool) { }
+    public void onToolChanged(Tool tool) {
+        for (int i = 0;  i < toolButtons.size(); i++) {
+            ToolButton tb = toolButtons.get(i);
+            tb.setSelected(tb.getTool() == tool);
+        }
+        repaint();
+    }
 
     @Override
     public void onPaintColorChanged(Color color) {
@@ -273,5 +280,10 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
         }
         choicesHolder.setTool(previousPaintSelectedTool);
         repaint();
+    }
+
+    @Override
+    public void onSelectedSubImageChanged(BufferedImage subImage) {
+        // unused interface method
     }
 }

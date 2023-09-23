@@ -56,6 +56,12 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     private RectangleSelectTool rectangleSelectTool;
 
     public Canvas(ChoicesHolder choicesHolder) {
+        mainImage = new Image(canvasWidth, canvasHeight);
+        mainImage.clear(new Color(255, 255, 255));
+
+        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
+
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
         this.choicesHolder = choicesHolder;
@@ -68,18 +74,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder, cursors);
         this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
         this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
-        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
 
         updateCanvasResizers();
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
 
-        mainImage = new Image(canvasWidth, canvasHeight);
-        mainImage.clear(new Color(255, 255, 255));
 
-        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
-        selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         this.setDoubleBuffered(true);
 
@@ -263,11 +265,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     }
 
     public void resizeCanvas(int newWidth, int newHeight) {
+        canvasWidth = newWidth;
+        canvasHeight = newHeight;
         mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
         selectionImageLayer.resize(newWidth, newHeight, new Color(0, 0, 0, 0));
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
+        repaint();
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
@@ -364,13 +369,8 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
         allowCanvasResizing = true;
 
-        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-            rectangleSelectTool.reset();
-        }
+        rectangleSelectTool.applyChanges();
 
-        if (choicesHolder.getPreviousTool() == Tool.RECTANGLE_SELECT) {
-            rectangleSelectTool.applyChanges();
-        }
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         repaint();
@@ -456,5 +456,21 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         updateCanvasResizers();
         revalidate();
         repaint();
+    }
+
+    // if rectangle tool is used and has selected a sub image, this returns that sub image
+    // returns null if rectangle tool not selected or if no sub image is currently selected
+    public BufferedImage getSelectedSubimage() {
+        if (choicesHolder.getTool() != Tool.RECTANGLE_SELECT) {
+            return null;
+        }
+        return rectangleSelectTool.getSelectedSubimage();
+
+    }
+
+    public void setSelectedSubimage(BufferedImage selectedSubimage) {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.setSelectedSubimage(selectedSubimage);
+        }
     }
 }

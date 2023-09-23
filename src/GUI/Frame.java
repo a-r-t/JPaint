@@ -33,12 +33,13 @@ public class Frame {
         choicesHolder = new ChoicesHolder();
 
         canvas = new Canvas(choicesHolder);
-        MenuBar menuBar = new MenuBar(canvas);
+        MenuBar menuBar = new MenuBar(canvas, choicesHolder);
         canvas.getCanvasHistory().addListener(menuBar);
         choicesHolder.addListener(canvas);
         toolstrip = new ToolStrip(choicesHolder);
         choicesHolder.addListener(toolstrip);
         canvas.addListener(toolstrip);
+        canvas.addListener(menuBar);
 
         mainPanel.setLayout(new BorderLayout());
 

@@ -12,6 +12,8 @@ public class CanvasMouseInfoHolder extends MouseInfoHolder {
     public CanvasMouseInfoHolder(Canvas canvas) {
         super();
         this.canvas = canvas;
+        this.currentMousePositionInImage = new Point(0, 0);
+        this.previousMousePositionInImage = new Point(0, 0);
     }
 
     @Override
