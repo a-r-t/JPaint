@@ -4,6 +4,8 @@ import Canvas.Canvas;
 import Canvas.CanvasListener;
 import Canvas.CanvasHistoryListener;
 import GUI.FileChooser;
+import Models.ChoicesHolder;
+import Models.ChoicesListener;
 import Utils.ClipboardUtils;
 
 import javax.imageio.ImageIO;
@@ -29,10 +31,11 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private JMenuItem undo;
     private JMenuItem redo;
     private JMenuItem copy;
+    private JMenuItem paste;
 
-    public MenuBar(Canvas canvas) {
+    public MenuBar(Canvas canvas, ChoicesHolder choicesHolder) {
         createFileSection(canvas);
-        createEditSection(canvas);
+        createEditSection(canvas, choicesHolder);
 
         JMenu help = new JMenu("Help");
         add(help);
@@ -74,7 +77,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         file.add(saveAs);
     }
 
-    private void createEditSection(Canvas canvas) {
+    private void createEditSection(Canvas canvas, ChoicesHolder choicesHolder) {
         JMenu edit = new JMenu("Edit");
         add(edit);
 
@@ -107,7 +110,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         copy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BufferedImage selectedSubImage = canvas.getSelectedSubImage();
+                BufferedImage selectedSubImage = canvas.getSelectedSubimage();
                 if (selectedSubImage != null) {
                     ClipboardUtils.copyToClipboard(selectedSubImage);
                 }
@@ -116,7 +119,20 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         copy.setAccelerator(KeyStroke.getKeyStroke('C', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(copy);
 
-
+        paste = new JMenuItem("Paste");
+        paste.setEnabled(true);
+        paste.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BufferedImage clipboardImage = ClipboardUtils.copyToImage();
+                if (clipboardImage != null) {
+                    choicesHolder.setTool(Tool.RECTANGLE_SELECT);
+                    canvas.setSelectedSubimage(clipboardImage);
+                }
+            }
+        });
+        paste.setAccelerator(KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        edit.add(paste);
     }
 
     @Override

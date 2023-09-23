@@ -460,11 +460,17 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
     // if rectangle tool is used and has selected a sub image, this returns that sub image
     // returns null if rectangle tool not selected or if no sub image is currently selected
-    public BufferedImage getSelectedSubImage() {
+    public BufferedImage getSelectedSubimage() {
         if (choicesHolder.getTool() != Tool.RECTANGLE_SELECT) {
             return null;
         }
         return rectangleSelectTool.getSelectedSubimage();
 
+    }
+
+    public void setSelectedSubimage(BufferedImage selectedSubimage) {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.setSelectedSubimage(selectedSubimage);
+        }
     }
 }

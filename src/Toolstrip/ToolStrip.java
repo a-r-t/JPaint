@@ -246,7 +246,13 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
     }
 
     @Override
-    public void onToolChanged(Tool tool) { }
+    public void onToolChanged(Tool tool) {
+        for (int i = 0;  i < toolButtons.size(); i++) {
+            ToolButton tb = toolButtons.get(i);
+            tb.setSelected(tb.getTool() == tool);
+        }
+        repaint();
+    }
 
     @Override
     public void onPaintColorChanged(Color color) {
