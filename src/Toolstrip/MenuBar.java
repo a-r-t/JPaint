@@ -2,6 +2,7 @@ package Toolstrip;
 
 import Canvas.Canvas;
 import Canvas.CanvasHistoryListener;
+import GUI.FileChooser;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,10 +10,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class MenuBar extends JMenuBar implements CanvasHistoryListener {
     private JMenuItem open;
@@ -29,9 +34,13 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png"));
-                int returnVal = fileChooser.showSaveDialog(null);
+                JFileChooser fileChooser = new FileChooser();
+                fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+                fileChooser.setApproveButtonText("Open");
+                fileChooser.setApproveButtonMnemonic('a');
+                fileChooser.setApproveButtonToolTipText("Open file in application");
+                fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files (*.jpg, *.jpeg, *.png)", "jpg", "jpeg", "png"));
+                int returnVal = fileChooser.showDialog(null, "Open");
 
                 if(returnVal == JFileChooser.APPROVE_OPTION) {
                     File chosenFile = fileChooser.getSelectedFile();
@@ -106,4 +115,5 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
     public void onRedo() {
         // interface method not used
     }
+
 }
