@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 public class FileChooser extends JFileChooser {
     public FileChooser() {
+
+        // this post gave me this wacky code to make the file chooser scroll vertically instead of horizontally: https://stackoverflow.com/a/47570750/16948475
         stream(this)
                 .filter(JList.class::isInstance)
                 .map(JList.class::cast)
