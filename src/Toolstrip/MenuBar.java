@@ -2,20 +2,62 @@ package Toolstrip;
 
 import Canvas.Canvas;
 import Canvas.CanvasHistoryListener;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
 public class MenuBar extends JMenuBar implements CanvasHistoryListener {
-
+    private JMenuItem open;
+    private JMenuItem save;
+    private JMenuItem saveAs;
     private JMenuItem undo;
     private JMenuItem redo;
 
     public MenuBar(Canvas canvas) {
         JMenu file = new JMenu("File");
-
         add(file);
+
+        open = new JMenuItem("Open");
+        open.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png"));
+                int returnVal = fileChooser.showSaveDialog(null);
+
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    File chosenFile = fileChooser.getSelectedFile();
+                    if (chosenFile != null) {
+                        BufferedImage chosenFileImage = null;
+                        try {
+                            chosenFileImage = ImageIO.read(chosenFile);
+                        } catch (IOException ioException) {
+                            // TODO: Error message in UI that file can't be read
+                        }
+                        canvas.setMainImage(chosenFileImage);
+                        canvas.fitCanvasToMainImage();
+                    }
+                }
+            }
+        });
+        open.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        file.add(open);
+
+        save = new JMenuItem("Save");
+        save.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        file.add(save);
+
+        saveAs = new JMenuItem("Save As");
+        saveAs.setAccelerator(KeyStroke.getKeyStroke('S', java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        file.add(saveAs);
 
         JMenu edit = new JMenu("Edit");
         add(edit);
