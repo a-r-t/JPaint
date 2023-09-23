@@ -38,19 +38,18 @@ public class RectangleSelectTool extends BaseTool {
             // move existing selection
             if (selectBorder.contains(new Point(mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale()))) {
                 mode = Mode.MOVE;
-                //selectedSubimage = canvas.getMainImage().getSubImage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
                 selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
                 selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
             }
 
             // create new selection
             else {
-                mode = Mode.SELECT;
-
                 // if a previous selection exists, permanently apply the changes to the image
                 if (selectBorder.width > 0 && selectBorder.height > 0) {
                     applyChanges();
                 }
+
+                mode = Mode.SELECT;
 
                 // prepare for new selection to be made
                 canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
@@ -260,7 +259,6 @@ public class RectangleSelectTool extends BaseTool {
 
     public void setSelectedSubimage(BufferedImage selectedSubimage) {
         applyChanges();
-        reset();
 
         canvas.getCanvasHistory().createPerformedState();
 

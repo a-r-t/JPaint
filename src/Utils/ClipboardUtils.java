@@ -11,6 +11,23 @@ import java.io.IOException;
 public class ClipboardUtils {
     private static final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
+    private static boolean isClipboardContentAValidImage() {
+        Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+
+        // no content in clipboard
+        if (content == null) {
+            return false;
+        }
+
+        // content in clipboard is not able to be converted into an image
+        if (!content.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+            return false;
+        }
+
+        // there is technically still the possibility that the clipboard content isn't a valid image, but the above checks are enough for 99.9% of cases
+        return true;
+    }
+
     public static void copyToClipboard(BufferedImage img) {
         clipboard.setContents(new TransferableImage(img), null);
     }
@@ -18,13 +35,7 @@ public class ClipboardUtils {
     public static BufferedImage copyToImage() {
         Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
 
-        // no content in clipboard
-        if (content == null) {
-            return null;
-        }
-
-        // content in clipboard is not able to be converted into an image
-        if (!content.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+        if (!isClipboardContentAValidImage()) {
             return null;
         }
 

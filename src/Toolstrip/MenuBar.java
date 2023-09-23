@@ -120,7 +120,6 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         edit.add(copy);
 
         paste = new JMenuItem("Paste");
-        paste.setEnabled(true);
         paste.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
