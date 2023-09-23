@@ -68,7 +68,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder, cursors);
         this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
         this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
-        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
 
         updateCanvasResizers();
 
@@ -456,5 +456,15 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         updateCanvasResizers();
         revalidate();
         repaint();
+    }
+
+    // if rectangle tool is used and has selected a sub image, this returns that sub image
+    // returns null if rectangle tool not selected or if no sub image is currently selected
+    public BufferedImage getSelectedSubImage() {
+        if (choicesHolder.getTool() != Tool.RECTANGLE_SELECT) {
+            return null;
+        }
+        return rectangleSelectTool.getSelectedSubimage();
+
     }
 }

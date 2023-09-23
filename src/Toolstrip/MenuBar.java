@@ -1,8 +1,10 @@
 package Toolstrip;
 
 import Canvas.Canvas;
+import Canvas.CanvasListener;
 import Canvas.CanvasHistoryListener;
 import GUI.FileChooser;
+import Utils.ClipboardUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,15 +21,25 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class MenuBar extends JMenuBar implements CanvasHistoryListener {
+public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryListener {
     private String currentlyOpenFile = null;
     private JMenuItem open;
     private JMenuItem save;
     private JMenuItem saveAs;
     private JMenuItem undo;
     private JMenuItem redo;
+    private JMenuItem copy;
 
     public MenuBar(Canvas canvas) {
+        createFileSection(canvas);
+        createEditSection(canvas);
+
+        JMenu help = new JMenu("Help");
+        add(help);
+    }
+
+    // all menu logic for the "File" section
+    private void createFileSection(Canvas canvas) {
         JMenu file = new JMenu("File");
         add(file);
 
@@ -60,7 +72,9 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         });
         saveAs.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | java.awt.event.InputEvent.SHIFT_MASK));
         file.add(saveAs);
+    }
 
+    private void createEditSection(Canvas canvas) {
         JMenu edit = new JMenu("Edit");
         add(edit);
 
@@ -88,9 +102,21 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         redo.setAccelerator(KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(redo);
 
-        JMenu help = new JMenu("Help");
+        copy = new JMenuItem("Copy");
+        copy.setEnabled(false);
+        copy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BufferedImage selectedSubImage = canvas.getSelectedSubImage();
+                if (selectedSubImage != null) {
+                    ClipboardUtils.copyToClipboard(selectedSubImage);
+                }
+            }
+        });
+        copy.setAccelerator(KeyStroke.getKeyStroke('C', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        edit.add(copy);
 
-        add(help);
+
     }
 
     @Override
@@ -109,7 +135,7 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         // interface method not used
     }
 
-    public void openFile(Canvas canvas) {
+    private void openFile(Canvas canvas) {
         JFileChooser fileChooser = new FileChooser();
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setApproveButtonText("Open");
@@ -134,7 +160,7 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         }
     }
 
-    public void saveFile(Canvas canvas) {
+    private void saveFile(Canvas canvas) {
         if (currentlyOpenFile == null) {
             saveAsFile(canvas);
         }
@@ -154,7 +180,7 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         }
     }
 
-    public void saveAsFile(Canvas canvas) {
+    private void saveAsFile(Canvas canvas) {
         JFileChooser fileChooser = new FileChooser();
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         fileChooser.setApproveButtonText("Save");
@@ -198,4 +224,23 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
     }
 
 
+    @Override
+    public void onPaintColorChanged(Color color) {
+        // unused interface method
+    }
+
+    @Override
+    public void onEraseColorChanged(Color color) {
+        // unused interface method
+    }
+
+    @Override
+    public void onEyeDropperUsedToChangePaintColor() {
+        // unused interface method
+    }
+
+    @Override
+    public void onSelectedSubImageChanged(BufferedImage subImage) {
+        copy.setEnabled(subImage != null);
+    }
 }

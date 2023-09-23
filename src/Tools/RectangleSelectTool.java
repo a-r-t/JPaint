@@ -5,12 +5,14 @@ import Canvas.CanvasMouseInfoHolder;
 import Canvas.CanvasCursorManager;
 import Models.ChoicesHolder;
 import Canvas.CanvasCursor;
+import Canvas.CanvasListener;
 
 import Utils.*;
 import Utils.Image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class RectangleSelectTool extends BaseTool {
     private Mode mode = null;
@@ -20,9 +22,11 @@ public class RectangleSelectTool extends BaseTool {
     private Point selectedSubimageCurrentLocation;
     private Rectangle originalSelectBorder;
     private Point selectAnchor;
+    private ArrayList<CanvasListener> canvasListeners;
 
-    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager) {
+    public RectangleSelectTool(Canvas canvas, ChoicesHolder choicesHolder, CanvasMouseInfoHolder mouseInfoHolder, CanvasCursorManager cursorManager, ArrayList<CanvasListener> canvasListeners) {
         super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
+        this.canvasListeners = canvasListeners;
         reset();
     }
 
@@ -182,6 +186,14 @@ public class RectangleSelectTool extends BaseTool {
         else {
             canvas.getCanvasHistory().createPerformedState();
         }
+
+        // this checks that the selected sub image has changed, and if so, alerts subscribers
+        if (mode == Mode.SELECT) {
+            selectedSubimage = canvas.getMainImage().getSubImage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+            for (CanvasListener listener: canvasListeners) {
+                listener.onSelectedSubImageChanged(selectedSubimage);
+            }
+        }
         mode = null;
     }
 
@@ -217,5 +229,9 @@ public class RectangleSelectTool extends BaseTool {
 
     private enum Mode {
         SELECT, MOVE
+    }
+
+    public BufferedImage getSelectedSubimage() {
+        return selectedSubimage;
     }
 }

@@ -39,6 +39,7 @@ public class Frame {
         toolstrip = new ToolStrip(choicesHolder);
         choicesHolder.addListener(toolstrip);
         canvas.addListener(toolstrip);
+        canvas.addListener(menuBar);
 
         mainPanel.setLayout(new BorderLayout());
 
