@@ -127,7 +127,15 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 BufferedImage clipboardImage = ClipboardUtils.copyToImage();
                 if (clipboardImage != null) {
                     choicesHolder.setTool(Tool.RECTANGLE_SELECT);
+                    if (canvas.getCanvasWidth() < clipboardImage.getWidth()) {
+                        canvas.resizeCanvas(clipboardImage.getWidth(), canvas.getCanvasHeight());
+                    }
+                    if (canvas.getCanvasHeight() < clipboardImage.getHeight()) {
+                        canvas.resizeCanvas(canvas.getCanvasWidth(), clipboardImage.getHeight());
+                    }
                     canvas.setSelectedSubimage(clipboardImage);
+                    canvas.revalidate();
+                    canvas.repaint();
                 }
             }
         });

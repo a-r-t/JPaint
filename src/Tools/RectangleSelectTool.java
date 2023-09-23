@@ -267,7 +267,7 @@ public class RectangleSelectTool extends BaseTool {
         this.selectedSubimage = selectedSubimage;
         isSelectedSubimageExternal = true;
 
-        selectBorder = new Rectangle(0, 0, selectedSubimage.getWidth(), selectedSubimage.getHeight());
+        selectBorder = new Rectangle(0, 0, selectedSubimage.getWidth() - 1, selectedSubimage.getHeight() - 1);
         canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
         Graphics2D graphics = canvas.getSelectionImageLayer().getGraphics();
 
@@ -300,6 +300,7 @@ public class RectangleSelectTool extends BaseTool {
         }
         graphics.dispose();
         originalSelectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
+        canvas.setAllowCanvasResizing(false);
         canvas.repaint();
 
         for (CanvasListener listener: canvasListeners) {

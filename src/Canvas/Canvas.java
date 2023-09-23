@@ -263,11 +263,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     }
 
     public void resizeCanvas(int newWidth, int newHeight) {
+        canvasWidth = newWidth;
+        canvasHeight = newHeight;
         mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
         selectionImageLayer.resize(newWidth, newHeight, new Color(0, 0, 0, 0));
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
+        repaint();
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
