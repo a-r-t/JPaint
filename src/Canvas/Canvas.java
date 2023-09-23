@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Canvas extends JPanel implements ChoicesListener {
+public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryListener {
     private int canvasWidth = 400;
     private int canvasHeight = 400;
     private Image mainImage;
@@ -61,6 +61,7 @@ public class Canvas extends JPanel implements ChoicesListener {
         this.choicesHolder = choicesHolder;
         this.canvasMode = CanvasMode.PAINT;
         this.canvasHistory = new CanvasHistory(this);
+        canvasHistory.addListener(this);
         this.cursors = new CanvasCursorManager();
         this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
         this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder, cursors);
@@ -428,4 +429,22 @@ public class Canvas extends JPanel implements ChoicesListener {
         return canvasHistory;
     }
 
+    @Override
+    public void onHistorySizeChange(int performedSize, int recallSize) {
+        // interface method not used
+    }
+
+    @Override
+    public void onUndo() {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.reset();
+        }
+    }
+
+    @Override
+    public void onRedo() {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.reset();
+        }
+    }
 }

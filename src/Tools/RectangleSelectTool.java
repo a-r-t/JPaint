@@ -179,6 +179,9 @@ public class RectangleSelectTool extends BaseTool {
             canvas.setAllowCanvasResizing(true);
             canvas.repaint();
         }
+        else {
+            canvas.getCanvasHistory().createPerformedState();
+        }
         mode = null;
     }
 
@@ -202,11 +205,14 @@ public class RectangleSelectTool extends BaseTool {
 
             graphics.dispose();
         }
+        canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
     }
 
     @Override
     public void reset() {
         selectBorder = new Rectangle(0, 0, 0, 0);
+        selectedSubimage = null;
+        mode = null;
     }
 
     private enum Mode {

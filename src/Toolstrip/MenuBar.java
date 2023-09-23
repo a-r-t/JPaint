@@ -54,4 +54,14 @@ public class MenuBar extends JMenuBar implements CanvasHistoryListener {
         undo.setEnabled(performedSize > 0);
         redo.setEnabled(recallSize > 0);
     }
+
+    @Override
+    public void onUndo() {
+        // interface method not used
+    }
+
+    @Override
+    public void onRedo() {
+        // interface method not used
+    }
 }
