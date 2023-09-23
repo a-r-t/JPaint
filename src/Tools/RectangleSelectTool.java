@@ -8,7 +8,6 @@ import Canvas.CanvasCursor;
 import Canvas.CanvasListener;
 
 import Utils.*;
-import Utils.Image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -231,13 +230,13 @@ public class RectangleSelectTool extends BaseTool {
             graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
 
             graphics.dispose();
-            reset();
         }
-        canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
+        reset();
     }
 
     @Override
     public void reset() {
+        canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
         originalSelectBorder = new Rectangle(0, 0, 0, 0);
         selectBorder = new Rectangle(0, 0, 0, 0);
         selectedSubimage = null;

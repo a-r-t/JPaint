@@ -56,6 +56,12 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     private RectangleSelectTool rectangleSelectTool;
 
     public Canvas(ChoicesHolder choicesHolder) {
+        mainImage = new Image(canvasWidth, canvasHeight);
+        mainImage.clear(new Color(255, 255, 255));
+
+        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
+
         this.isLeftMouseDown = false;
         this.isRightMouseDown = false;
         this.choicesHolder = choicesHolder;
@@ -75,11 +81,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
 
-        mainImage = new Image(canvasWidth, canvasHeight);
-        mainImage.clear(new Color(255, 255, 255));
 
-        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
-        selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         this.setDoubleBuffered(true);
 
@@ -368,9 +370,6 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         allowCanvasResizing = true;
 
         rectangleSelectTool.applyChanges();
-        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-            rectangleSelectTool.reset();
-        }
 
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
