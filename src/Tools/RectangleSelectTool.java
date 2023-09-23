@@ -179,22 +179,25 @@ public class RectangleSelectTool extends BaseTool {
 
     @Override
     public void mouseReleased() {
-        if (!mouseInfoHolder.isLeftMouseButtonPressed() && (selectBorder.width == 0 || selectBorder.height == 0)) {
-            canvas.setAllowCanvasResizing(true);
-            canvas.repaint();
-        }
-        else {
-            canvas.getCanvasHistory().createPerformedState();
-        }
-
-        // this checks that the selected sub image has changed, and if so, alerts subscribers
-        if (mode == Mode.SELECT) {
-            selectedSubimage = canvas.getMainImage().getSubImage(originalSelectBorder.x, originalSelectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
-            for (CanvasListener listener: canvasListeners) {
-                listener.onSelectedSubImageChanged(selectedSubimage);
+        if (!mouseInfoHolder.isLeftMouseButtonPressed()) {
+            if (selectBorder.width == 0 || selectBorder.height == 0) {
+                selectedSubimage = null;
+                canvas.setAllowCanvasResizing(true);
+                canvas.repaint();
             }
+            else {
+                canvas.getCanvasHistory().createPerformedState();
+                selectedSubimage = canvas.getMainImage().getSubImage(selectBorder.x, selectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+            }
+
+            // this checks that the selected sub image has changed, and if so, alerts subscribers
+            if (mode == Mode.SELECT) {
+                for (CanvasListener listener: canvasListeners) {
+                    listener.onSelectedSubImageChanged(selectedSubimage);
+                }
+            }
+            mode = null;
         }
-        mode = null;
     }
 
     @Override
@@ -216,6 +219,7 @@ public class RectangleSelectTool extends BaseTool {
             graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectedSubimage.getWidth(), selectedSubimage.getHeight(), null);
 
             graphics.dispose();
+            reset();
         }
         canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
     }
@@ -225,6 +229,10 @@ public class RectangleSelectTool extends BaseTool {
         selectBorder = new Rectangle(0, 0, 0, 0);
         selectedSubimage = null;
         mode = null;
+
+        for (CanvasListener listener: canvasListeners) {
+            listener.onSelectedSubImageChanged(selectedSubimage);
+        }
     }
 
     private enum Mode {
