@@ -7,6 +7,7 @@ import Toolstrip.ToolStrip;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import Canvas.*;
@@ -18,7 +19,7 @@ import javax.swing.*;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class Frame {
+public class Frame implements MenuBarListener {
     private JFrame frame;
     private JPanel mainPanel;
     private Canvas canvas;
@@ -34,6 +35,7 @@ public class Frame {
 
         canvas = new Canvas(choicesHolder);
         MenuBar menuBar = new MenuBar(canvas, choicesHolder);
+        menuBar.addListener(this);
         canvas.getCanvasHistory().addListener(menuBar);
         choicesHolder.addListener(canvas);
         toolstrip = new ToolStrip(choicesHolder);
@@ -47,7 +49,7 @@ public class Frame {
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(toolstrip, BorderLayout.NORTH);
-        frame.setTitle("JPaint");
+        frame.setTitle("Untitled - JPaint");
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setSize(800, 600);
@@ -90,5 +92,11 @@ public class Frame {
             System.out.println("Unable to load icon images! Using defaults.");
         }
         return icons;
+    }
+
+    @Override
+    public void onFileOpened(String filePath) {
+        File file = new File(filePath);
+        frame.setTitle(file.getName() + " - JPaint");
     }
 }

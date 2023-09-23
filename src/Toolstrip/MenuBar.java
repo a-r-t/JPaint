@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -32,6 +33,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private JMenuItem redo;
     private JMenuItem copy;
     private JMenuItem paste;
+    private ArrayList<MenuBarListener> listeners = new ArrayList<>();
 
     public MenuBar(Canvas canvas, ChoicesHolder choicesHolder) {
         createFileSection(canvas);
@@ -173,9 +175,15 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 BufferedImage chosenFileImage = null;
                 try {
                     chosenFileImage = ImageIO.read(chosenFile);
-                    currentlyOpenFile = chosenFile.getAbsolutePath();
                     canvas.setMainImage(chosenFileImage);
                     canvas.fitCanvasToMainImage();
+
+                    currentlyOpenFile = chosenFile.getAbsolutePath();
+
+                    // let subscribers know a file was opened
+                    for (MenuBarListener listener : listeners) {
+                        listener.onFileOpened(currentlyOpenFile);
+                    }
                 } catch (IOException ioException) {
                     // TODO: Error message in UI that file can't be read
                 }
@@ -265,5 +273,9 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     @Override
     public void onSelectedSubImageChanged(BufferedImage subImage) {
         copy.setEnabled(subImage != null);
+    }
+
+    public void addListener(MenuBarListener listener) {
+        listeners.add(listener);
     }
 }
