@@ -367,13 +367,11 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
         allowCanvasResizing = true;
 
+        rectangleSelectTool.applyChanges();
         if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
             rectangleSelectTool.reset();
         }
 
-        if (choicesHolder.getPreviousTool() == Tool.RECTANGLE_SELECT) {
-            rectangleSelectTool.applyChanges();
-        }
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
 
         repaint();
