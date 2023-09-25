@@ -235,31 +235,8 @@ public class RectangleSelectTool extends BaseTool {
 
         graphics.drawImage(selectedSubimage, selectBorder.x, selectBorder.y, selectBorder.width + 1, selectBorder.height + 1, null);
 
-        graphics.setColor(new Color(0, 0, 0, 255));
-        if (selectBorder.width > 0 && selectBorder.height > 0) {
-            for (int i = selectBorder.x; i < selectBorder.x + selectBorder.width; i += 2) {
-                graphics.fillRect(i, selectBorder.y, 1, 1);
-                graphics.fillRect(i, selectBorder.y + selectBorder.height, 1, 1);
-            }
-            for (int i = selectBorder.y; i < selectBorder.y + selectBorder.height; i += 2) {
-                graphics.fillRect(selectBorder.x, i, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, i, 1, 1);
-            }
+        createSelectionBorderOutline(selectBorder, graphics);
 
-            // this entire block fixes the bottom left of the rectangle select border because it was sometimes coming out wonky due to pixel count
-            // it forces the bottom left pixel to always be filled in, and then potentially adjusts the adjacent pixels to make it look less awkward
-            graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height, 1, 1);
-            if (canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height) == ColorUtils.getIntFromColor(Color.black) && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1) == ColorUtils.getIntFromColor(Color.black)) {
-                graphics.setColor(new Color(0, 0, 0, 0));
-                graphics.setComposite(AlphaComposite.Clear);
-                graphics.fillRect(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1, 1, 1);
-                graphics.setColor(new Color(0, 0, 0, 255));
-                graphics.setComposite(AlphaComposite.SrcOver);
-                graphics.fillRect(selectBorder.x + selectBorder.width - 2, selectBorder.y + selectBorder.height, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 2, 1, 1);
-            }
-        }
         graphics.dispose();
         originalSelectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
         selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
