@@ -6,7 +6,6 @@ import Tools.*;
 import Toolstrip.Tool;
 import Utils.*;
 import Utils.Image;
-import javafx.scene.input.KeyCode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -365,7 +364,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
         allowCanvasResizing = true;
 
-        rectangleSelectTool.applyChanges();
+        rectangleSelectTool.commitSelectedSubimage();
 
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
 

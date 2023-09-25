@@ -29,6 +29,7 @@ public class RectangleSelectTool extends BaseTool {
         super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
         this.canvasListeners = canvasListeners;
         reset();
+
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
@@ -72,7 +73,7 @@ public class RectangleSelectTool extends BaseTool {
             else {
                 // if a previous selection exists, permanently apply the changes to the image
                 if (selectBorder.width > 0 && selectBorder.height > 0) {
-                    applyChanges();
+                    commitSelectedSubimage();
                 }
 
                 mode = Mode.SELECT;
@@ -179,7 +180,7 @@ public class RectangleSelectTool extends BaseTool {
         return cursorManager.get(CanvasCursor.SELECT);
     }
 
-    public void applyChanges() {
+    public void commitSelectedSubimage() {
         if (originalSelectBorder != null && selectBorder != null && selectedSubimage != null) {
             canvas.getCanvasHistory().createPerformedState();
 
@@ -221,8 +222,12 @@ public class RectangleSelectTool extends BaseTool {
         return selectedSubimage;
     }
 
+    public boolean isSubimageSelected() {
+        return selectedSubimage != null;
+    }
+
     public void setSelectedSubimage(BufferedImage selectedSubimage) {
-        applyChanges();
+        commitSelectedSubimage();
 
         canvas.getCanvasHistory().createPerformedState();
 
