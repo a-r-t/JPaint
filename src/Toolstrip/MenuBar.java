@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryListener {
     private String currentlyOpenFile = null;
+    private JMenuItem newCanvas;
     private JMenuItem open;
     private JMenuItem save;
     private JMenuItem saveAs;
@@ -49,6 +50,17 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private void createFileSection(Canvas canvas) {
         JMenu file = new JMenu("File");
         add(file);
+
+        newCanvas = new JMenuItem("New");
+        newCanvas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                canvas.reset();
+            }
+        });
+        newCanvas.setIcon(new ImageIcon(JMenuBar.class.getResource("/new-canvas-icon.png")));
+        newCanvas.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        file.add(newCanvas);
 
         open = new JMenuItem("Open");
         open.addActionListener(new ActionListener() {

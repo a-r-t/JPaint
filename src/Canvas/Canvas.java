@@ -55,27 +55,9 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     private boolean isCtrlPressed = false; // used for mouse wheel zoom shortcut
 
     public Canvas(ChoicesHolder choicesHolder) {
-        mainImage = new Image(canvasWidth, canvasHeight);
-        mainImage.clear(new Color(255, 255, 255));
-
-        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
-        selectionImageLayer.clear(new Color(0, 0, 0, 0));
-
-        this.isLeftMouseDown = false;
-        this.isRightMouseDown = false;
         this.choicesHolder = choicesHolder;
-        this.canvasMode = CanvasMode.PAINT;
-        this.canvasHistory = new CanvasHistory(this);
-        canvasHistory.addListener(this);
-        this.cursors = new CanvasCursorManager();
-        this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
-        this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder, cursors);
-        this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder, cursors);
-        this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
-        this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
-        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
 
-        updateCanvasResizers();
+        setup();
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
@@ -240,6 +222,40 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                 return false;
             }
         });
+    }
+
+    public void reset() {
+        setup();
+        choicesHolder.setScale(1);
+        choicesHolder.setTool(null);
+        choicesHolder.setPaintColor(Color.black);
+        choicesHolder.setEraseColor(Color.white);
+        repaint();
+    }
+
+    private void setup() {
+        canvasWidth = 400;
+        canvasHeight = 400;
+        mainImage = new Image(canvasWidth, canvasHeight);
+        mainImage.clear(new Color(255, 255, 255));
+
+        selectionImageLayer = new Image(canvasWidth, canvasHeight, ImageType.ARGB);
+        selectionImageLayer.clear(new Color(0, 0, 0, 0));
+
+        this.isLeftMouseDown = false;
+        this.isRightMouseDown = false;
+        this.canvasMode = CanvasMode.PAINT;
+        this.canvasHistory = new CanvasHistory(this);
+        canvasHistory.addListener(this);
+        this.cursors = new CanvasCursorManager();
+        this.mouseInfoHolder = new CanvasMouseInfoHolder(this);
+        this.pencilTool = new PencilTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.bucketTool = new BucketTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
+        this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
+        this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
+
+        updateCanvasResizers();
     }
 
     private Cursor getProperCursor(Point mousePosition) {
