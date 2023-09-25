@@ -67,6 +67,9 @@ public class Frame implements MenuBarListener {
                         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
                     }
                 }
+                else {
+                    frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                }
             }
         });
 
