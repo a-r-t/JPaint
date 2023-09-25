@@ -52,6 +52,9 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     private EraserTool eraserTool;
     private RectangleSelectTool rectangleSelectTool;
 
+    // if true, canvas has changes made to it since the last time it was saved
+    private boolean isDirty;
+
     private boolean isCtrlPressed = false; // used for mouse wheel zoom shortcut
 
     public Canvas(ChoicesHolder choicesHolder) {
@@ -224,15 +227,6 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         });
     }
 
-    public void reset() {
-        setup();
-        choicesHolder.setScale(1);
-        choicesHolder.setTool(null);
-        choicesHolder.setPaintColor(Color.black);
-        choicesHolder.setEraseColor(Color.white);
-        repaint();
-    }
-
     private void setup() {
         canvasWidth = 400;
         canvasHeight = 400;
@@ -256,6 +250,15 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
 
         updateCanvasResizers();
+    }
+
+    public void reset() {
+        setup();
+        choicesHolder.setScale(1);
+        choicesHolder.setTool(null);
+        choicesHolder.setPaintColor(Color.black);
+        choicesHolder.setEraseColor(Color.white);
+        repaint();
     }
 
     private Cursor getProperCursor(Point mousePosition) {
@@ -473,6 +476,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
     public CanvasHistory getCanvasHistory() {
         return canvasHistory;
+    }
+
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    public void setIsDirty(boolean isDirty) {
+        this.isDirty = isDirty;
     }
 
     @Override

@@ -5,7 +5,6 @@ import Canvas.CanvasListener;
 import Canvas.CanvasHistoryListener;
 import GUI.FileChooser;
 import Models.ChoicesHolder;
-import Models.ChoicesListener;
 import Utils.ClipboardUtils;
 
 import javax.imageio.ImageIO;
@@ -14,15 +13,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryListener {
     private String currentlyOpenFile = null;
@@ -55,7 +49,21 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         newCanvas.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                canvas.reset();
+                // creates a new canvas
+                // prompts user to save first if canvas is dirty
+                Integer savePromptAnswer = null;
+                if (canvas.isDirty()) {
+                    savePromptAnswer = promptToSave(canvas);
+                }
+                if (savePromptAnswer == null || savePromptAnswer != JOptionPane.CANCEL_OPTION) {
+                    // reset canvas, clear currently opened file
+                    canvas.reset();
+                    canvas.setIsDirty(false);
+                    currentlyOpenFile = null;
+                    for (MenuBarListener listener : listeners) {
+                        listener.onFileOpened(currentlyOpenFile);
+                    }
+                }
             }
         });
         newCanvas.setIcon(new ImageIcon(JMenuBar.class.getResource("/new-canvas-icon.png")));
@@ -66,7 +74,16 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openFile(canvas);
+                // creates a new canvas
+                // prompts user to save first if canvas is dirty
+                Integer savePromptAnswer = null;
+                if (canvas.isDirty()) {
+                    savePromptAnswer = promptToSave(canvas);
+                }
+                if (savePromptAnswer == null || savePromptAnswer != JOptionPane.CANCEL_OPTION) {
+                    // open new image file into canvas
+                    openFile(canvas);
+                }
             }
         });
         open.setIcon(new ImageIcon(JMenuBar.class.getResource("/open-icon.png")));
@@ -186,31 +203,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         canvasSize.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // pops open a dialog asking user for width and height to set canvas to
-                JTextField widthTextField = new JTextField(String.valueOf(canvas.getCanvasWidth()));
-                widthTextField.setPreferredSize(new Dimension(50, 20));
-                JTextField heightTextField = new JTextField(String.valueOf(canvas.getCanvasHeight()));
-                heightTextField.setPreferredSize(new Dimension(50, 20));
-                final JComponent[] inputs = new JComponent[] {
-                        new JLabel("Width"),
-                        widthTextField,
-                        new JLabel("Height"),
-                        heightTextField
-                };
-                int result = JOptionPane.showConfirmDialog(null, inputs, "Canvas Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                if (result == JOptionPane.OK_OPTION) {
-                    int width = 0;
-                    int height = 0;
-                    try {
-                        width = Integer.parseInt(widthTextField.getText());
-                        height = Integer.parseInt(heightTextField.getText());
-                    }
-                    catch (Exception ex) {}
-                    if (width > 0 && width < Integer.MAX_VALUE && height > 0 && height < Integer.MAX_VALUE) {
-                        canvas.getCanvasHistory().createPerformedState();
-                        canvas.resizeCanvas(width, height);
-                    }
-                }
+                setCanvasSize(canvas);
             }
         });
         edit.add(canvasSize);
@@ -251,6 +244,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                     canvas.fitCanvasToMainImage();
 
                     currentlyOpenFile = chosenFile.getAbsolutePath();
+                    canvas.setIsDirty(false);
 
                     // let subscribers know a file was opened
                     for (MenuBarListener listener : listeners) {
@@ -277,6 +271,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
 
             try {
                 ImageIO.write(canvas.getMainImage().getRaw(), saveFileType, new File(currentlyOpenFile));
+                canvas.setIsDirty(false);
             } catch (IOException e) {
                 // TODO: Error message in UI that file can't be saved
             }
@@ -319,6 +314,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 try {
                     ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
                     currentlyOpenFile = filePath;
+                    canvas.setIsDirty(false);
 
                     // let subscribers know a file was opened
                     for (MenuBarListener listener : listeners) {
@@ -329,6 +325,51 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         }
+    }
+
+    private void setCanvasSize(Canvas canvas) {
+        // pops open a dialog asking user for width and height to set canvas to
+        JTextField widthTextField = new JTextField(String.valueOf(canvas.getCanvasWidth()));
+        widthTextField.setPreferredSize(new Dimension(50, 20));
+        JTextField heightTextField = new JTextField(String.valueOf(canvas.getCanvasHeight()));
+        heightTextField.setPreferredSize(new Dimension(50, 20));
+        final JComponent[] components = new JComponent[] {
+                new JLabel("Width"),
+                widthTextField,
+                new JLabel("Height"),
+                heightTextField
+        };
+        int result = JOptionPane.showConfirmDialog(null, components, "Canvas Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            int width = 0;
+            int height = 0;
+            try {
+                width = Integer.parseInt(widthTextField.getText());
+                height = Integer.parseInt(heightTextField.getText());
+            }
+            catch (Exception ex) {}
+            if (width > 0 && width < Integer.MAX_VALUE && height > 0 && height < Integer.MAX_VALUE) {
+                canvas.getCanvasHistory().createPerformedState();
+                canvas.resizeCanvas(width, height);
+            }
+        }
+    }
+
+    // prompts user to save their image
+    // if user hits yes, image is saved
+    // if user hits no, image is not saved
+    // if user hits cancel, image is not saved
+    // method returns whether user hit yes, no, or cancel
+    public int promptToSave(Canvas canvas) {
+        // pops open a dialog asking user for width and height to set canvas to
+        String fileName = currentlyOpenFile != null ? new File(currentlyOpenFile).getName() : "Untitled";
+        JLabel label = new JLabel("Do you want to save changes to " + fileName + "?");
+        final JComponent[] components = new JComponent[] { label };
+        int result = JOptionPane.showConfirmDialog(null, components, "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            saveFile(canvas);
+        }
+        return result;
     }
 
 
