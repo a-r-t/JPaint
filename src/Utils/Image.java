@@ -101,5 +101,4 @@ public class Image {
     public void paint(Graphics2D g, int x, int y, int width, int height, int scale) {
         g.drawImage(image, x, y, width * scale, height * scale, null);
     }
-
 }

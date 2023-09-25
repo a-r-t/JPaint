@@ -291,6 +291,21 @@ public class RectangleSelectTool extends BaseTool {
         canvas.repaint();
     }
 
+    // replaces selected subimage with erase color
+    // used for things like cut, delete, etc
+    public void clearSelectedSubimage() {
+        if (selectedSubimage != null) {
+            if (!isSelectedSubimageExternal) {
+                Graphics2D graphics = canvas.getMainImage().getGraphics();
+                graphics.setColor(choicesHolder.getEraseColor());
+                graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
+                graphics.dispose();
+            }
+            reset();
+            canvas.repaint();
+        }
+    }
+
     // creates dotted rectangular border around selected area
     private void createSelectionBorderOutline(Rectangle selectBorder, Graphics2D graphics) {
         if (selectBorder.width > 0 && selectBorder.height > 0) {

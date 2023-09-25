@@ -503,4 +503,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             rectangleSelectTool.setSelectedSubimage(selectedSubimage);
         }
     }
+
+    public void clearSelectedSubimage() {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.clearSelectedSubimage();
+        }
+    }
 }

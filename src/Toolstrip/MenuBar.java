@@ -31,6 +31,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private JMenuItem saveAs;
     private JMenuItem undo;
     private JMenuItem redo;
+    private JMenuItem cut;
     private JMenuItem copy;
     private JMenuItem paste;
     private JMenuItem canvasSize;
@@ -109,6 +110,21 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         edit.add(redo);
 
         edit.add(new JSeparator());
+
+        cut = new JMenuItem("Cut");
+        cut.setEnabled(false);
+        cut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BufferedImage selectedSubImage = canvas.getSelectedSubimage();
+                if (selectedSubImage != null) {
+                    ClipboardUtils.copyToClipboard(selectedSubImage);
+                    canvas.clearSelectedSubimage();
+                }
+            }
+        });
+        cut.setAccelerator(KeyStroke.getKeyStroke('X', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        edit.add(cut);
 
         copy = new JMenuItem("Copy");
         copy.setEnabled(false);
@@ -315,6 +331,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
 
     @Override
     public void onSelectedSubImageChanged(BufferedImage subImage) {
+        cut.setEnabled(subImage != null);
         copy.setEnabled(subImage != null);
     }
 
