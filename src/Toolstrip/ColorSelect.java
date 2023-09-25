@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class ColorSelect extends JPanel implements ColorPickerListener {
     private ChoicesHolder choicesHolder;
-    private ColorSwatch[] defaultColors;
+    private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
     private boolean blockCtrl = false;
@@ -23,7 +23,7 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
         this.choicesHolder = choicesHolder;
         setLayout(null);
         setBackground(new Color(245, 246, 247));
-        defaultColors = loadDefaultColors();
+        colorOptions = loadDefaultColors();
         setSize(new Dimension(202, 44));
 
         this.addMouseMotionListener(new MouseAdapter() {
@@ -32,12 +32,12 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
             public void mouseMoved(MouseEvent e) {
                 boolean needsRepaint = false;
                 boolean isSwatchHovered = false;
-                for (int i = 0; i < defaultColors.length; i++) {
-                    ColorSwatch cs = defaultColors[i];
+                for (int i = 0; i < colorOptions.length; i++) {
+                    ColorSwatch cs = colorOptions[i];
                     boolean oldState = cs.isHovered();
 
                     if (cs.isPointInBounds(e.getPoint())) {
-                        Arrays.stream(defaultColors).forEach(colorSwatch -> colorSwatch.setHovered(false));
+                        Arrays.stream(colorOptions).forEach(colorSwatch -> colorSwatch.setHovered(false));
                         cs.setHovered(true);
                         isSwatchHovered = true;
                     } else {
@@ -67,8 +67,8 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
                     boolean needsRepaint = false;
-                    for (int i = 0; i < defaultColors.length; i++) {
-                        ColorSwatch cs = defaultColors[i];
+                    for (int i = 0; i < colorOptions.length; i++) {
+                        ColorSwatch cs = colorOptions[i];
                         if (cs.isPointInBounds(e.getPoint())) {
                             lastSelectedColorIndex = i;
 
@@ -119,11 +119,12 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
                 }
                 else if (e.getID() == KeyEvent.KEY_RELEASED) {
                     if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
-                        System.out.println("HELL");
                         isCtrlPressed = false;
                         blockCtrl = false;
                     }
                 }
+
+                // due to a bug, this prevents keyboard focus manager from not properly recognizing the ctrl key has been released after the color picker modal has closed
                 if (blockCtrl) {
                     isCtrlPressed = false;
                 }
@@ -172,7 +173,7 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
-        for (ColorSwatch colorSwatch : defaultColors) {
+        for (ColorSwatch colorSwatch : colorOptions) {
             colorSwatch.paint(brush);
         }
     }
@@ -184,7 +185,7 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
     // respond to color picker choice
     @Override
     public void onColorChosen(Color color) {
-        defaultColors[lastSelectedColorIndex].setColor(color);
+        colorOptions[lastSelectedColorIndex].setColor(color);
         repaint();
     }
 }
