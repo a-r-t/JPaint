@@ -35,9 +35,6 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     public MenuBar(Canvas canvas, ChoicesHolder choicesHolder) {
         createFileSection(canvas);
         createEditSection(canvas, choicesHolder);
-
-        JMenu help = new JMenu("Help");
-        add(help);
     }
 
     // all menu logic for the "File" section
