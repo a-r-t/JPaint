@@ -6,6 +6,8 @@ import Toolstrip.MenuBar;
 import Toolstrip.ToolStrip;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +57,16 @@ public class Frame implements MenuBarListener {
         frame.setSize(800, 600);
         frame.setJMenuBar(menuBar);
         frame.setLocationRelativeTo(null);
+
+        frame.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                // if closing window and canvas is dirty, prompt user to save
+                if (canvas.isDirty()) {
+                    menuBar.promptToSave(canvas);
+                }
+            }
+        });
+
         frame.setVisible(true);
     }
 

@@ -360,7 +360,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     // if user hits no, image is not saved
     // if user hits cancel, image is not saved
     // method returns whether user hit yes, no, or cancel
-    private int promptToSave(Canvas canvas) {
+    public int promptToSave(Canvas canvas) {
         // pops open a dialog asking user for width and height to set canvas to
         String fileName = currentlyOpenFile != null ? new File(currentlyOpenFile).getName() : "Untitled";
         JLabel label = new JLabel("Do you want to save changes to " + fileName + "?");
