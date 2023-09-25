@@ -52,6 +52,8 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     private EraserTool eraserTool;
     private RectangleSelectTool rectangleSelectTool;
 
+    private boolean isCtrlPressed = false; // used for mouse wheel zoom shortcut
+
     public Canvas(ChoicesHolder choicesHolder) {
         mainImage = new Image(canvasWidth, canvasHeight);
         mainImage.clear(new Color(255, 255, 255));
@@ -79,6 +81,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
 
         this.setDoubleBuffered(true);
+
 
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -203,11 +206,39 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             }
         });
 
-        this.addComponentListener(new ComponentAdapter() {
+        this.addMouseWheelListener(new MouseWheelListener() {
             @Override
-            public void componentResized(ComponentEvent e) {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                // if mouse wheel is moved while ctrl is pressed, zoom in or out
+                if (isCtrlPressed) {
+                    // wheel was moved forward (up)
+                    if (e.getWheelRotation() == -1) {
+                        choicesHolder.setScale(choicesHolder.getScale() + 1);
+                    }
+                    // wheel was moved backward (down)
+                    else if (e.getWheelRotation() == 1) {
+                        choicesHolder.setScale(choicesHolder.getScale() - 1);
+                    }
+                }
             }
+        });
 
+        // detects if certain keys are being pressed to use with other events
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                        isCtrlPressed = true;
+                    }
+                }
+                else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                        isCtrlPressed = false;
+                    }
+                }
+                return false;
+            }
         });
     }
 
