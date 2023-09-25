@@ -4,16 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ColorPickerDialog extends JDialog {
-    public ColorPickerDialog(JFrame parent) {
+    public ColorPickerDialog(JFrame parent, Color startingColor, ColorPickerListener listener) {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 380));
         pack();
         setLocationRelativeTo(parent);
         setModal(true);
         setTitle("Color Picker");
         setResizable(false);
 
-        ColorPicker colorPicker = new ColorPicker();
+        ColorPicker colorPicker = new ColorPicker(this, startingColor, listener);
         add(colorPicker, BorderLayout.CENTER);
 
         setVisible(true);
