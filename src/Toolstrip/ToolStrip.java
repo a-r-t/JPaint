@@ -202,6 +202,33 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
                     repaint();
                 }
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // if double click on either paint or erase color displays, load up color picker
+                if (e.getClickCount() == 2) {
+                    if (paintColorDisplay.isPointInBounds(e.getPoint())) {
+                        new ColorPickerDialog(ToolStrip.this, paintColorDisplay.getColor(), new ColorPickerListener() {
+                            @Override
+                            public void onColorChosen(Color color) {
+                                paintColorDisplay.setColor(color);
+                                choicesHolder.setPaintColor(color);
+                                repaint();
+                            }
+                        });
+                    }
+                    else if (eraseColorDisplay.isPointInBounds(e.getPoint())) {
+                        new ColorPickerDialog(ToolStrip.this, eraseColorDisplay.getColor(), new ColorPickerListener() {
+                            @Override
+                            public void onColorChosen(Color color) {
+                                eraseColorDisplay.setColor(color);
+                                choicesHolder.setEraseColor(color);
+                                repaint();
+                            }
+                        });
+                    }
+                }
+            }
         });
 
         this.addComponentListener(new ComponentAdapter() {

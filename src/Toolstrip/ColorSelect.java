@@ -4,6 +4,8 @@ import Models.ChoicesHolder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -11,14 +13,16 @@ import java.util.Arrays;
 
 public class ColorSelect extends JPanel {
     private ChoicesHolder choicesHolder;
-    private ColorSwatch[] defaultColors;
+    private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
+    private boolean isCtrlPressed;
+    private boolean blockCtrl = false;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
         setLayout(null);
         setBackground(new Color(245, 246, 247));
-        defaultColors = loadDefaultColors();
+        colorOptions = loadDefaultColors();
         setSize(new Dimension(202, 44));
 
         this.addMouseMotionListener(new MouseAdapter() {
@@ -27,12 +31,12 @@ public class ColorSelect extends JPanel {
             public void mouseMoved(MouseEvent e) {
                 boolean needsRepaint = false;
                 boolean isSwatchHovered = false;
-                for (int i = 0; i < defaultColors.length; i++) {
-                    ColorSwatch cs = defaultColors[i];
+                for (int i = 0; i < colorOptions.length; i++) {
+                    ColorSwatch cs = colorOptions[i];
                     boolean oldState = cs.isHovered();
 
                     if (cs.isPointInBounds(e.getPoint())) {
-                        Arrays.stream(defaultColors).forEach(colorSwatch -> colorSwatch.setHovered(false));
+                        Arrays.stream(colorOptions).forEach(colorSwatch -> colorSwatch.setHovered(false));
                         cs.setHovered(true);
                         isSwatchHovered = true;
                     } else {
@@ -62,25 +66,38 @@ public class ColorSelect extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 || e.getButton() == MouseEvent.BUTTON3) { // left or right click
                     boolean needsRepaint = false;
-                    for (int i = 0; i < defaultColors.length; i++) {
-                        ColorSwatch cs = defaultColors[i];
-
+                    for (int i = 0; i < colorOptions.length; i++) {
+                        ColorSwatch cs = colorOptions[i];
                         if (cs.isPointInBounds(e.getPoint())) {
-                            if (e.getButton() == MouseEvent.BUTTON1) { // left click
-                                choicesHolder.setPaintColor(cs.getColor());
+                            // if not holding ctrl while clicking a color, change paint or erase color to selected color
+                            if (!isCtrlPressed) {
+                                if (e.getButton() == MouseEvent.BUTTON1) { // left click
+                                    choicesHolder.setPaintColor(cs.getColor());
 
-                                // let subscribers know paint color was just changed
-                                for (ColorSelectListener listener : listeners) {
-                                    listener.onPaintColorChanged(cs.getColor());
+                                    // let subscribers know paint color was just changed
+                                    for (ColorSelectListener listener : listeners) {
+                                        listener.onPaintColorChanged(cs.getColor());
+                                    }
+                                } else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+                                    choicesHolder.setEraseColor(cs.getColor());
+
+                                    // let subscribers know erase color was just changed
+                                    for (ColorSelectListener listener : listeners) {
+                                        listener.onEraseColorChanged(cs.getColor());
+                                    }
                                 }
                             }
-                            else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                choicesHolder.setEraseColor(cs.getColor());
-
-                                // let subscribers know erase color was just changed
-                                for (ColorSelectListener listener : listeners) {
-                                    listener.onEraseColorChanged(cs.getColor());
-                                }
+                            // if holding ctrl while clicking a color, bring up color picker
+                            else {
+                                // brings up color picker dialog modal to allow user to choose their color
+                                new ColorPickerDialog(ColorSelect.this, cs.getColor(), new ColorPickerListener() {
+                                    @Override
+                                    public void onColorChosen(Color color) {
+                                        cs.setColor(color);
+                                        choicesHolder.setPaintColor(color);
+                                        repaint();
+                                    }
+                                });
                             }
                             needsRepaint = true;
                             break;
@@ -90,6 +107,24 @@ public class ColorSelect extends JPanel {
                         repaint();
                     }
                 }
+            }
+        });
+
+        // detects if certain keys are being pressed to use with other events
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                        isCtrlPressed = true;
+                    }
+                }
+                else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
+                        isCtrlPressed = false;
+                    }
+                }
+                return false;
             }
         });
 
@@ -134,7 +169,7 @@ public class ColorSelect extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D brush = (Graphics2D) g;
-        for (ColorSwatch colorSwatch : defaultColors) {
+        for (ColorSwatch colorSwatch : colorOptions) {
             colorSwatch.paint(brush);
         }
     }
