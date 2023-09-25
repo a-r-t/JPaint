@@ -96,7 +96,12 @@ public class Frame implements MenuBarListener {
 
     @Override
     public void onFileOpened(String filePath) {
-        File file = new File(filePath);
-        frame.setTitle(file.getName() + " - JPaint");
+        if (filePath == null) {
+            frame.setTitle("Untitled - JPaint");
+        }
+        else {
+            File file = new File(filePath);
+            frame.setTitle(file.getName() + " - JPaint");
+        }
     }
 }
