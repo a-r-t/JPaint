@@ -74,7 +74,16 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openFile(canvas);
+                // creates a new canvas
+                // prompts user to save first if canvas is dirty
+                Integer savePromptAnswer = null;
+                if (canvas.isDirty()) {
+                    savePromptAnswer = promptToSave(canvas);
+                }
+                if (savePromptAnswer == null || savePromptAnswer != JOptionPane.CANCEL_OPTION) {
+                    // open new image file into canvas
+                    openFile(canvas);
+                }
             }
         });
         open.setIcon(new ImageIcon(JMenuBar.class.getResource("/open-icon.png")));
