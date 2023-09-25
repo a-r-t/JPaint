@@ -251,6 +251,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                     canvas.fitCanvasToMainImage();
 
                     currentlyOpenFile = chosenFile.getAbsolutePath();
+                    canvas.setIsDirty(false);
 
                     // let subscribers know a file was opened
                     for (MenuBarListener listener : listeners) {
@@ -277,6 +278,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
 
             try {
                 ImageIO.write(canvas.getMainImage().getRaw(), saveFileType, new File(currentlyOpenFile));
+                canvas.setIsDirty(false);
             } catch (IOException e) {
                 // TODO: Error message in UI that file can't be saved
             }
@@ -319,6 +321,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 try {
                     ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
                     currentlyOpenFile = filePath;
+                    canvas.setIsDirty(false);
 
                     // let subscribers know a file was opened
                     for (MenuBarListener listener : listeners) {

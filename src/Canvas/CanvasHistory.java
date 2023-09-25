@@ -25,6 +25,7 @@ public class CanvasHistory {
             performed.remove(performed.size() - 1);
         }
         recall.clear();
+        canvas.setIsDirty(true);
 
         // tell listeners the current sizes of the performed and recall lists
         for (CanvasHistoryListener listener : listeners) {
