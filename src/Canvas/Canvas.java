@@ -205,6 +205,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                         choicesHolder.setScale(choicesHolder.getScale() - 1);
                     }
                 }
+
+                // need this so parent jscrollpane will still scroll when mouse wheel is used
+                // otherwise this mousewheelevent will block that from working
+                getParent().dispatchEvent(e);
             }
         });
 
@@ -218,7 +222,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                     }
                 }
                 else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = false;
                     }
                 }

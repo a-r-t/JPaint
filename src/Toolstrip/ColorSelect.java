@@ -11,13 +11,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ColorSelect extends JPanel implements ColorPickerListener {
+public class ColorSelect extends JPanel {
     private ChoicesHolder choicesHolder;
     private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
     private boolean blockCtrl = false;
-    private int lastSelectedColorIndex;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -70,8 +69,6 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
                     for (int i = 0; i < colorOptions.length; i++) {
                         ColorSwatch cs = colorOptions[i];
                         if (cs.isPointInBounds(e.getPoint())) {
-                            lastSelectedColorIndex = i;
-
                             // if not holding ctrl while clicking a color, change paint or erase color to selected color
                             if (!isCtrlPressed) {
                                 if (e.getButton() == MouseEvent.BUTTON1) { // left click
@@ -93,9 +90,13 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
                             // if holding ctrl while clicking a color, bring up color picker
                             else {
                                 // brings up color picker dialog modal to allow user to choose their color
-                                blockCtrl = true;
-                                new ColorPickerDialog(ColorSelect.this, cs.getColor(), ColorSelect.this);
-                                blockCtrl = false;
+                                new ColorPickerDialog(ColorSelect.this, cs.getColor(), new ColorPickerListener() {
+                                    @Override
+                                    public void onColorChosen(Color color) {
+                                        cs.setColor(color);
+                                        repaint();
+                                    }
+                                });
                             }
                             needsRepaint = true;
                             break;
@@ -113,20 +114,14 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK && !blockCtrl) {
+                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
                         isCtrlPressed = true;
                     }
                 }
                 else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = false;
-                        blockCtrl = false;
                     }
-                }
-
-                // due to a bug, this prevents keyboard focus manager from not properly recognizing the ctrl key has been released after the color picker modal has closed
-                if (blockCtrl) {
-                    isCtrlPressed = false;
                 }
                 return false;
             }
@@ -180,12 +175,5 @@ public class ColorSelect extends JPanel implements ColorPickerListener {
 
     public void addListener(ColorSelectListener listener) {
         listeners.add(listener);
-    }
-
-    // respond to color picker choice
-    @Override
-    public void onColorChosen(Color color) {
-        colorOptions[lastSelectedColorIndex].setColor(color);
-        repaint();
     }
 }
