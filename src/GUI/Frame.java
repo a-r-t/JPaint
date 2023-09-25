@@ -68,7 +68,8 @@ public class Frame implements MenuBarListener {
         });
 
         frame.setVisible(true);
-    }
+
+        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(frame); }
 
     private void setSwingStyle() {
         try {
