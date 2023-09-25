@@ -94,6 +94,7 @@ public class ColorSelect extends JPanel {
                                     @Override
                                     public void onColorChosen(Color color) {
                                         cs.setColor(color);
+                                        choicesHolder.setPaintColor(color);
                                         repaint();
                                     }
                                 });
