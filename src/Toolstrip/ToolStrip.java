@@ -25,8 +25,6 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
     private Tool previousPaintSelectedTool;
     private ImageButton zoomIn;
     private ImageButton zoomOut;
-    private final int MIN_SCALE = 1;
-    private final int MAX_SCALE = 10;
 
     public ToolStrip(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -154,9 +152,7 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
                     oldState = zoomIn.isSelected();
                     if (zoomIn.isPointInBounds(e.getPoint())) {
                         zoomIn.setSelected(true);
-                        if (choicesHolder.getScale() < MAX_SCALE) {
-                            choicesHolder.setScale(choicesHolder.getScale() + 1);
-                        }
+                        choicesHolder.setScale(choicesHolder.getScale() + 1);
                     } else {
                         zoomIn.setSelected(false);
                     }
@@ -167,9 +163,7 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
                     oldState = zoomOut.isSelected();
                     if (zoomOut.isPointInBounds(e.getPoint())) {
                         zoomOut.setSelected(true);
-                        if (choicesHolder.getScale() > MIN_SCALE) {
-                            choicesHolder.setScale(choicesHolder.getScale() - 1);
-                        }
+                        choicesHolder.setScale(choicesHolder.getScale() - 1);
                     } else {
                         zoomOut.setSelected(false);
                     }

@@ -12,6 +12,10 @@ public class ChoicesHolder {
     private Color paintColor;
     private Color eraseColor;
     private int scale;
+
+    private final int MIN_SCALE = 1;
+    private final int MAX_SCALE = 10;
+
     private ArrayList<ChoicesListener> listeners = new ArrayList<>();
 
     public ChoicesHolder() {
@@ -76,10 +80,12 @@ public class ChoicesHolder {
     }
 
     public void setScale(int scale) {
-        this.scale = scale;
+        if (scale >= MIN_SCALE && scale <= MAX_SCALE) {
+            this.scale = scale;
 
-        for (ChoicesListener listener : listeners) {
-            listener.onScaleChanged(this.scale);
+            for (ChoicesListener listener : listeners) {
+                listener.onScaleChanged(this.scale);
+            }
         }
     }
 
