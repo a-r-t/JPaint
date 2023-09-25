@@ -8,6 +8,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+// allow for copying/pasting images to and from the clipboard
 public class ClipboardUtils {
     private static final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 

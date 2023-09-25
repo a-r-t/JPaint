@@ -265,8 +265,12 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         mainImage.resize(newWidth, newHeight, choicesHolder.getEraseColor());
         updateCanvasResizers();
 
+        // after a canvas resize, reset any selected sub image
         selectionImageLayer.resize(newWidth, newHeight, new Color(0, 0, 0, 0));
         selectionImageLayer.clear(new Color(0, 0, 0, 0));
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.reset();
+        }
         repaint();
     }
 

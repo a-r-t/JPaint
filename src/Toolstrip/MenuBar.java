@@ -33,6 +33,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private JMenuItem redo;
     private JMenuItem copy;
     private JMenuItem paste;
+    private JMenuItem canvasSize;
     private ArrayList<MenuBarListener> listeners = new ArrayList<>();
 
     public MenuBar(Canvas canvas, ChoicesHolder choicesHolder) {
@@ -107,6 +108,8 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         redo.setAccelerator(KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(redo);
 
+        edit.add(new JSeparator());
+
         copy = new JMenuItem("Copy");
         copy.setEnabled(false);
         copy.addActionListener(new ActionListener() {
@@ -142,6 +145,41 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
         });
         paste.setAccelerator(KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(paste);
+
+        edit.add(new JSeparator());
+
+        canvasSize = new JMenuItem("Canvas Size");
+        canvasSize.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // pops open a dialog asking user for width and height to set canvas to
+                JTextField widthTextField = new JTextField(String.valueOf(canvas.getCanvasWidth()));
+                widthTextField.setPreferredSize(new Dimension(50, 20));
+                JTextField heightTextField = new JTextField(String.valueOf(canvas.getCanvasHeight()));
+                heightTextField.setPreferredSize(new Dimension(50, 20));
+                final JComponent[] inputs = new JComponent[] {
+                        new JLabel("Width"),
+                        widthTextField,
+                        new JLabel("Height"),
+                        heightTextField
+                };
+                int result = JOptionPane.showConfirmDialog(null, inputs, "Canvas Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    int width = 0;
+                    int height = 0;
+                    try {
+                        width = Integer.parseInt(widthTextField.getText());
+                        height = Integer.parseInt(heightTextField.getText());
+                    }
+                    catch (Exception ex) {}
+                    if (width > 0 && width < Integer.MAX_VALUE && height > 0 && height < Integer.MAX_VALUE) {
+                        canvas.getCanvasHistory().createPerformedState();
+                        canvas.resizeCanvas(width, height);
+                    }
+                }
+            }
+        });
+        edit.add(canvasSize);
     }
 
     @Override
