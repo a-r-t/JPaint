@@ -10,6 +10,7 @@ import Canvas.CanvasListener;
 import Utils.*;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -28,6 +29,34 @@ public class RectangleSelectTool extends BaseTool {
         super(canvas, choicesHolder, mouseInfoHolder, cursorManager);
         this.canvasListeners = canvasListeners;
         reset();
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    if (e.getKeyCode() == KeyEvent.VK_UP) {
+                        if (selectedSubimage != null) {
+                            moveSelectedSubimage(0, -1);
+                        }
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                        if (selectedSubimage != null) {
+                            moveSelectedSubimage(0, 1);
+                        }
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                        if (selectedSubimage != null) {
+                            moveSelectedSubimage(-1, 0);
+                        }
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                        if (selectedSubimage != null) {
+                            moveSelectedSubimage(1, 0);
+                        }
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -37,8 +66,6 @@ public class RectangleSelectTool extends BaseTool {
             // move existing selection
             if (selectBorder.contains(new Point(mouseInfoHolder.getCurrentMousePositionInImageX() / choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() / choicesHolder.getScale()))) {
                 mode = Mode.MOVE;
-                selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
-                selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
             }
 
             // create new selection
@@ -137,46 +164,7 @@ public class RectangleSelectTool extends BaseTool {
             int differenceX = absX / choicesHolder.getScale() - prvX / choicesHolder.getScale();
             int differenceY = absY / choicesHolder.getScale() - prvY / choicesHolder.getScale();
 
-            Graphics2D graphics =  canvas.getSelectionImageLayer().getGraphics();
-            canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
-
-
-            // if selected sub image was originally a part of the existing image, fill in the original location with the erase color
-            // this check is needed to ensure that this will not happen if a subimage is pasted in
-            if (!isSelectedSubimageExternal) {
-                graphics.setColor(choicesHolder.getEraseColor());
-                graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
-            }
-
-            selectedSubimageCurrentLocation = new Point(selectedSubimageCurrentLocation.x + differenceX, selectedSubimageCurrentLocation.y + differenceY);
-
-            graphics.drawImage(selectedSubimage, selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width + 1, selectBorder.height + 1, null);
-            selectBorder = new Rectangle(selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width, selectBorder.height);
-
-            graphics.setColor(new Color(0, 0, 0, 255));
-
-            for (int i = selectBorder.x; i < selectBorder.x + selectBorder.width; i += 2) {
-                graphics.fillRect(i, selectBorder.y, 1, 1);
-                graphics.fillRect(i, selectBorder.y + selectBorder.height, 1, 1);
-            }
-            for (int i = selectBorder.y; i < selectBorder.y + selectBorder.height; i += 2) {
-                graphics.fillRect(selectBorder.x, i, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, i, 1, 1);
-            }
-
-            // this entire block fixes the bottom left of the rectangle select border because it was sometimes coming out wonky due to pixel count
-            // it forces the bottom left pixel to always be filled in, and then potentially adjusts the adjacent pixels to make it look less awkward
-            graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height, 1, 1);
-            if (selectBorder.x + selectBorder.width < canvas.getMainImage().getWidth() && selectBorder.y + selectBorder.height < canvas.getMainImage().getHeight() && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height) == ColorUtils.getIntFromColor(Color.black) && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1) == ColorUtils.getIntFromColor(Color.black)) {
-                graphics.setColor(new Color(0, 0, 0, 0));
-                graphics.setComposite(AlphaComposite.Clear);
-                graphics.fillRect(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1, 1, 1);
-                graphics.setColor(new Color(0, 0, 0, 255));
-                graphics.setComposite(AlphaComposite.SrcOver);
-                graphics.fillRect(selectBorder.x + selectBorder.width - 2, selectBorder.y + selectBorder.height, 1, 1);
-                graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 2, 1, 1);
-            }
+            moveSelectedSubimage(differenceX, differenceY);
         }
         canvas.repaint();
     }
@@ -194,6 +182,8 @@ public class RectangleSelectTool extends BaseTool {
                 else {
                     canvas.getCanvasHistory().createPerformedState();
                     selectedSubimage = canvas.getMainImage().getSubImage(selectBorder.x, selectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+                    selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
+                    selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
                     isSelectedSubimageExternal = false;
                 }
 
@@ -297,11 +287,76 @@ public class RectangleSelectTool extends BaseTool {
         }
         graphics.dispose();
         originalSelectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
+        selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
+        selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
         canvas.setAllowCanvasResizing(false);
         canvas.repaint();
 
         for (CanvasListener listener: canvasListeners) {
             listener.onSelectedSubImageChanged(selectedSubimage);
         }
+    }
+
+    public void moveSelectedSubimage(int dx, int dy) {
+        if (selectedSubimage != null) {
+            Graphics2D graphics = canvas.getSelectionImageLayer().getGraphics();
+            canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
+
+
+            // if selected sub image was originally a part of the existing image, fill in the original location with the erase color
+            // this check is needed to ensure that this will not happen if a subimage is pasted in
+            if (!isSelectedSubimageExternal) {
+                graphics.setColor(choicesHolder.getEraseColor());
+                graphics.fillRect(selectedSubimageOriginalLocation.x, selectedSubimageOriginalLocation.y, selectBorder.width + 1, selectBorder.height + 1);
+            }
+
+            selectedSubimageCurrentLocation = new Point(selectedSubimageCurrentLocation.x + dx, selectedSubimageCurrentLocation.y + dy);
+
+            // prevents selection from being able to be taken completely off canvas in any direction
+            if (selectedSubimageCurrentLocation.y + selectBorder.height < 0) {
+                selectedSubimageCurrentLocation = new Point(selectedSubimageCurrentLocation.x, -(selectBorder.height));
+            }
+            else if (selectedSubimageCurrentLocation.y >= canvas.getCanvasHeight()) {
+                selectedSubimageCurrentLocation = new Point(selectedSubimageCurrentLocation.x, canvas.getCanvasHeight() - 1);
+            }
+            if (selectedSubimageCurrentLocation.x + selectBorder.width < 0) {
+                selectedSubimageCurrentLocation = new Point(-(selectBorder.width), selectedSubimageCurrentLocation.y);
+            }
+            else if (selectedSubimageCurrentLocation.x >= canvas.getCanvasWidth()) {
+                selectedSubimageCurrentLocation = new Point(canvas.getCanvasWidth() - 1, selectedSubimageCurrentLocation.y);
+            }
+
+            graphics.drawImage(selectedSubimage, selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width + 1, selectBorder.height + 1, null);
+            selectBorder = new Rectangle(selectedSubimageCurrentLocation.x, selectedSubimageCurrentLocation.y, selectBorder.width, selectBorder.height);
+
+            graphics.setColor(new Color(0, 0, 0, 255));
+
+            for (int i = selectBorder.x; i < selectBorder.x + selectBorder.width; i += 2) {
+                graphics.fillRect(i, selectBorder.y, 1, 1);
+                graphics.fillRect(i, selectBorder.y + selectBorder.height, 1, 1);
+            }
+            for (int i = selectBorder.y; i < selectBorder.y + selectBorder.height; i += 2) {
+                graphics.fillRect(selectBorder.x, i, 1, 1);
+                graphics.fillRect(selectBorder.x + selectBorder.width, i, 1, 1);
+            }
+
+            // this entire block fixes the bottom left of the rectangle select border because it was sometimes coming out wonky due to pixel count
+            // it forces the bottom left pixel to always be filled in, and then potentially adjusts the adjacent pixels to make it look less awkward
+            graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height, 1, 1);
+
+            if (selectBorder.x + selectBorder.width > 0 && selectBorder.y + selectBorder.height > 0) {
+                if (selectBorder.x + selectBorder.width < canvas.getMainImage().getWidth() && selectBorder.y + selectBorder.height < canvas.getMainImage().getHeight() && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height) == ColorUtils.getIntFromColor(Color.black) && canvas.getSelectionImageLayer().getRGB(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1) == ColorUtils.getIntFromColor(Color.black)) {
+                    graphics.setColor(new Color(0, 0, 0, 0));
+                    graphics.setComposite(AlphaComposite.Clear);
+                    graphics.fillRect(selectBorder.x + selectBorder.width - 1, selectBorder.y + selectBorder.height, 1, 1);
+                    graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 1, 1, 1);
+                    graphics.setColor(new Color(0, 0, 0, 255));
+                    graphics.setComposite(AlphaComposite.SrcOver);
+                    graphics.fillRect(selectBorder.x + selectBorder.width - 2, selectBorder.y + selectBorder.height, 1, 1);
+                    graphics.fillRect(selectBorder.x + selectBorder.width, selectBorder.y + selectBorder.height - 2, 1, 1);
+                }
+            }
+        }
+        canvas.repaint();
     }
 }

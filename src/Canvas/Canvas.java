@@ -6,13 +6,11 @@ import Tools.*;
 import Toolstrip.Tool;
 import Utils.*;
 import Utils.Image;
+import javafx.scene.input.KeyCode;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -80,8 +78,6 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
         setBackground(new Color(197, 207, 223));
         setBorder(BorderFactory.createMatteBorder(5, 5, 0, 0, new Color(197, 207, 223)));
-
-
 
         this.setDoubleBuffered(true);
 
