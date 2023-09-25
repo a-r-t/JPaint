@@ -5,15 +5,28 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
+
+// styles JSlider to make it look nicer
+// I found this entire thing on StackOverflow (https://stackoverflow.com/a/62613662/16948475) and then made some slight tweaks
 public class ColorSlider extends BasicSliderUI {
     private static final int TRACK_HEIGHT = 8;
     private static final int TRACK_WIDTH = 8;
     private static final int TRACK_ARC = 5;
     private static final Dimension THUMB_SIZE = new Dimension(20, 20);
     private final RoundRectangle2D.Float trackShape = new RoundRectangle2D.Float();
+    private Color fillColor;
+    private Color thumbColor;
+    private Color enabledThumbColor;
+    private Color disabledThumbColor;
 
     public ColorSlider(final JSlider b) {
         super(b);
+        fillColor = new Color(0, 0, 0);
+        thumbColor = new Color(255, 255, 255);
+        enabledThumbColor = new Color(255, 255, 255);
+        disabledThumbColor = new Color(10, 10, 10);
+
+        thumbColor = enabledThumbColor;
     }
 
     @Override
@@ -94,17 +107,33 @@ public class ColorSlider extends BasicSliderUI {
                 g2.clipRect(0, thumbPos, slider.getWidth(), slider.getHeight() - thumbPos);
             }
         }
-        g2.setColor(Color.ORANGE);
+        g2.setColor(fillColor);
         g2.fill(trackShape);
         g2.setClip(clip);
     }
 
     @Override
     public void paintThumb(final Graphics g) {
-        g.setColor(new Color(246, 146, 36));
+        g.setColor(thumbColor);
         g.fillOval(thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height);
     }
 
     @Override
     public void paintFocus(final Graphics g) {}
+
+    public void setFillColor(Color fillColor) {
+        this.fillColor = fillColor;
+    }
+
+    public void setThumbEnabled(boolean enabled) {
+        this.thumbColor = enabled ? this.enabledThumbColor : this.disabledThumbColor;
+    }
+
+    public void setEnabledThumbColor(Color enabledThumbColor) {
+        this.enabledThumbColor = enabledThumbColor;
+    }
+
+    public void setDisabledThumbColor(Color disabledThumbColor) {
+        this.disabledThumbColor = disabledThumbColor;
+    }
 }

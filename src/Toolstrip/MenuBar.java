@@ -66,7 +66,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         });
-        newCanvas.setIcon(new ImageIcon(JMenuBar.class.getResource("/new-canvas-icon.png")));
+        newCanvas.setIcon(new ImageIcon(MenuBar.class.getResource("/new-canvas-icon.png")));
         newCanvas.setAccelerator(KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         file.add(newCanvas);
 
@@ -86,7 +86,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         });
-        open.setIcon(new ImageIcon(JMenuBar.class.getResource("/open-icon.png")));
+        open.setIcon(new ImageIcon(MenuBar.class.getResource("/open-icon.png")));
         open.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         file.add(open);
 
@@ -97,7 +97,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 saveFile(canvas);
             }
         });
-        save.setIcon(new ImageIcon(JMenuBar.class.getResource("/save-icon.png")));
+        save.setIcon(new ImageIcon(MenuBar.class.getResource("/save-icon.png")));
         save.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         file.add(save);
 
@@ -108,7 +108,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 saveAsFile(canvas);
             }
         });
-        saveAs.setIcon(new ImageIcon(JMenuBar.class.getResource("/save-as-icon.png")));
+        saveAs.setIcon(new ImageIcon(MenuBar.class.getResource("/save-as-icon.png")));
         saveAs.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | java.awt.event.InputEvent.SHIFT_MASK));
         file.add(saveAs);
     }
@@ -125,7 +125,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 canvas.getCanvasHistory().undo();
             }
         });
-        undo.setIcon(new ImageIcon(JMenuBar.class.getResource("/undo-icon.png")));
+        undo.setIcon(new ImageIcon(MenuBar.class.getResource("/undo-icon.png")));
         undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(undo);
 
@@ -137,7 +137,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 canvas.getCanvasHistory().redo();
             }
         });
-        redo.setIcon(new ImageIcon(JMenuBar.class.getResource("/redo-icon.png")));
+        redo.setIcon(new ImageIcon(MenuBar.class.getResource("/redo-icon.png")));
         redo.setAccelerator(KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(redo);
 
@@ -155,7 +155,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         });
-        cut.setIcon(new ImageIcon(JMenuBar.class.getResource("/scissors-icon.png")));
+        cut.setIcon(new ImageIcon(MenuBar.class.getResource("/scissors-icon.png")));
         cut.setAccelerator(KeyStroke.getKeyStroke('X', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(cut);
 
@@ -170,7 +170,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         });
-        copy.setIcon(new ImageIcon(JMenuBar.class.getResource("/copy-icon.png")));
+        copy.setIcon(new ImageIcon(MenuBar.class.getResource("/copy-icon.png")));
         copy.setAccelerator(KeyStroke.getKeyStroke('C', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(copy);
 
@@ -193,7 +193,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
             }
         });
-        paste.setIcon(new ImageIcon(JMenuBar.class.getResource("/paste-icon.png")));
+        paste.setIcon(new ImageIcon(MenuBar.class.getResource("/paste-icon.png")));
         paste.setAccelerator(KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         edit.add(paste);
 
