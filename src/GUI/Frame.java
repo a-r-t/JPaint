@@ -19,7 +19,7 @@ import Models.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import static javax.swing.WindowConstants.*;
 
 public class Frame implements MenuBarListener {
     private JFrame frame;
@@ -53,7 +53,7 @@ public class Frame implements MenuBarListener {
         mainPanel.add(toolstrip, BorderLayout.NORTH);
         frame.setTitle("Untitled - JPaint");
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setJMenuBar(menuBar);
         frame.setLocationRelativeTo(null);
@@ -62,7 +62,10 @@ public class Frame implements MenuBarListener {
             public void windowClosing(WindowEvent e){
                 // if closing window and canvas is dirty, prompt user to save
                 if (canvas.isDirty()) {
-                    menuBar.promptToSave(canvas);
+                    int result = menuBar.promptToSave(canvas);
+                    if (result != JOptionPane.CANCEL_OPTION) {
+                        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                    }
                 }
             }
         });
