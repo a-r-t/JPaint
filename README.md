@@ -14,6 +14,14 @@ Since Java projects can run on any OS, this project's goal is to get a Microsoft
 
 ![app-image.png](Assets/app-image.png)
 
+## How to run this project?
+
+You should be able to just download and run the JAR file in the Releases section as long as you have Java installed (and to be safe, grab a modern version, such as >= 17).
+
+You can also clone and run the project yourself.
+It does not use any external libraries.
+I recommend using IntelliJ IDE, as all you need to do is mark the Resources directly as the "resources root" and the project will run from there.
+
 ## Where is progress at?
 
 Right now, the project is in progress, and randomly receives a surge of commits here and there whenever I feel motivated enough.
