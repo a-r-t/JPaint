@@ -247,16 +247,16 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
                 bucket.setLocation(new Point(40, getHeight() / 2 - bucket.getHeight() / 2));
                 eyedropper.setLocation(new Point(70, getHeight() / 2 - eyedropper.getHeight() / 2));
                 // eraser.setLocation(new Point(100, getHeight() / 2 - eraser.getHeight() / 2));
-                colorSelect.setLocation(new Point(220, getHeight() / 2 - colorSelect.getHeight() / 2));
-                paintColorDisplay.setLocation(new Point(440, getHeight() / 2 - (int)paintColorDisplay.getSizeWithLabel().getHeight() / 2));
-                eraseColorDisplay.setLocation(new Point(480, getHeight() / 2 - (int)eraseColorDisplay.getSizeWithLabel().getHeight() / 2));
-                zoomIn.setLocation(new Point(140, getHeight() / 2 - zoomIn.getHeight() / 2));
-                zoomOut.setLocation(new Point(170, getHeight() / 2 - zoomOut.getHeight() / 2));
+                colorSelect.setLocation(new Point(225, getHeight() / 2 - colorSelect.getHeight() / 2));
+                paintColorDisplay.setLocation(new Point(445, getHeight() / 2 - (int)paintColorDisplay.getSizeWithLabel().getHeight() / 2));
+                eraseColorDisplay.setLocation(new Point(485, getHeight() / 2 - (int)eraseColorDisplay.getSizeWithLabel().getHeight() / 2));
+                zoomIn.setLocation(new Point(145, getHeight() / 2 - zoomIn.getHeight() / 2));
+                zoomOut.setLocation(new Point(175, getHeight() / 2 - zoomOut.getHeight() / 2));
                 rectangleSelect.setLocation(new Point(100, getHeight() / 2 - eraser.getHeight() / 2));
                 //freeFormSelect.setLocation(new Point(520, getHeight() / 2 - freeFormSelect.getHeight() / 2));
 
                 separator1.setLocation(new Point(130, getHeight() / 2 - separator1.getHeight() / 2 ));
-                separator2.setLocation(new Point(200, getHeight() / 2 - separator2.getHeight() / 2 ));
+                separator2.setLocation(new Point(205, getHeight() / 2 - separator2.getHeight() / 2 ));
             }
 
         });
