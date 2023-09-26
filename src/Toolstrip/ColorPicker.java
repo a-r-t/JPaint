@@ -12,9 +12,9 @@ public class ColorPicker extends JPanel {
     private JSlider greenSlider;
     private JSlider blueSlider;
     private JButton okayButton;
-    JTextField redColorValue;
-    JTextField greenColorValue;
-    JTextField blueColorValue;
+    private JTextField redColorValue;
+    private JTextField greenColorValue;
+    private JTextField blueColorValue;
 
     public ColorPicker(ColorPickerDialog parent, Color startingColor, ColorPickerListener listener) {
         setLayout(null);
