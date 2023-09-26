@@ -22,7 +22,7 @@ I have ported over a ton of core Microsoft Paint features, and I even made the t
 I developed it on a Windows computer, and it works well on Windows from my testing.
 However, since the goal is for it to be used on MacOS, I have released this beta to let others test it out for me on their Mac computers and let me know of any bugs/oddities before I move into an official version 1 release.
 
-Right now, the application supports the following features from Paint:
+The application supports the following features from Paint:
 - Pencil Tool
 - Eye Dropper Tool
 - Bucket Tool
