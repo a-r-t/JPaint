@@ -12,7 +12,7 @@ So I made one.
 JPaint, or its unofficial title of Macrosoft Paint, is a Microsoft Paint clone that is written in Java.
 Since Java projects can run on any OS, this project's goal is to get a Microsoft Paint equivalent working for MacOS.
 
-[app-image.png](Assets/app-image.png)
+![app-image.png](Assets/app-image.png)
 
 ## Where is progress at?
 
