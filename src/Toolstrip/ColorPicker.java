@@ -52,7 +52,7 @@ public class ColorPicker extends JPanel {
 
         redColorValue = new JTextField();
         redColorValue.setSize(50, 20);
-        redColorValue.setLocation(310, 30);
+        redColorValue.setLocation(312, 30);
         redColorValue.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -84,7 +84,7 @@ public class ColorPicker extends JPanel {
         redSlider.setMaximum(255);
         redSlider.setMinimum(0);
         redSlider.setSize(255, 20);
-        redSlider.setLocation(40, 30);
+        redSlider.setLocation(42, 30);
         redSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -101,7 +101,7 @@ public class ColorPicker extends JPanel {
 
         greenColorValue = new JTextField();
         greenColorValue.setSize(50, 20);
-        greenColorValue.setLocation(310, 60);
+        greenColorValue.setLocation(312, 60);
         greenColorValue.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -133,7 +133,7 @@ public class ColorPicker extends JPanel {
         greenSlider.setMaximum(255);
         greenSlider.setMinimum(0);
         greenSlider.setSize(255, 20);
-        greenSlider.setLocation(40, 60);
+        greenSlider.setLocation(42, 60);
         greenSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -150,7 +150,7 @@ public class ColorPicker extends JPanel {
 
         blueColorValue = new JTextField();
         blueColorValue.setSize(50, 20);
-        blueColorValue.setLocation(310, 90);
+        blueColorValue.setLocation(312, 90);
         blueColorValue.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -182,7 +182,7 @@ public class ColorPicker extends JPanel {
         blueSlider.setMaximum(255);
         blueSlider.setMinimum(0);
         blueSlider.setSize(255, 20);
-        blueSlider.setLocation(40, 90);
+        blueSlider.setLocation(42, 90);
         blueSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -191,9 +191,9 @@ public class ColorPicker extends JPanel {
         });
         add(blueSlider);
 
-        JLabel selectedColorLabel = new JLabel("Selected Color");
+        JLabel selectedColorLabel = new JLabel("Selected Color:");
         selectedColorLabel.setSize(100, 20);
-        selectedColorLabel.setLocation(165, 140);
+        selectedColorLabel.setLocation(152, 140);
         add(selectedColorLabel);
 
         redSlider.setValue(startingColor.getRed());
