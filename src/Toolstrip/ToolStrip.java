@@ -279,8 +279,8 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
 
         // separator lines
         g.setColor(new Color(112, 112, 112));
-        g.drawLine(130, 0, 130, getHeight() - 2);
-        g.drawLine(205, 0, 205, getHeight() - 2);
+        g.drawLine(130, 0, 130, getHeight());
+        g.drawLine(205, 0, 205, getHeight());
     }
 
     @Override

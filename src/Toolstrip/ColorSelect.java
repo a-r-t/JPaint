@@ -16,6 +16,8 @@ public class ColorSelect extends JPanel {
     private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
+    private boolean isMouseDown;
+    private int mouseDownOnSwatchIndex;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -86,17 +88,10 @@ public class ColorSelect extends JPanel {
                                     }
                                 }
                             }
-                            // if holding ctrl while clicking a color, bring up color picker
+                            // if holding ctrl while clicking a color, prepare to bring up color picker (which actually happens on mouse released event)
                             else {
-                                // brings up color picker dialog modal to allow user to choose their color
-                                new ColorPickerDialog((JPanel)(ColorSelect.this.getParent()), cs.getColor(), new ColorPickerListener() {
-                                    @Override
-                                    public void onColorChosen(Color color) {
-                                        cs.setColor(color);
-                                        choicesHolder.setPaintColor(color);
-                                        repaint();
-                                    }
-                                });
+                                isMouseDown = true;
+                                mouseDownOnSwatchIndex = i;
                             }
                             needsRepaint = true;
                             break;
@@ -106,6 +101,22 @@ public class ColorSelect extends JPanel {
                         repaint();
                     }
                 }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isMouseDown) {
+                    new ColorPickerDialog(ColorSelect.this, colorOptions[mouseDownOnSwatchIndex].getColor(), new ColorPickerListener() {
+                        @Override
+                        public void onColorChosen(Color color) {
+                            colorOptions[mouseDownOnSwatchIndex].setColor(color);
+                            choicesHolder.setPaintColor(color);
+                            repaint();
+                        }
+                    });
+                }
+                isMouseDown = false;
+
             }
         });
 
