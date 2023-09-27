@@ -89,7 +89,7 @@ public class ColorSelect extends JPanel {
                             // if holding ctrl while clicking a color, bring up color picker
                             else {
                                 // brings up color picker dialog modal to allow user to choose their color
-                                new ColorPickerDialog(ColorSelect.this, cs.getColor(), new ColorPickerListener() {
+                                new ColorPickerDialog((JPanel)(ColorSelect.this.getParent()), cs.getColor(), new ColorPickerListener() {
                                     @Override
                                     public void onColorChosen(Color color) {
                                         cs.setColor(color);
@@ -114,7 +114,7 @@ public class ColorSelect extends JPanel {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = true;
                     }
                 }

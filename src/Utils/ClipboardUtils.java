@@ -6,7 +6,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 // allow for copying/pasting images to and from the clipboard
 public class ClipboardUtils {
@@ -43,8 +42,14 @@ public class ClipboardUtils {
         BufferedImage img = null;
         try {
             img = (BufferedImage) content.getTransferData(DataFlavor.imageFlavor);
-        } catch (UnsupportedFlavorException | IOException e) {
-            return null;
+        } catch (Exception e) {
+            try {
+                // if clipboard data is not easily converted into a buffered image, first put into standard awt Image and then try converting it
+                java.awt.Image temp = (java.awt.Image) content.getTransferData(DataFlavor.imageFlavor);
+                img = ImageUtils.convertImageToBufferedImage(temp);
+            } catch (Exception e2) {
+                return null;
+            }
         }
         return img;
     }
