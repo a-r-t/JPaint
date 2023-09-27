@@ -1,5 +1,7 @@
 package Toolstrip;
 
+import Utils.GraphicsUtils;
+
 import java.awt.*;
 
 public class ColorSwatch {
@@ -120,7 +122,7 @@ public class ColorSwatch {
         }
 
         brush.setColor(color);
-        brush.fillRect(location.x, location.y, size.width, size.height);
+        GraphicsUtils.fillRect(brush, location.x, location.y, size.width, size.height);
 
         brush.setColor(oldColor);
     }
