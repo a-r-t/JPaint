@@ -300,9 +300,9 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     }
 
     private void updateCanvasResizers() {
-        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * choicesHolder.getScale()),  ((CANVAS_START_Y + canvasHeight * choicesHolder.getScale()) / 2) + 2, 4, 4);
-        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * choicesHolder.getScale()) / 2) + 2, CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 4, 4);
-        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * choicesHolder.getScale(), CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 4, 4);
+        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * choicesHolder.getScale()),  ((CANVAS_START_Y + canvasHeight * choicesHolder.getScale()) / 2) + 2, 5, 5);
+        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * choicesHolder.getScale()) / 2) + 2, CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 5, 5);
+        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * choicesHolder.getScale(), CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 5, 5);
     }
 
     private boolean isLeftOrRightClick(MouseClick mouseClick) {
@@ -349,14 +349,14 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         // canvas resizers
         if (allowCanvasResizing) {
             brush.setColor(Color.white);
-            brush.fillRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
-            brush.fillRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
-            brush.fillRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+            GraphicsUtils.fillRect(brush, horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+            GraphicsUtils.fillRect(brush, verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+            GraphicsUtils.fillRect(brush, diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
             brush.setColor(new Color(85, 85, 85));
-            brush.drawRect(horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
-            brush.drawRect(verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
-            brush.drawRect(diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
+            GraphicsUtils.drawRect(brush, horizontalResizer.x, horizontalResizer.y, horizontalResizer.width, horizontalResizer.height);
+            GraphicsUtils.drawRect(brush, verticalResizer.x, verticalResizer.y, verticalResizer.width, verticalResizer.height);
+            GraphicsUtils.drawRect(brush, diagonalResizer.x, diagonalResizer.y, diagonalResizer.width, diagonalResizer.height);
 
             brush.setColor(oldColor);
             brush.setStroke(oldStroke);
@@ -373,32 +373,32 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             brush.setColor(new Color(0, 0, 0));
             if (canvasResizeDirection == CanvasResizeDirection.EAST) {
                 for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
-                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
-                    brush.fillRect(i, CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 1, 1);
+                    GraphicsUtils.fillRect(brush, i, CANVAS_START_Y, 1, 1);
+                    GraphicsUtils.fillRect(brush, i, CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 1, 1);
                 }
                 for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
-                    brush.fillRect(CANVAS_START_X, i, 1, 1);
-                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                    GraphicsUtils.fillRect(brush, CANVAS_START_X, i, 1, 1);
+                    GraphicsUtils.fillRect(brush, (int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
                 }
             }
             else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
                 for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
-                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
-                    brush.fillRect(i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
+                    GraphicsUtils.fillRect(brush, i, CANVAS_START_Y, 1, 1);
+                    GraphicsUtils.fillRect(brush, i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
                 }
                 for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
-                    brush.fillRect(CANVAS_START_X, i, 1, 1);
-                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                    GraphicsUtils.fillRect(brush, CANVAS_START_X, i, 1, 1);
+                    GraphicsUtils.fillRect(brush, (int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
                 }
             }
             else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
                 for (int i = CANVAS_START_X; i < canvasResizeBorder.getX() + canvasResizeBorder.getWidth(); i += 2) {
-                    brush.fillRect(i, CANVAS_START_Y, 1, 1);
-                    brush.fillRect(i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
+                    GraphicsUtils.fillRect(brush, i, CANVAS_START_Y, 1, 1);
+                    GraphicsUtils.fillRect(brush, i, (int) (canvasResizeBorder.getY() + canvasResizeBorder.getHeight()), 1, 1);
                 }
                 for (int i = CANVAS_START_Y; i < canvasResizeBorder.getY() + canvasResizeBorder.getHeight(); i += 2) {
-                    brush.fillRect(CANVAS_START_X, i, 1, 1);
-                    brush.fillRect((int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
+                    GraphicsUtils.fillRect(brush, CANVAS_START_X, i, 1, 1);
+                    GraphicsUtils.fillRect(brush, (int) (canvasResizeBorder.getX() + canvasResizeBorder.getWidth()), i, 1, 1);
                 }
             }
 
