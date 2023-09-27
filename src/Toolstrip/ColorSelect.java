@@ -16,7 +16,6 @@ public class ColorSelect extends JPanel {
     private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
-    private boolean blockCtrl = false;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;

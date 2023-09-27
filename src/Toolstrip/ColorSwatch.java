@@ -1,6 +1,7 @@
 package Toolstrip;
 
 import Utils.GraphicsUtils;
+import com.sun.corba.se.impl.orbutil.graph.Graph;
 
 import java.awt.*;
 
@@ -115,9 +116,9 @@ public class ColorSwatch {
                 brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
             } else {
                 brush.setColor(innerBorderColor);
-                brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.fillRect(brush, location.x - 2, location.y - 2, size.width + 4, size.height + 4);
                 brush.setColor(outerBorderColor);
-                brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.drawRect(brush, location.x - 2, location.y - 2, size.width + 4, size.height + 4);
             }
         }
 
