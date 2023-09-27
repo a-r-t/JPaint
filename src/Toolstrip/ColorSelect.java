@@ -16,7 +16,8 @@ public class ColorSelect extends JPanel {
     private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
-    private boolean blockCtrl = false;
+    private boolean isMouseDown;
+    private int mouseDownOnSwatchIndex;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -87,17 +88,10 @@ public class ColorSelect extends JPanel {
                                     }
                                 }
                             }
-                            // if holding ctrl while clicking a color, bring up color picker
+                            // if holding ctrl while clicking a color, prepare to bring up color picker (which actually happens on mouse released event)
                             else {
-                                // brings up color picker dialog modal to allow user to choose their color
-                                new ColorPickerDialog(ColorSelect.this, cs.getColor(), new ColorPickerListener() {
-                                    @Override
-                                    public void onColorChosen(Color color) {
-                                        cs.setColor(color);
-                                        choicesHolder.setPaintColor(color);
-                                        repaint();
-                                    }
-                                });
+                                isMouseDown = true;
+                                mouseDownOnSwatchIndex = i;
                             }
                             needsRepaint = true;
                             break;
@@ -108,6 +102,22 @@ public class ColorSelect extends JPanel {
                     }
                 }
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isMouseDown) {
+                    new ColorPickerDialog(ColorSelect.this, colorOptions[mouseDownOnSwatchIndex].getColor(), new ColorPickerListener() {
+                        @Override
+                        public void onColorChosen(Color color) {
+                            colorOptions[mouseDownOnSwatchIndex].setColor(color);
+                            choicesHolder.setPaintColor(color);
+                            repaint();
+                        }
+                    });
+                }
+                isMouseDown = false;
+
+            }
         });
 
         // detects if certain keys are being pressed to use with other events
@@ -115,7 +125,7 @@ public class ColorSelect extends JPanel {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+                    if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = true;
                     }
                 }
@@ -159,7 +169,7 @@ public class ColorSelect extends JPanel {
         for (Color color : defaultColors) {
             int x = (22 * (index / 2)) + 2;
             int y = index % 2 == 0 ? 4 : 26;
-            colorSwatches[index] = new ColorSwatch(color, new Point(x, y), new Dimension(16, 16));
+            colorSwatches[index] = new ColorSwatch(color, new Point(x + 1, y), new Dimension(16, 16));
             index++;
         }
         return colorSwatches;

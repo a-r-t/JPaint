@@ -10,7 +10,7 @@ public class ToolButton extends ImageButton {
     public ToolButton(String imageResource, Tool tool) {
         super(imageResource);
         location = new Point(0, 0);
-        bounds = new Rectangle(location.x - 5, location.y - 5, image.getWidth() + 10, image.getHeight() + 10);
+        bounds = new Rectangle(location.x - 5, location.y - 5, image.getWidth() + 11, image.getHeight() + 11);
         this.tool = tool;
     }
 

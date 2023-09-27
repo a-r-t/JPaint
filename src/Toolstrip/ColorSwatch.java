@@ -1,5 +1,7 @@
 package Toolstrip;
 
+import Utils.GraphicsUtils;
+
 import java.awt.*;
 
 public class ColorSwatch {
@@ -108,19 +110,19 @@ public class ColorSwatch {
         if (showBorder) {
             if (isHovered) {
                 brush.setColor(hoveredInnerBorderColor);
-                brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.fillRect(brush, location.x - 2, location.y - 2, size.width + 4, size.height + 4);
                 brush.setColor(hoveredOuterBorderColor);
-                brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.drawRect(brush,location.x - 2, location.y - 2, size.width + 4, size.height + 4);
             } else {
                 brush.setColor(innerBorderColor);
-                brush.fillRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.fillRect(brush, location.x - 2, location.y - 2, size.width + 4, size.height + 4);
                 brush.setColor(outerBorderColor);
-                brush.drawRect(location.x - 2, location.y - 2, size.width + 3, size.height + 3);
+                GraphicsUtils.drawRect(brush, location.x - 2, location.y - 2, size.width + 4, size.height + 4);
             }
         }
 
         brush.setColor(color);
-        brush.fillRect(location.x, location.y, size.width, size.height);
+        GraphicsUtils.fillRect(brush, location.x, location.y, size.width, size.height);
 
         brush.setColor(oldColor);
     }
