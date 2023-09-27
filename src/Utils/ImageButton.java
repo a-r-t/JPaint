@@ -99,20 +99,20 @@ public class ImageButton {
 
         if (isSelected) {
             brush.setColor(new Color(201, 224, 247));
-            brush.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            GraphicsUtils.fillRect(brush, bounds.x, bounds.y, bounds.width, bounds.height);
 
             brush.setColor(new Color(98, 162, 228));
             brush.setStroke(new BasicStroke(2));
-            brush.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            GraphicsUtils.drawRect(brush, bounds.x, bounds.y, bounds.width, bounds.height);
         }
 
         else if (isHovered) {
             brush.setColor(new Color(232, 239, 247));
-            brush.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            GraphicsUtils.fillRect(brush, bounds.x, bounds.y, bounds.width, bounds.height);
 
             brush.setColor(new Color(164, 206, 249));
             brush.setStroke(new BasicStroke(2));
-            brush.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            GraphicsUtils.drawRect(brush, bounds.x, bounds.y, bounds.width, bounds.height);
         }
 
         brush.drawImage(image, location.x, location.y, image.getWidth(), image.getHeight(), null);

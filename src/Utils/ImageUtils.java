@@ -32,7 +32,7 @@ public class ImageUtils {
             graphics.setComposite(AlphaComposite.SrcOver.derive(color.getAlpha() / 255)); // pixels will have partial alpha applied
         }
 
-        graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
+        GraphicsUtils.fillRect(graphics, 0, 0, image.getWidth(), image.getHeight());
 
         graphics.dispose();
     }

@@ -1,5 +1,7 @@
 package Toolstrip;
 
+import Utils.GraphicsUtils;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.BadLocationException;
@@ -209,10 +211,10 @@ public class ColorPicker extends JPanel {
         Graphics2D brush = (Graphics2D)g;
 
         brush.setColor(Color.black);
-        brush.drawRect(150, 160, 100, 100);
+        GraphicsUtils.drawRect(brush, 150, 160, 101, 101);
 
         brush.setColor(new Color(redSlider.getValue(), greenSlider.getValue(), blueSlider.getValue()));
-        brush.fillRect(152, 162, 97, 97);
+        GraphicsUtils.fillRect(brush, 152, 162, 97, 97);
     }
 
     private boolean isColorValueValid(String colorValue) {
