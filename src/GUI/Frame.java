@@ -18,6 +18,7 @@ import Models.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.StrokeBorder;
 
 import static javax.swing.WindowConstants.*;
 
@@ -48,6 +49,8 @@ public class Frame implements MenuBarListener {
         mainPanel.setLayout(new BorderLayout());
 
         JScrollPane scrollPane = new JScrollPane(canvas);
+        scrollPane.setForeground(new Color(112, 112, 112));
+        scrollPane.setBorder(new StrokeBorder(new BasicStroke(1)));
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(toolstrip, BorderLayout.NORTH);

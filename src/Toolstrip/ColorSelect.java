@@ -158,7 +158,7 @@ public class ColorSelect extends JPanel {
         for (Color color : defaultColors) {
             int x = (22 * (index / 2)) + 2;
             int y = index % 2 == 0 ? 4 : 26;
-            colorSwatches[index] = new ColorSwatch(color, new Point(x, y), new Dimension(16, 16));
+            colorSwatches[index] = new ColorSwatch(color, new Point(x + 1, y), new Dimension(16, 16));
             index++;
         }
         return colorSwatches;

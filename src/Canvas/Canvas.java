@@ -300,9 +300,9 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     }
 
     private void updateCanvasResizers() {
-        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * choicesHolder.getScale()),  ((CANVAS_START_Y + canvasHeight * choicesHolder.getScale()) / 2) + 2, 5, 5);
-        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * choicesHolder.getScale()) / 2) + 2, CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 5, 5);
-        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * choicesHolder.getScale(), CANVAS_START_Y + canvasHeight * choicesHolder.getScale(), 5, 5);
+        horizontalResizer = new Rectangle((CANVAS_START_X + canvasWidth * choicesHolder.getScale()) + 1,  ((CANVAS_START_Y + canvasHeight * choicesHolder.getScale()) / 2) + 2, 5, 5);
+        verticalResizer = new Rectangle(((CANVAS_START_X + canvasWidth * choicesHolder.getScale()) / 2) + 2, CANVAS_START_Y + canvasHeight * choicesHolder.getScale() + 1, 5, 5);
+        diagonalResizer = new Rectangle(CANVAS_START_X + canvasWidth * choicesHolder.getScale() + 1, CANVAS_START_Y + canvasHeight * choicesHolder.getScale() + 1, 5, 5);
     }
 
     private boolean isLeftOrRightClick(MouseClick mouseClick) {
@@ -330,8 +330,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
     // this is just to make the scroll pane respect the bounds of the canvas's image
     @Override
-    public Dimension getPreferredSize()
-    {
+    public Dimension getPreferredSize() {
         return new Dimension( CANVAS_START_X + (canvasWidth * choicesHolder.getScale()) + EXTRA_CANVAS_WIDTH, CANVAS_START_Y + (canvasHeight * choicesHolder.getScale()) + EXTRA_CANVAS_HEIGHT);
     }
 
