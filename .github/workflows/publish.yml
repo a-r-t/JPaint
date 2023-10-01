@@ -5,6 +5,9 @@ on:
   create:
     tags:
       - v*
+      -
+permissions:
+  contents: write
 
 jobs:
   build:
