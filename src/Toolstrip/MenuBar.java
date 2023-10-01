@@ -13,6 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -29,12 +30,15 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     private JMenuItem cut;
     private JMenuItem copy;
     private JMenuItem paste;
+    private JMenuItem zoomIn;
+    private JMenuItem zoomOut;
     private JMenuItem canvasSize;
     private ArrayList<MenuBarListener> listeners = new ArrayList<>();
 
     public MenuBar(Canvas canvas, ChoicesHolder choicesHolder) {
         createFileSection(canvas);
         createEditSection(canvas, choicesHolder);
+        createViewSection(choicesHolder);
     }
 
     // all menu logic for the "File" section
@@ -204,6 +208,33 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
             }
         });
         edit.add(canvasSize);
+    }
+
+    private void createViewSection(ChoicesHolder choicesHolder) {
+        JMenu view = new JMenu("View");
+        add(view);
+
+        zoomIn = new JMenuItem("Zoom In");
+        zoomIn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                choicesHolder.setScale(choicesHolder.getScale() + 1);
+            }
+        });
+        zoomIn.setIcon(new ImageIcon(MenuBar.class.getResource("/zoom-in-icon.png")));
+        zoomIn.setAccelerator(KeyStroke.getKeyStroke('=', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        view.add(zoomIn);
+
+        zoomOut = new JMenuItem("Zoom Out");
+        zoomOut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                choicesHolder.setScale(choicesHolder.getScale() - 1);
+            }
+        });
+        zoomOut.setIcon(new ImageIcon(MenuBar.class.getResource("/zoom-out-icon.png")));
+        zoomOut.setAccelerator(KeyStroke.getKeyStroke('-', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        view.add(zoomOut);
     }
 
     @Override
