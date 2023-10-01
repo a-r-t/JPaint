@@ -9,3 +9,4 @@ out/
 .DS_Store
 todo.txt
 MANIFEST.MF
+target/
