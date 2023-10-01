@@ -12,9 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import Canvas.*;
 import Toolstrip.*;
-import Models.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,6 +31,16 @@ public class Frame implements MenuBarListener {
         setSwingStyle();
         frame = new JFrame();
         frame.setIconImages(getIcons());
+
+        // attempt to set dock icon on certain Operating Systems like MacOS
+        try {
+            Taskbar tb = Taskbar.getTaskbar();
+            tb.setIconImage(ImageIO.read(Frame.class.getResource("/icon-256.png")));
+        }
+        catch(Exception e) {
+            // unable to set taskbar icon
+        }
+
         mainPanel = new JPanel();
         choicesHolder = new ChoicesHolder();
 
@@ -90,6 +98,7 @@ public class Frame implements MenuBarListener {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
+            System.out.println("Unable to set look and feel to match the Operating System");
         }
     }
 
