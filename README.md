@@ -81,6 +81,8 @@ While a sub image is selected, it can be cut or copied to the clipboard.
 
 When pasting an image into the canvas, it will automatically be wrapped in a rectangle select box as a sub image.
 
+Press both ctrl (or command on MacOS) and A to select entire image as sub image.
+
 ### Zoom In/Out
 
 Click one of the zoom in or zoom out icons to scale the canvas.

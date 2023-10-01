@@ -225,6 +225,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                     else if (e.getKeyCode() == KeyEvent.VK_A) {
                         isAPressed = true;
                     }
+                    // if both ctrl and A is pressed, change tool to rectangle and select entire image as subimage
                     if (isCtrlPressed && isAPressed && !selectAllShortcutActivated) {
                         selectAllShortcutActivated = true;
                         choicesHolder.setTool(Tool.RECTANGLE_SELECT);
