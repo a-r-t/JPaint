@@ -246,6 +246,10 @@ public class RectangleSelectTool extends BaseTool {
 
         canvas.setAllowCanvasResizing(false);
         canvas.repaint();
+
+        for (CanvasListener listener: canvasListeners) {
+            listener.onSelectedSubImageChanged(selectedSubimage);
+        }
     }
 
     public void setExternalSelectedSubimage(BufferedImage selectedSubimage) {
