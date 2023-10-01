@@ -58,6 +58,9 @@ Pencil tool allows for free-hand drawing.
 Hold left-click down to draw in the selected paint color.
 Hold right-click down to draw in the selected erase color.
 
+Hold shift to force drawing in a straight line.
+Works either horizontally or vertically based on the direction the mouse is first dragged in while shift key is held.
+
 ### Bucket Tool
 
 Left-click to spread a chosen color with the selected paint color.
