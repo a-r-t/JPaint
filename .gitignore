@@ -8,5 +8,5 @@ out/
 *.iml
 .DS_Store
 todo.txt
-MANIFEST.MF
+META-INF/
 target/

@@ -116,18 +116,20 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                 mouseInfoHolder.mouseButtonReleased(mouseClick);
                 mouseInfoHolder.updateMousePosition(e.getPoint());
                 if (canvasMode == CanvasMode.RESIZE && mouseClick == MouseClick.LEFT_CLICK) {
-
+                    int newCanvasWidth = canvasWidth;
+                    int newCanvasHeight = canvasHeight;
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
-                        canvasWidth = Math.max(e.getX() / choicesHolder.getScale(), 1);
+                        newCanvasWidth = Math.max((canvasResizeBorder.x + canvasResizeBorder.width - CANVAS_START_X) / choicesHolder.getScale(), 1);
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
-                        canvasHeight = Math.max(e.getY() / choicesHolder.getScale(), 1);
+                        newCanvasHeight = Math.max((canvasResizeBorder.y + canvasResizeBorder.height - CANVAS_START_Y) / choicesHolder.getScale(), 1);
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
-                        canvasWidth = Math.max(e.getX() / choicesHolder.getScale(), 1);
-                        canvasHeight = Math.max(e.getY() / choicesHolder.getScale(), 1);
+                        newCanvasWidth = Math.max((canvasResizeBorder.x + canvasResizeBorder.width - CANVAS_START_X) / choicesHolder.getScale(), 1);
+                        newCanvasHeight = Math.max((canvasResizeBorder.y + canvasResizeBorder.height - CANVAS_START_Y) / choicesHolder.getScale(), 1);
                     }
-                    resizeCanvas(canvasWidth, canvasHeight);
+                    canvasHistory.createPerformedState();
+                    resizeCanvas(newCanvasWidth, newCanvasHeight);
                     canvasMode = CanvasMode.PAINT;
                     canvasResizeDirection = null;
                     setCursor(Cursor.getDefaultCursor());
@@ -178,15 +180,15 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                 }
                 else if (canvasMode == CanvasMode.RESIZE) {
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, canvasHeight * choicesHolder.getScale());
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInImageX() - 1, canvasHeight * choicesHolder.getScale());
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * choicesHolder.getScale(), e.getPoint().y);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() - 1);
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, e.getPoint().x, e.getPoint().y);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInImageX() - 1, mouseInfoHolder.getCurrentMousePositionInImageY() - 1);
                         repaint();
                     }
                 }

@@ -28,6 +28,9 @@ public class CanvasCursorManager {
         Cursor selectCursor = null;
         Cursor dragCursor = null;
         Cursor invisibleCursor = null;
+        Cursor resizeHCursor = null;
+        Cursor resizeVCursor = null;
+        Cursor resizeDRCursor = null;
         try {
             pencilCursor = toolkit.createCustomCursor(
                     ImageIO.read(CanvasCursorManager.class.getResource("/pencil-cursor-transparent.png")),
@@ -60,8 +63,24 @@ public class CanvasCursorManager {
                     new Point(0, 0),
                     "invisible"
             );
+            resizeHCursor = toolkit.createCustomCursor(
+                    ImageIO.read(CanvasCursorManager.class.getResource("/resize-h-cursor-transparent.png")),
+                    new Point(16, 15),
+                    "resizeH"
+            );
+            resizeVCursor = toolkit.createCustomCursor(
+                    ImageIO.read(CanvasCursorManager.class.getResource("/resize-v-cursor-transparent.png")),
+                    new Point(15, 15),
+                    "resizeV"
+            );
+            resizeDRCursor = toolkit.createCustomCursor(
+                    ImageIO.read(CanvasCursorManager.class.getResource("/resize-dr-cursor-transparent.png")),
+                    new Point(16, 13),
+                    "resizeDR"
+            );
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Unable to read in custom cursors!");
             System.exit(1);
         }
         cursors.put(CanvasCursor.PENCIL, pencilCursor);
@@ -70,8 +89,8 @@ public class CanvasCursorManager {
         cursors.put(CanvasCursor.SELECT, selectCursor);
         cursors.put(CanvasCursor.DRAG, dragCursor);
         cursors.put(CanvasCursor.INVISIBLE, invisibleCursor);
-        cursors.put(CanvasCursor.E_RESIZE_CURSOR, new Cursor(Cursor.E_RESIZE_CURSOR));
-        cursors.put(CanvasCursor.S_RESIZE_CURSOR, new Cursor(Cursor.S_RESIZE_CURSOR));
-        cursors.put(CanvasCursor.SE_RESIZE_CURSOR, new Cursor(Cursor.SE_RESIZE_CURSOR));
+        cursors.put(CanvasCursor.E_RESIZE_CURSOR, resizeHCursor);
+        cursors.put(CanvasCursor.S_RESIZE_CURSOR, resizeVCursor);
+        cursors.put(CanvasCursor.SE_RESIZE_CURSOR, resizeDRCursor);
     }
 }

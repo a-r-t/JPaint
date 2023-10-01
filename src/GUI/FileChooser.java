@@ -1,7 +1,5 @@
 package GUI;
 
-import Toolstrip.MenuBar;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
