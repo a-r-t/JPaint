@@ -16,7 +16,9 @@ Since Java projects can run on any OS, this project's goal is to get a Microsoft
 
 ## How to run this project?
 
-You should be able to just download and run the JAR file in the Releases section as long as you have Java installed (and to be safe, grab a modern version, such as >= 17).
+You should be able to just download and run the JAR file in the Releases section as long as you have Java installed.
+I've been developing and testing this app with Java version 17, so I recommend a Java version >= 17 be installed to run this.
+I think technically it may be able to work with as low as Java 9 worst case...but once again I do not recommend using the app with a Java version below 17.
 
 You can also clone and run the project yourself.
 It does not use any external libraries.
@@ -48,7 +50,7 @@ The application currently supports the following features from Paint:
 ## How do I use this project?
 
 If you know how to use Microsoft Paint, you should be able to jump right into this project no problem and edit images.
-Please use an external mouse (NO trackpad -- you will not have a good time).
+I recommend that you use an external mouse instead of a trackpad if on a laptop.
 
 Here are some tips:
 

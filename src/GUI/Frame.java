@@ -30,6 +30,8 @@ public class Frame implements MenuBarListener {
     public Frame() {
         setSwingStyle();
         frame = new JFrame();
+
+        // set icon images (favicon, system tray image, etc.) for Operating Systems like Windows
         frame.setIconImages(getIcons());
 
         // attempt to set dock icon on certain Operating Systems like MacOS
