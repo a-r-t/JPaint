@@ -203,6 +203,7 @@ public class RectangleSelectTool extends BaseTool {
     @Override
     public void reset() {
         canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
+        canvas.setAllowCanvasResizing(true);
         originalSelectBorder = new Rectangle(0, 0, 0, 0);
         selectBorder = new Rectangle(0, 0, 0, 0);
         selectedSubimage = null;
