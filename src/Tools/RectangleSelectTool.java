@@ -227,7 +227,28 @@ public class RectangleSelectTool extends BaseTool {
         return selectedSubimage != null;
     }
 
-    public void setSelectedSubimage(BufferedImage selectedSubimage) {
+    public void setSelectedSubimage(Rectangle selectBorder) {
+        commitSelectedSubimage();
+        canvas.getCanvasHistory().createPerformedState();
+
+        this.selectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
+        isSelectedSubimageExternal = false;
+
+        selectedSubimage = canvas.getMainImage().getSubImage(selectBorder.x, selectBorder.y, selectBorder.width + 1, selectBorder.height + 1);
+        selectedSubimageOriginalLocation = new Point(originalSelectBorder.x, originalSelectBorder.y);
+        selectedSubimageCurrentLocation = new Point(selectBorder.x, selectBorder.y);
+
+        canvas.getSelectionImageLayer().clear(new Color(0, 0, 0, 0));
+        Graphics2D graphics = canvas.getSelectionImageLayer().getGraphics();
+        createSelectionBorderOutline(selectBorder, graphics);
+        graphics.dispose();
+        originalSelectBorder = new Rectangle(this.selectBorder.x, this.selectBorder.y, this.selectBorder.width, this.selectBorder.height);
+
+        canvas.setAllowCanvasResizing(false);
+        canvas.repaint();
+    }
+
+    public void setExternalSelectedSubimage(BufferedImage selectedSubimage) {
         commitSelectedSubimage();
 
         canvas.getCanvasHistory().createPerformedState();

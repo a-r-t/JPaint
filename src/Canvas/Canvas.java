@@ -55,7 +55,9 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
     // if true, canvas has changes made to it since the last time it was saved
     private boolean isDirty;
 
-    private boolean isCtrlPressed = false; // used for mouse wheel zoom shortcut
+    private boolean isCtrlPressed = false; // used for certain shortcuts like mouse wheel zoom and select all
+    private boolean isAPressed = false; // used for select all shortcut
+    private boolean selectAllShortcutActivated = false; // used for select all shortcut
 
     public Canvas(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -220,10 +222,24 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                     if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = true;
                     }
+                    else if (e.getKeyCode() == KeyEvent.VK_A) {
+                        isAPressed = true;
+                    }
+                    if (isCtrlPressed && isAPressed && !selectAllShortcutActivated) {
+                        selectAllShortcutActivated = true;
+                        choicesHolder.setTool(Tool.RECTANGLE_SELECT);
+                        setSelectedSubimage(new Rectangle(0, 0, canvasWidth - 1, canvasHeight - 1));
+                    }
                 }
                 else if (e.getID() == KeyEvent.KEY_RELEASED) {
                     if (e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_META) {
                         isCtrlPressed = false;
+                    }
+                    else if (e.getKeyCode() == KeyEvent.VK_A) {
+                        isAPressed = false;
+                    }
+                    if (!isCtrlPressed || !isAPressed) {
+                        selectAllShortcutActivated = false;
                     }
                 }
                 return false;
@@ -528,9 +544,15 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
 
     }
 
-    public void setSelectedSubimage(BufferedImage selectedSubimage) {
+    public void setSelectedSubimage(Rectangle selectBorder) {
         if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
-            rectangleSelectTool.setSelectedSubimage(selectedSubimage);
+            rectangleSelectTool.setSelectedSubimage(selectBorder);
+        }
+    }
+
+    public void setExternalSelectedSubimage(BufferedImage selectedSubimage) {
+        if (choicesHolder.getTool() == Tool.RECTANGLE_SELECT) {
+            rectangleSelectTool.setExternalSelectedSubimage(selectedSubimage);
         }
     }
 

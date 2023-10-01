@@ -13,7 +13,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -188,7 +187,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                     if (canvas.getCanvasHeight() < clipboardImage.getHeight()) {
                         canvas.resizeCanvas(canvas.getCanvasWidth(), clipboardImage.getHeight());
                     }
-                    canvas.setSelectedSubimage(clipboardImage);
+                    canvas.setExternalSelectedSubimage(clipboardImage);
                     canvas.revalidate();
                     canvas.repaint();
                 }
