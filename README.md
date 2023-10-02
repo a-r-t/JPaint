@@ -16,7 +16,7 @@ Since Java projects can run on any OS, this project's goal is to get a Microsoft
 
 ## How to run this project?
 
-You should be able to just download and run the JAR file in the Releases section as long as you have Java installed.
+You should be able to just download and run the JAR file from the latest release on the [Releases](https://github.com/a-r-t/JPaint/releases) page as long as you have Java installed.
 I've been developing and testing this app with Java version 17, so I recommend a Java version >= 17 be installed to run this.
 I think technically it may be able to work with as low as Java 9 worst case...but once again I do not recommend using the app with a Java version below 17.
 
