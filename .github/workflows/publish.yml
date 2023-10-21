@@ -51,7 +51,7 @@ jobs:
         with:
           files: |
             JPaint-${{ env.RELEASE_VERSION }}.jar,
-            JPaint-${{ env.RELEASE_VERSION }}.app.zip,
+            JPaint-${{ env.RELEASE_VERSION }}.zip,
             Release.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
