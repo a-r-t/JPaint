@@ -19,10 +19,11 @@ jobs:
           java-version: '17'
           java-package: jdk
           architecture: x64
-      - name: Setup JAR to DMG convert script
+      - name: Download JAR to DMG convert script
         uses: actions/checkout@master
         with:
           name: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
+      - name: Install JAR to DMG convert script
         run: |
           cd jar2app
           chmod +x install.sh uninstall.sh
