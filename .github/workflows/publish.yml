@@ -24,7 +24,7 @@ jobs:
       - name: Download JAR to DMG convert script
         uses: actions/checkout@v3
         with:
-          repository: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
+          repository: Jorl17/jar2app
           path: './jar2app'
       - name: Install JAR to DMG convert script
         run: |
