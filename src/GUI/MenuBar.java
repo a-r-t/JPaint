@@ -1,10 +1,10 @@
-package Toolstrip;
+package GUI;
 
 import Canvas.Canvas;
 import Canvas.CanvasListener;
 import Canvas.CanvasHistoryListener;
-import GUI.FileChooser;
 import Models.ChoicesHolder;
+import Toolstrip.Tool;
 import Utils.ClipboardUtils;
 
 import javax.imageio.ImageIO;
@@ -206,6 +206,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 setCanvasSize(canvas);
             }
         });
+        canvasSize.setIcon(new ImageIcon(MenuBar.class.getResource("/canvas-size-icon.png")));
         edit.add(canvasSize);
     }
 
@@ -423,5 +424,20 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
 
     public void addListener(MenuBarListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public void onCursorMove(Point location) {
+        // unused interface method
+    }
+
+    @Override
+    public void onCanvasSizeChange(int width, int height) {
+       // unused interface method
+    }
+
+    @Override
+    public void onRectangleSelectChange(Rectangle selectedBounds) {
+        // unused interface method
     }
 }

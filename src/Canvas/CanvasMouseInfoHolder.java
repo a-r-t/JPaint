@@ -23,27 +23,27 @@ public class CanvasMouseInfoHolder extends MouseInfoHolder {
         currentMousePositionInImage = new Point(mousePosition.x - canvas.getStartX(), mousePosition.y - canvas.getStartY());
     }
 
-    public Point getCurrentMousePositionInImage() {
+    public Point getCurrentMousePositionInCanvas() {
         return currentMousePositionInImage;
     }
 
-    public int getCurrentMousePositionInImageX() {
+    public int getCurrentMousePositionInCanvasX() {
         return currentMousePositionInImage.x;
     }
 
-    public int getCurrentMousePositionInImageY() {
+    public int getCurrentMousePositionInCanvasY() {
         return currentMousePositionInImage.y;
     }
 
-    public Point getPreviousMousePositionInImage() {
+    public Point getPreviousMousePositionInCanvas() {
         return previousMousePositionInImage;
     }
 
-    public int getPreviousMousePositionInImageX() {
+    public int getPreviousMousePositionInCanvasX() {
         return previousMousePositionInImage.x;
     }
 
-    public int getPreviousMousePositionInImageY() {
+    public int getPreviousMousePositionInCanvasY() {
         return previousMousePositionInImage.y;
     }
 }

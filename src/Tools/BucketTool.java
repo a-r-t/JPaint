@@ -30,7 +30,7 @@ public class BucketTool extends BaseTool {
             color = choicesHolder.getEraseColorAsIntRGB();
         }
 
-        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInCanvas();
         int oldRgb = canvas.getMainImage().getRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale());
         int newRgb = color;
         if (oldRgb != newRgb) {

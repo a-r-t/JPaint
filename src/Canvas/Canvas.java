@@ -14,8 +14,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryListener {
-    private int canvasWidth = 400;
-    private int canvasHeight = 400;
+    private int canvasWidth;
+    private int canvasHeight;
     private Image mainImage;
     private ChoicesHolder choicesHolder;
 
@@ -153,12 +153,24 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                     isRightMouseDown = false;
                 }
             }
+
+            public void mouseExited(MouseEvent e) {
+                // tell listeners that mouse is no longer in canvas
+                for (CanvasListener listener : listeners) {
+                    listener.onCursorMove(null);
+                }
+            }
         });
 
         this.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 mouseInfoHolder.updateMousePosition(e.getPoint());
+
+                for (CanvasListener listener : listeners) {
+                    listener.onCursorMove(mouseInfoHolder.getCurrentMousePositionInCanvas());
+                }
+                
                 Point mousePosition = e.getPoint();
                 setCursor(getProperCursor(mousePosition));
             }
@@ -166,6 +178,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             @Override
             public void mouseDragged(MouseEvent e) {
                 mouseInfoHolder.updateMousePosition(e.getPoint());
+
+                for (CanvasListener listener : listeners) {
+                    listener.onCursorMove(mouseInfoHolder.getCurrentMousePositionInCanvas());
+                }
 
                 if (canvasMode == CanvasMode.PAINT) {
                     if (choicesHolder.getTool() == Tool.PENCIL) {
@@ -180,15 +196,15 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                 }
                 else if (canvasMode == CanvasMode.RESIZE) {
                     if (canvasResizeDirection == CanvasResizeDirection.EAST) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInImageX() - 1, canvasHeight * choicesHolder.getScale());
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInCanvasX() - 1, canvasHeight * choicesHolder.getScale());
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInImageY() - 1);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, canvasWidth * choicesHolder.getScale(), mouseInfoHolder.getCurrentMousePositionInCanvasY() - 1);
                         repaint();
                     }
                     else if (canvasResizeDirection == CanvasResizeDirection.SOUTH_EAST) {
-                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInImageX() - 1, mouseInfoHolder.getCurrentMousePositionInImageY() - 1);
+                        canvasResizeBorder = new Rectangle(CANVAS_START_X, CANVAS_START_Y, mouseInfoHolder.getCurrentMousePositionInCanvasX() - 1, mouseInfoHolder.getCurrentMousePositionInCanvasY() - 1);
                         repaint();
                     }
                 }
@@ -213,6 +229,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
                 // need this so parent jscrollpane will still scroll when mouse wheel is used
                 // otherwise this mousewheelevent will block that from working
                 getParent().dispatchEvent(e);
+
+                for (CanvasListener listener : listeners) {
+                    listener.onCursorMove(mouseInfoHolder.getCurrentMousePositionInCanvas());
+                }
             }
         });
 
@@ -271,8 +291,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
         this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
         this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
-
-        updateCanvasResizers();
+        resizeCanvas(400, 400);
     }
 
     public void reset() {
@@ -345,6 +364,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             rectangleSelectTool.reset();
         }
         repaint();
+
+        for (CanvasListener listener : listeners) {
+            listener.onCanvasSizeChange(newWidth, newHeight);
+        }
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image

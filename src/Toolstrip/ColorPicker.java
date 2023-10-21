@@ -202,7 +202,6 @@ public class ColorPicker extends JPanel {
         redColorValue.setText(String.valueOf(redSlider.getValue()));
         greenColorValue.setText(String.valueOf(greenSlider.getValue()));
         blueColorValue.setText(String.valueOf(blueSlider.getValue()));
-
     }
 
     @Override

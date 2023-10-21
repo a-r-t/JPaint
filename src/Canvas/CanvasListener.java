@@ -8,4 +8,7 @@ public interface CanvasListener {
     void onEraseColorChanged(Color color);
     void onEyeDropperUsedToChangePaintColor();
     void onSelectedSubImageChanged(BufferedImage subImage);
+    void onCursorMove(Point location);
+    void onRectangleSelectChange(Rectangle selectedBounds);
+    void onCanvasSizeChange(int width, int height);
 }
