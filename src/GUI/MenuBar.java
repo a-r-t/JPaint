@@ -254,33 +254,23 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     }
 
     private void openFile(Canvas canvas) {
-        JFileChooser fileChooser = new FileChooser();
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setApproveButtonText("Open");
-        fileChooser.setApproveButtonMnemonic('a');
-        fileChooser.setApproveButtonToolTipText("Open file in application");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files (*.jpg, *.jpeg, *.png)", "jpg", "jpeg", "png"));
-        int returnVal = fileChooser.showDialog(null, "Open");
+        FilePickerResponse filePickerResponse = FilePicker.showDialog(FilePickerType.OPEN);
+        if(filePickerResponse.getSelectedFile() != null) {
+            BufferedImage chosenFileImage = null;
+            try {
+                chosenFileImage = ImageIO.read(filePickerResponse.getSelectedFile());
+                canvas.setMainImage(chosenFileImage);
+                canvas.fitCanvasToMainImage();
 
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-            File chosenFile = fileChooser.getSelectedFile();
-            if (chosenFile != null) {
-                BufferedImage chosenFileImage = null;
-                try {
-                    chosenFileImage = ImageIO.read(chosenFile);
-                    canvas.setMainImage(chosenFileImage);
-                    canvas.fitCanvasToMainImage();
+                currentlyOpenFile = filePickerResponse.getSelectedFile().getAbsolutePath();
+                canvas.setIsDirty(false);
 
-                    currentlyOpenFile = chosenFile.getAbsolutePath();
-                    canvas.setIsDirty(false);
-
-                    // let subscribers know a file was opened
-                    for (MenuBarListener listener : listeners) {
-                        listener.onFileOpened(currentlyOpenFile);
-                    }
-                } catch (IOException ioException) {
-                    // TODO: Error message in UI that file can't be read
+                // let subscribers know a file was opened
+                for (MenuBarListener listener : listeners) {
+                    listener.onFileOpened(currentlyOpenFile);
                 }
+            } catch (IOException ioException) {
+                // TODO: Error message in UI that file can't be read
             }
         }
     }
@@ -307,50 +297,35 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     }
 
     private void saveAsFile(Canvas canvas) {
-        JFileChooser fileChooser = new FileChooser();
-        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        fileChooser.setApproveButtonText("Save");
-        fileChooser.setApproveButtonMnemonic('a');
-        fileChooser.setApproveButtonToolTipText("Save file from application");
-        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG (*.png)", "png", "*.png");
-        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("JPEG (*.jpeg, *.jpg)", "jpeg", "jpg", "*.jpeg", "*.jpg");
-        fileChooser.addChoosableFileFilter(pngFilter);
-        fileChooser.addChoosableFileFilter(jpgFilter);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setFileFilter(pngFilter);
-        int returnVal = fileChooser.showDialog(null, "Save");
+        FilePickerResponse filePickerResponse = FilePicker.showDialog(FilePickerType.SAVE);
+        if(filePickerResponse.getSelectedFile() != null) {            
+            String filePath = filePickerResponse.getSelectedFile().getAbsolutePath();
+            String fileType = "";
 
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-            File chosenFile = fileChooser.getSelectedFile();
-            if (chosenFile != null) {
-                String filePath = chosenFile.getAbsolutePath();
-                String fileType = "";
-
-                if (fileChooser.getFileFilter() == pngFilter) {
-                    if (!filePath.endsWith(".png")) {
-                        filePath = filePath + ".png";
-                    }
-                    fileType = "PNG";
+            if (filePickerResponse.getSelectedFileFilter() == FilePicker.pngFilter) {
+                if (!filePath.endsWith(".png")) {
+                    filePath = filePath + ".png";
                 }
-                else if (fileChooser.getFileFilter() == jpgFilter) {
-                    if ((!filePath.endsWith(".jpg") || !filePath.endsWith(".jpeg"))) {
-                        filePath = filePath + ".jpg";
-                    }
-                    fileType = "JPEG";
+                fileType = "PNG";
+            }
+            else if (filePickerResponse.getSelectedFileFilter() == FilePicker.jpgFilter) {
+                if ((!filePath.endsWith(".jpg") || !filePath.endsWith(".jpeg"))) {
+                    filePath = filePath + ".jpg";
                 }
+                fileType = "JPEG";
+            }
 
-                try {
-                    ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
-                    currentlyOpenFile = filePath;
-                    canvas.setIsDirty(false);
+            try {
+                ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
+                currentlyOpenFile = filePath;
+                canvas.setIsDirty(false);
 
-                    // let subscribers know a file was opened
-                    for (MenuBarListener listener : listeners) {
-                        listener.onFileOpened(currentlyOpenFile);
-                    }
-                } catch (IOException e) {
-                    // TODO: Error message in UI that file can't be saved
+                // let subscribers know a file was opened
+                for (MenuBarListener listener : listeners) {
+                    listener.onFileOpened(currentlyOpenFile);
                 }
+            } catch (IOException e) {
+                // TODO: Error message in UI that file can't be saved
             }
         }
     }

@@ -21,19 +21,6 @@ jobs:
           java-version: '17'
           java-package: jdk
           architecture: x64
-      - name: Download JAR to DMG convert script
-        uses: actions/checkout@v3
-        with:
-          repository: Jorl17/jar2app
-          path: './jar2app'
-      - name: Install JAR to DMG convert script
-        run: |
-          ls
-          cd jar2app
-          chmod +x install.sh uninstall.sh
-          sudo ./install.sh
-          cd ..
-          rm -rf jar2app
       - name: Set Release Version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Create JAR
@@ -41,9 +28,6 @@ jobs:
           echo ${{ github.sha }} > Release.txt
           mvn package
           cp target/JPaint-0.0.1-jar-with-dependencies.jar ./JPaint-${{ env.RELEASE_VERSION }}.jar
-          git clone https://github.com/Jorl17/jar2app
-          jar2app ./JPaint-${{ env.RELEASE_VERSION }}.jar -r $JAVA_HOME
-          zip -r JPaint-${{ env.RELEASE_VERSION }}.zip JPaint-${{ env.RELEASE_VERSION }}.app 
       - name: Test
         run: cat Release.txt
       - name: Release
@@ -51,7 +35,6 @@ jobs:
         with:
           files: |
             JPaint-${{ env.RELEASE_VERSION }}.jar,
-            JPaint-${{ env.RELEASE_VERSION }}.zip,
             Release.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
