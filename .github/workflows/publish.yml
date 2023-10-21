@@ -22,7 +22,7 @@ jobs:
       - name: Setup JAR to DMG convert script
         uses: actions/checkout@master
         with:
-        name: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
+          name: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
         run: |
           cd jar2app
           chmod +x install.sh uninstall.sh
