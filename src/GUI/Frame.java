@@ -68,6 +68,8 @@ public class Frame implements MenuBarListener {
         statusBar = new StatusBar(canvas, choicesHolder);
         canvas.addListener(statusBar);
 
+        canvas.resizeCanvas(400, 400);
+
         JScrollPane scrollPane = new JScrollPane(canvas);
         scrollPane.setForeground(new Color(112, 112, 112));
         scrollPane.setBorder(new StrokeBorder(new BasicStroke(1)));

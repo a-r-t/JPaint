@@ -14,8 +14,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryListener {
-    private int canvasWidth = 400;
-    private int canvasHeight = 400;
+    private int canvasWidth;
+    private int canvasHeight;
     private Image mainImage;
     private ChoicesHolder choicesHolder;
 
@@ -291,8 +291,7 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
         this.eyeDropperTool = new EyeDropperTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
         this.eraserTool = new EraserTool(this, choicesHolder, mouseInfoHolder, cursors);
         this.rectangleSelectTool = new RectangleSelectTool(this, choicesHolder, mouseInfoHolder, cursors, listeners);
-
-        updateCanvasResizers();
+        resizeCanvas(400, 400);
     }
 
     public void reset() {
@@ -365,6 +364,10 @@ public class Canvas extends JPanel implements ChoicesListener, CanvasHistoryList
             rectangleSelectTool.reset();
         }
         repaint();
+
+        for (CanvasListener listener : listeners) {
+            listener.onCanvasSizeChange(newWidth, newHeight);
+        }
     }
 
     // this is just to make the scroll pane respect the bounds of the canvas's image

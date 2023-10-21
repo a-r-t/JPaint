@@ -50,6 +50,10 @@ public class StatusBar extends JPanel implements CanvasListener {
         rectangleSelectDimensionLabel.setSize(80, 10);
         this.add(rectangleSelectDimensionLabel);
 
+        canvasSizeIcon = new JLabel(new ImageIcon(StatusBar.class.getResource("/canvas-size-icon.png")));
+        canvasSizeIcon.setSize(16, 16);
+        this.add(canvasSizeIcon);
+
         canvasSizeLabel = new JLabel("");
         canvasSizeLabel.setSize(80, 10);
         this.add(canvasSizeLabel);
@@ -65,9 +69,8 @@ public class StatusBar extends JPanel implements CanvasListener {
                 rectangleSelectDimensionIcon.setLocation(new Point(100, getHeight() / 2 - rectangleSelectDimensionIcon.getHeight() / 2));
                 rectangleSelectDimensionLabel.setLocation(new Point(120, getHeight() / 2 - rectangleSelectDimensionLabel.getHeight() / 2));
 
-                canvasSizeLabel.setLocation(new Point(200, getHeight() / 2 - canvasSizeLabel.getHeight() / 2));
-
-
+                canvasSizeIcon.setLocation(new Point(190, getHeight() / 2 - canvasSizeIcon.getHeight() / 2));
+                canvasSizeLabel.setLocation(new Point(210, getHeight() / 2 - canvasSizeLabel.getHeight() / 2));
             }
 
         });
@@ -86,7 +89,7 @@ public class StatusBar extends JPanel implements CanvasListener {
     @Override
     public void onRectangleSelectChange(Rectangle selectedBounds) {
         if (selectedBounds != null && selectedBounds.x > 0 && selectedBounds.height > 0) {
-            rectangleSelectDimensionLabel.setText(String.format("%s, %spx", selectedBounds.width, selectedBounds.height));
+            rectangleSelectDimensionLabel.setText(String.format("%s x %spx", selectedBounds.width, selectedBounds.height));
         }
         else {
             rectangleSelectDimensionLabel.setText("");
@@ -95,7 +98,7 @@ public class StatusBar extends JPanel implements CanvasListener {
 
     @Override
     public void onCanvasSizeChange(int width, int height) {
-
+        canvasSizeLabel.setText(String.format("%s x %spx", width, height));
     }
 
     @Override
