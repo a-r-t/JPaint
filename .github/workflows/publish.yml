@@ -25,10 +25,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Jorl17/jar2app
-          path: './jar2app'
       - name: Install JAR to DMG convert script
         run: |
-          cd jar2app/jar2app
+          mv $GITHUB_WORKSPACE/jar2app/ .
+          cd jar2app
           chmod +x install.sh uninstall.sh
           sudo ./install.sh
           cd ..
