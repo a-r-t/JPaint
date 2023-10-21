@@ -25,8 +25,6 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
     private Tool previousPaintSelectedTool;
     private ImageButton zoomIn;
     private ImageButton zoomOut;
-    private JSeparator separator1;
-    private JSeparator separator2;
 
     public ToolStrip(ChoicesHolder choicesHolder) {
         this.choicesHolder = choicesHolder;
@@ -57,13 +55,6 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
 
         zoomIn = new ImageButton("zoom-in-icon.png");
         zoomOut = new ImageButton("zoom-out-icon.png");
-
-        separator1 = new JSeparator(SwingConstants.VERTICAL);
-        separator1.setSize(1, 60);
-        //add(separator1);
-        separator2 = new JSeparator(SwingConstants.VERTICAL);
-        separator2.setSize(1, 60);
-        //add(separator2);
 
         this.addMouseMotionListener(new MouseAdapter() {
 
@@ -254,9 +245,6 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
                 zoomOut.setLocation(new Point(175, getHeight() / 2 - zoomOut.getHeight() / 2));
                 rectangleSelect.setLocation(new Point(100, getHeight() / 2 - eraser.getHeight() / 2));
                 //freeFormSelect.setLocation(new Point(520, getHeight() / 2 - freeFormSelect.getHeight() / 2));
-
-                separator1.setLocation(new Point(130, getHeight() / 2 - separator1.getHeight() / 2 ));
-                separator2.setLocation(new Point(205, getHeight() / 2 - separator2.getHeight() / 2 ));
             }
 
         });

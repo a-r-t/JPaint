@@ -2,6 +2,8 @@ package StatusBar;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -66,11 +68,11 @@ public class StatusBar extends JPanel implements CanvasListener {
                 cursorPositionIcon.setLocation(new Point(10, getHeight() / 2 - cursorPositionIcon.getHeight() / 2));
                 cursorPositionLabel.setLocation(new Point(30, getHeight() / 2 - cursorPositionLabel.getHeight() / 2));
            
-                rectangleSelectDimensionIcon.setLocation(new Point(100, getHeight() / 2 - rectangleSelectDimensionIcon.getHeight() / 2));
-                rectangleSelectDimensionLabel.setLocation(new Point(120, getHeight() / 2 - rectangleSelectDimensionLabel.getHeight() / 2));
+                rectangleSelectDimensionIcon.setLocation(new Point(140, getHeight() / 2 - rectangleSelectDimensionIcon.getHeight() / 2));
+                rectangleSelectDimensionLabel.setLocation(new Point(160, getHeight() / 2 - rectangleSelectDimensionLabel.getHeight() / 2));
 
-                canvasSizeIcon.setLocation(new Point(190, getHeight() / 2 - canvasSizeIcon.getHeight() / 2));
-                canvasSizeLabel.setLocation(new Point(210, getHeight() / 2 - canvasSizeLabel.getHeight() / 2));
+                canvasSizeIcon.setLocation(new Point(270, getHeight() / 2 - canvasSizeIcon.getHeight() / 2));
+                canvasSizeLabel.setLocation(new Point(290, getHeight() / 2 - canvasSizeLabel.getHeight() / 2));
             }
 
         });
@@ -119,5 +121,16 @@ public class StatusBar extends JPanel implements CanvasListener {
     @Override
     public void onSelectedSubImageChanged(BufferedImage subImage) {
         // unused interface method
-    }    
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D brush = (Graphics2D) g;
+
+        // separator lines
+        brush.setColor(new Color(112, 112, 112));
+        brush.drawLine(130, 0, 130, getHeight());
+        brush.drawLine(260, 0, 260, getHeight());
+    }
 }
