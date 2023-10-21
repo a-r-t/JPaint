@@ -34,30 +34,37 @@ public class StatusBar extends JPanel implements CanvasListener {
         this.canvas = canvas;
         this.choicesHolder = choicesHolder;
 
-        cursorPositionLabel = new JLabel("test");
-        cursorPositionLabel.setSize(80, 10);
-        this.add(cursorPositionLabel);
-
-        rectangleSelectDimensionLabel = new JLabel("test2");
-        rectangleSelectDimensionLabel.setSize(50, 10);
-        this.add(rectangleSelectDimensionLabel);
-
-        canvasSizeLabel = new JLabel("test3");
-        canvasSizeLabel.setSize(50, 10);
-        this.add(canvasSizeLabel);
-
         cursorPositionIcon = new JLabel(new ImageIcon(StatusBar.class.getResource("/cursor-position-icon.png")));
         cursorPositionIcon.setSize(16, 16);
         this.add(cursorPositionIcon);
+
+        cursorPositionLabel = new JLabel("");
+        cursorPositionLabel.setSize(80, 10);
+        this.add(cursorPositionLabel);
+
+        rectangleSelectDimensionIcon = new JLabel(new ImageIcon(StatusBar.class.getResource("/selection-size-icon.png")));
+        rectangleSelectDimensionIcon.setSize(16, 16);
+        this.add(rectangleSelectDimensionIcon);
+
+        rectangleSelectDimensionLabel = new JLabel("");
+        rectangleSelectDimensionLabel.setSize(80, 10);
+        this.add(rectangleSelectDimensionLabel);
+
+        canvasSizeLabel = new JLabel("");
+        canvasSizeLabel.setSize(80, 10);
+        this.add(canvasSizeLabel);
+
+
 
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 cursorPositionIcon.setLocation(new Point(10, getHeight() / 2 - cursorPositionIcon.getHeight() / 2));
                 cursorPositionLabel.setLocation(new Point(30, getHeight() / 2 - cursorPositionLabel.getHeight() / 2));
-                
-                rectangleSelectDimensionLabel.setLocation(new Point(100, getHeight() / 2 - rectangleSelectDimensionLabel.getHeight() / 2));
-                
+           
+                rectangleSelectDimensionIcon.setLocation(new Point(100, getHeight() / 2 - rectangleSelectDimensionIcon.getHeight() / 2));
+                rectangleSelectDimensionLabel.setLocation(new Point(120, getHeight() / 2 - rectangleSelectDimensionLabel.getHeight() / 2));
+
                 canvasSizeLabel.setLocation(new Point(200, getHeight() / 2 - canvasSizeLabel.getHeight() / 2));
 
 
@@ -77,13 +84,18 @@ public class StatusBar extends JPanel implements CanvasListener {
     }
 
     @Override
-    public void onCanvasSizeChange(int width, int height) {
-
+    public void onRectangleSelectChange(Rectangle selectedBounds) {
+        if (selectedBounds != null && selectedBounds.x > 0 && selectedBounds.height > 0) {
+            rectangleSelectDimensionLabel.setText(String.format("%s, %spx", selectedBounds.width, selectedBounds.height));
+        }
+        else {
+            rectangleSelectDimensionLabel.setText("");
+        }
     }
 
     @Override
-    public void onRectangleSelectChange(Rectangle selectedBounds) {
-       
+    public void onCanvasSizeChange(int width, int height) {
+
     }
 
     @Override

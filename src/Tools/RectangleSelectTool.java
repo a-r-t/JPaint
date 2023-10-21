@@ -129,6 +129,10 @@ public class RectangleSelectTool extends BaseTool {
             createSelectionBorderOutline(selectBorder, graphics);
             graphics.dispose();
             originalSelectBorder = new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width, selectBorder.height);
+
+            for (CanvasListener listener : canvasListeners) {
+                listener.onRectangleSelectChange(new Rectangle(selectBorder.x, selectBorder.y, selectBorder.width + 1, selectBorder.height + 1));
+            }
         }
         else if (mode == Mode.MOVE) { // moving an existing selection
 
@@ -212,6 +216,10 @@ public class RectangleSelectTool extends BaseTool {
 
         for (CanvasListener listener: canvasListeners) {
             listener.onSelectedSubImageChanged(selectedSubimage);
+        }
+
+        for (CanvasListener listener : canvasListeners) {
+            listener.onRectangleSelectChange(selectBorder);
         }
     }
 
