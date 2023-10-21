@@ -42,7 +42,7 @@ jobs:
           mvn package
           cp target/JPaint-0.0.1-jar-with-dependencies.jar ./JPaint-${{ env.RELEASE_VERSION }}.jar
           git clone https://github.com/Jorl17/jar2app
-          jar2app ./JPaint-${{ env.RELEASE_VERSION }}.jar
+          jar2app ./JPaint-${{ env.RELEASE_VERSION }}.jar -r $JAVA_HOME
           zip -r JPaint-${{ env.RELEASE_VERSION }}.zip JPaint-${{ env.RELEASE_VERSION }}.app 
       - name: Test
         run: cat Release.txt
