@@ -12,7 +12,7 @@ jobs:
     permissions: write-all
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -20,9 +20,10 @@ jobs:
           java-package: jdk
           architecture: x64
       - name: Download JAR to DMG convert script
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
         with:
           name: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
+          path: './'
       - name: Install JAR to DMG convert script
         run: |
           cd jar2app
