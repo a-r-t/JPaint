@@ -55,7 +55,7 @@ public class PencilTool extends BaseTool {
                 color = choicesHolder.getEraseColorAsIntRGB();
                 mode = Mode.ERASE;
             }
-            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInCanvas();
             canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
             canvas.repaint();
         }
@@ -64,10 +64,10 @@ public class PencilTool extends BaseTool {
     @Override
     public void mouseDragged() {
         if (mode != null) {
-            int previousMouseX = mouseInfoHolder.getPreviousMousePositionInImageX();
-            int previousMouseY = mouseInfoHolder.getPreviousMousePositionInImageY();
-            int mousePositionX = mouseInfoHolder.getCurrentMousePositionInImageX();
-            int mousePositionY = mouseInfoHolder.getCurrentMousePositionInImageY();
+            int previousMouseX = mouseInfoHolder.getPreviousMousePositionInCanvasX();
+            int previousMouseY = mouseInfoHolder.getPreviousMousePositionInCanvasY();
+            int mousePositionX = mouseInfoHolder.getCurrentMousePositionInCanvasX();
+            int mousePositionY = mouseInfoHolder.getCurrentMousePositionInCanvasY();
 
             while (!isDrawingCompleted(previousMouseX, previousMouseY, mousePositionX, mousePositionY)) {
                 int xOffset = 0;

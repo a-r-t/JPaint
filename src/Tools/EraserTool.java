@@ -24,7 +24,7 @@ public class EraserTool extends BaseTool {
             canvas.getCanvasHistory().createPerformedState();
 
             int color = choicesHolder.getEraseColorAsIntRGB();
-            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+            Point mousePosition = mouseInfoHolder.getCurrentMousePositionInCanvas();
             canvas.getMainImage().setRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale(), color);
             mode = Mode.ERASE;
             canvas.repaint();

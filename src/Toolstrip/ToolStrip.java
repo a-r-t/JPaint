@@ -3,7 +3,6 @@ package Toolstrip;
 import Models.ChoicesHolder;
 import Models.ChoicesListener;
 import Canvas.*;
-import Utils.GraphicsUtils;
 import Utils.ImageButton;
 import Utils.LabeledColorSwatch;
 import Utils.MouseClick;
@@ -322,6 +321,21 @@ public class ToolStrip extends JPanel implements ChoicesListener, CanvasListener
 
     @Override
     public void onSelectedSubImageChanged(BufferedImage subImage) {
+        // unused interface method
+    }
+
+    @Override
+    public void onCursorMove(Point location) {
+        // unused interface method
+    }
+
+    @Override
+    public void onRectangleSelectChange(Rectangle selectedBounds) {
+        // unused interface method
+    }
+
+    @Override
+    public void onCanvasSizeChange(int width, int height) {
         // unused interface method
     }
 }

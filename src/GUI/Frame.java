@@ -2,6 +2,7 @@ package GUI;
 
 import Canvas.Canvas;
 import Models.ChoicesHolder;
+import StatusBar.StatusBar;
 import Toolstrip.MenuBar;
 import Toolstrip.ToolStrip;
 
@@ -25,6 +26,7 @@ public class Frame implements MenuBarListener {
     private JPanel mainPanel;
     private Canvas canvas;
     private ToolStrip toolstrip;
+    private StatusBar statusBar;
     private ChoicesHolder choicesHolder;
 
     public Frame() {
@@ -47,16 +49,24 @@ public class Frame implements MenuBarListener {
         choicesHolder = new ChoicesHolder();
 
         canvas = new Canvas(choicesHolder);
+
         MenuBar menuBar = new MenuBar(canvas, choicesHolder);
         menuBar.addListener(this);
         canvas.getCanvasHistory().addListener(menuBar);
+
         choicesHolder.addListener(canvas);
+
         toolstrip = new ToolStrip(choicesHolder);
+
         choicesHolder.addListener(toolstrip);
+
         canvas.addListener(toolstrip);
         canvas.addListener(menuBar);
 
         mainPanel.setLayout(new BorderLayout());
+
+        statusBar = new StatusBar(canvas, choicesHolder);
+        canvas.addListener(statusBar);
 
         JScrollPane scrollPane = new JScrollPane(canvas);
         scrollPane.setForeground(new Color(112, 112, 112));
@@ -64,6 +74,7 @@ public class Frame implements MenuBarListener {
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(toolstrip, BorderLayout.NORTH);
+        mainPanel.add(statusBar, BorderLayout.SOUTH);
         frame.setTitle("Untitled - JPaint");
         frame.setContentPane(mainPanel);
 

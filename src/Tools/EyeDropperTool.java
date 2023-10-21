@@ -25,7 +25,7 @@ public class EyeDropperTool extends BaseTool {
 
     @Override
     public void mousePressed() {
-        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInImage();
+        Point mousePosition = mouseInfoHolder.getCurrentMousePositionInCanvas();
         int rgb = canvas.getMainImage().getRGB(mousePosition.x / choicesHolder.getScale(), mousePosition.y / choicesHolder.getScale());
         Color color = ColorUtils.getColorFromInt(rgb);
         if (mouseInfoHolder.isLeftMouseButtonPressed()) {

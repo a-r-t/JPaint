@@ -424,4 +424,19 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
     public void addListener(MenuBarListener listener) {
         listeners.add(listener);
     }
+
+    @Override
+    public void onCursorMove(Point location) {
+        // unused interface method
+    }
+
+    @Override
+    public void onCanvasSizeChange(int width, int height) {
+       // unused interface method
+    }
+
+    @Override
+    public void onRectangleSelectChange(Rectangle selectedBounds) {
+        // unused interface method
+    }
 }
