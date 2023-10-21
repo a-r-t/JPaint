@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          path: './'
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -22,11 +24,11 @@ jobs:
       - name: Download JAR to DMG convert script
         uses: actions/checkout@v3
         with:
-          name: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
-          path: './'
+          repository: Jorl17/jar2app  <-- clone https://github.com/Jorl17/jar2app
+          path: './jar2app'
       - name: Install JAR to DMG convert script
         run: |
-          cd jar2app
+          cd jar2app/jar2app
           chmod +x install.sh uninstall.sh
           sudo ./install.sh
           cd ..
