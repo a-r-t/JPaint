@@ -1,10 +1,9 @@
 package GUI;
 
 import Canvas.Canvas;
+import GUI.MenuBar;
 import Models.ChoicesHolder;
 import StatusBar.StatusBar;
-import Toolstrip.MenuBar;
-import Toolstrip.ToolStrip;
 
 import java.awt.*;
 import java.awt.event.WindowAdapter;

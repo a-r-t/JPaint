@@ -1,10 +1,10 @@
-package Toolstrip;
+package GUI;
 
 import Canvas.Canvas;
 import Canvas.CanvasListener;
 import Canvas.CanvasHistoryListener;
-import GUI.FileChooser;
 import Models.ChoicesHolder;
+import Toolstrip.Tool;
 import Utils.ClipboardUtils;
 
 import javax.imageio.ImageIO;
@@ -206,6 +206,7 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 setCanvasSize(canvas);
             }
         });
+        canvasSize.setIcon(new ImageIcon(MenuBar.class.getResource("/canvas-size-icon.png")));
         edit.add(canvasSize);
     }
 
