@@ -22,7 +22,6 @@ I think technically it may be able to work with as low as Java 9 worst case...bu
 
 You can also clone and run the project yourself.
 It does not use any external libraries.
-I recommend using IntelliJ IDE, as all you need to do is mark the Resources directly as the "resources root" and the project will run from there.
 
 ## Where is progress at?
 
