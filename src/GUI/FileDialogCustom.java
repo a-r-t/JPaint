@@ -9,7 +9,6 @@ public class FileDialogCustom extends FileDialog {
     public FileDialogCustom(FilePickerType filePickerType) {
         super(dummy(), "", convertFilePickerType(filePickerType));
 
-        setFile("*.png;*.jpg;*.jpeg");
         setFilenameFilter(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {

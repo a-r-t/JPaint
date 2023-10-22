@@ -314,6 +314,10 @@ public class MenuBar extends JMenuBar implements CanvasListener, CanvasHistoryLi
                 }
                 fileType = "JPEG";
             }
+            else {
+                filePath = filePath + ".png";
+                fileType = "PNG";
+            }
 
             try {
                 ImageIO.write(canvas.getMainImage().getRaw(), fileType, new File(filePath));
