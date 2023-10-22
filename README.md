@@ -27,11 +27,8 @@ I recommend using IntelliJ IDE, as all you need to do is mark the Resources dire
 ## Where is progress at?
 
 Right now, the project is in progress, and randomly receives a surge of commits here and there whenever I feel motivated enough.
-It is now far enough along that I released a beta.
+It is now far enough along that an official version 1 has been released.
 I have ported over a ton of core Microsoft Paint features, and I even made the thing look like the older version of Paint before Microsoft tried to Zoomer-fy it.
-I developed it on a Windows computer, and it works well on Windows from my testing.
-However, since the goal is for it to be used on MacOS, I have released this beta to let others test it out for me on their Mac computers and let me know of any bugs/oddities before I move into an official version 1 release.
-I have tested on my Mac computer and things seem fine so far after fixing a ton of random bugs I came across -- I'm sure there are more that haven't been found yet that will be discovered once the app gets used more.
 
 The application currently supports the following features from Paint:
 - Pencil Tool
