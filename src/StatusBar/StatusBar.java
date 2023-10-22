@@ -41,7 +41,7 @@ public class StatusBar extends JPanel implements CanvasListener {
         this.add(cursorPositionIcon);
 
         cursorPositionLabel = new JLabel("");
-        cursorPositionLabel.setSize(80, 10);
+        cursorPositionLabel.setSize(80, 20);
         this.add(cursorPositionLabel);
 
         rectangleSelectDimensionIcon = new JLabel(new ImageIcon(StatusBar.class.getResource("/selection-size-icon.png")));
@@ -49,7 +49,7 @@ public class StatusBar extends JPanel implements CanvasListener {
         this.add(rectangleSelectDimensionIcon);
 
         rectangleSelectDimensionLabel = new JLabel("");
-        rectangleSelectDimensionLabel.setSize(80, 10);
+        rectangleSelectDimensionLabel.setSize(80, 20);
         this.add(rectangleSelectDimensionLabel);
 
         canvasSizeIcon = new JLabel(new ImageIcon(StatusBar.class.getResource("/canvas-size-icon.png")));
@@ -57,7 +57,7 @@ public class StatusBar extends JPanel implements CanvasListener {
         this.add(canvasSizeIcon);
 
         canvasSizeLabel = new JLabel("");
-        canvasSizeLabel.setSize(80, 10);
+        canvasSizeLabel.setSize(80, 20);
         this.add(canvasSizeLabel);
 
 
