@@ -4,7 +4,6 @@ import Models.ChoicesHolder;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ColorSelect extends JPanel {
-    private ChoicesHolder choicesHolder;
     private ColorSwatch[] colorOptions;
     private ArrayList<ColorSelectListener> listeners = new ArrayList<>();
     private boolean isCtrlPressed;
@@ -20,7 +18,6 @@ public class ColorSelect extends JPanel {
     private int mouseDownOnSwatchIndex;
 
     public ColorSelect(ChoicesHolder choicesHolder) {
-        this.choicesHolder = choicesHolder;
         setLayout(null);
         setBackground(new Color(245, 246, 247));
         colorOptions = loadDefaultColors();
