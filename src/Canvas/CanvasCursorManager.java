@@ -31,6 +31,7 @@ public class CanvasCursorManager {
         Cursor resizeHCursor = null;
         Cursor resizeVCursor = null;
         Cursor resizeDRCursor = null;
+
         try {
             pencilCursor = toolkit.createCustomCursor(
                     ImageIO.read(CanvasCursorManager.class.getResource("/pencil-cursor-transparent.png")),
@@ -83,6 +84,7 @@ public class CanvasCursorManager {
             System.err.println("Unable to read in custom cursors!");
             System.exit(1);
         }
+        
         cursors.put(CanvasCursor.PENCIL, pencilCursor);
         cursors.put(CanvasCursor.BUCKET, bucketCursor);
         cursors.put(CanvasCursor.EYE_DROPPER, eyedropperCursor);

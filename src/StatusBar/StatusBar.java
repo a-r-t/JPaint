@@ -90,7 +90,7 @@ public class StatusBar extends JPanel implements CanvasListener {
 
     @Override
     public void onRectangleSelectChange(Rectangle selectedBounds) {
-        if (selectedBounds != null && selectedBounds.x > 0 && selectedBounds.height > 0) {
+        if (selectedBounds != null && selectedBounds.x >= 0 && selectedBounds.height >= 0) {
             rectangleSelectDimensionLabel.setText(String.format("%s x %spx", selectedBounds.width, selectedBounds.height));
         }
         else {
